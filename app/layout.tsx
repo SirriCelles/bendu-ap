@@ -1,6 +1,8 @@
 import { Inter, Playfair_Display } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { Toaster } from "@/components/ui/sonner";
+
 import "./globals.css";
 
 const fontBody = Inter({
@@ -18,7 +20,10 @@ const fontHeading = Playfair_Display({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${fontBody.variable} ${fontHeading.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
