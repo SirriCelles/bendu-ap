@@ -1,0 +1,62 @@
+@config "../tailwind.config.js";
+@import "tailwindcss";
+
+:root {
+  --background: 36 29% 95%;
+  --foreground: 216 28% 12%;
+
+  --card: 35 24% 92%;
+  --card-foreground: 216 28% 12%;
+
+  --muted: 34 14% 87%;
+  --muted-foreground: 215 12% 39%;
+
+  --border: 34 13% 79%;
+  --input: 34 13% 79%;
+  --ring: 213 62% 24%;
+
+  --primary: 213 62% 24%;
+  --primary-foreground: 36 33% 96%;
+
+  --secondary: 210 12% 78%;
+  --secondary-foreground: 216 26% 20%;
+
+  --accent: 44 92% 49%;
+  --accent-foreground: 216 28% 12%;
+
+  --destructive: 0 72% 46%;
+  --destructive-foreground: 0 0% 98%;
+
+  --info: 205 37% 78%;
+  --info-foreground: 216 28% 12%;
+
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html,
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  body {
+    font-family: var(--font-body), sans-serif;
+    @apply antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading), serif;
+    letter-spacing: -0.02em;
+    color: hsl(var(--foreground));
+  }
+}

@@ -84,7 +84,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-003 -->
 
-Status: TODO
+Status: IN_PROGRESS
 
 - **Feature Area:** Infra
 - **Context:** UI foundation must reflect approved visual direction.
