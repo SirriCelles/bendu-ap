@@ -46,6 +46,55 @@ export default function DesignPreviewPage() {
           </p>
         </section>
 
+        <div className="mb-6 grid gap-6 md:gap-8 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Color Swatches</CardTitle>
+              <CardDescription>Token-backed palette for quick visual validation.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              <div className="rounded-lg border border-border bg-background p-3 text-xs">
+                Background
+              </div>
+              <div className="rounded-lg border border-border bg-card p-3 text-xs">Card</div>
+              <div className="rounded-lg border border-border bg-muted p-3 text-xs">Muted</div>
+              <div className="rounded-lg border border-border bg-primary p-3 text-xs text-primary-foreground">
+                Primary
+              </div>
+              <div className="rounded-lg border border-border bg-secondary p-3 text-xs text-secondary-foreground">
+                Secondary
+              </div>
+              <div className="rounded-lg border border-border bg-accent p-3 text-xs text-accent-foreground">
+                Accent
+              </div>
+              <div className="rounded-lg border border-border bg-destructive p-3 text-xs text-destructive-foreground">
+                Destructive
+              </div>
+              <div className="rounded-lg border border-border bg-info p-3 text-xs text-info-foreground">
+                Info
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Typography Scale</CardTitle>
+              <CardDescription>Headings and body hierarchy preview.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <h1 className="text-4xl">Heading 1</h1>
+              <h2 className="text-3xl">Heading 2</h2>
+              <h3 className="text-2xl">Heading 3</h3>
+              <p className="text-base text-foreground">
+                Body base text for comfortable reading in booking and account flows.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Secondary copy for hints, labels, and low-emphasis metadata.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid gap-6 md:gap-8 md:grid-cols-2">
           <Card>
             <CardHeader>
@@ -67,6 +116,8 @@ export default function DesignPreviewPage() {
                 <Badge variant="secondary">Secondary</Badge>
                 <Badge variant="outline">Outline</Badge>
                 <Badge variant="destructive">Destructive</Badge>
+                <Badge>Available</Badge>
+                <Badge variant="destructive">Booked</Badge>
               </div>
             </CardContent>
           </Card>
@@ -169,6 +220,24 @@ export default function DesignPreviewPage() {
             </CardFooter>
           </Card>
         </div>
+
+        <Card className="mt-6 md:mt-8">
+          <CardHeader>
+            <CardTitle>Spacing Rhythm</CardTitle>
+            <CardDescription>
+              Quick check for section, container, card, and grid spacing scale.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-lg border border-border bg-muted p-4 md:p-6">
+              <div className="grid gap-6 md:gap-8 md:grid-cols-3">
+                <div className="rounded-md bg-card p-4 text-sm shadow-sm">`p-4` block</div>
+                <div className="rounded-md bg-card p-4 text-sm shadow-sm">`gap-6` / `md:gap-8`</div>
+                <div className="rounded-md bg-card p-4 text-sm shadow-sm">Container rhythm</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

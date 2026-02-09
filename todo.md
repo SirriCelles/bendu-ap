@@ -84,16 +84,16 @@ Status: DONE
 
 <!-- issue: bookeasy:T-003 -->
 
-Status: IN_PROGRESS
+Status: DONE
 
 - **Feature Area:** Infra
 - **Context:** UI foundation must reflect approved visual direction.
 - **Scope Included:** Tailwind setup, color/typography tokens, base UI primitives.
 - **Scope Excluded:** Full page implementations.
 - **Acceptance Criteria:**
-- [ ] Global theme variables reflect approved palette
-- [ ] Base layout uses configured typography and spacing scale
-- [ ] Button, input, card, and badge components are ready
+- [x] Global theme variables reflect approved palette
+- [x] Base layout uses configured typography and spacing scale
+- [x] Button, input, card, and badge components are ready
 - **Implementation Notes:** Update `app/globals.css`, `tailwind.config.*`, `components/ui/*`.
 - **Dependencies:** 001
 - **Estimate:** M
