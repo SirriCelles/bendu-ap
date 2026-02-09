@@ -203,6 +203,21 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** T-001
 - **Estimate:** S
 
+### Task 009B
+
+- **ID:** 009B
+- **Feature Area:** Chore
+- **Title:** Fix todo-sync issue creation parsing
+- **Context:** GitHub Actions workflow runs, but issues are not created from `todo.md` checkboxes.
+- **Scope Included:** Update checkbox parsing logic in sync script and verify matching against current markdown format.
+- **Scope Excluded:** Workflow redesign or CI policy changes.
+- **Acceptance Criteria:**
+- [x] Workflow parser matches standard markdown checkboxes (`[ ]` / `[x]`)
+- [x] Sync script detects unchecked tasks from `todo.md`
+- **Implementation Notes:** Update regex in `scripts/todo-sync.mjs` and validate with local parser checks.
+- **Dependencies:** None
+- **Estimate:** XS
+
 ## Milestone 1 — Core Data Model & Inventory
 
 ### Task 010

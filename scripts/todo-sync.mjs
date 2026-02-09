@@ -106,7 +106,7 @@ function parseTodo(content, filePath) {
       continue;
     }
 
-    const taskMatch = /^\s*-\s+\[\s([xX ])\s\]\s+(.*)$/.exec(line);
+    const taskMatch = /^\s*-\s+\[([ xX])\]\s+(.*)$/.exec(line);
     if (!taskMatch) continue;
 
     const checked = taskMatch[1].toLowerCase() === "x";
