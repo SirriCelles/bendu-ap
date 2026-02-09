@@ -1,6 +1,7 @@
 # BookEasy Implementation Todo
 
 ## Project Summary
+
 BookEasy is a single-property guest-house booking platform for Buea, Cameroon, built with Next.js App Router and PostgreSQL.
 MVP focuses on browsing rooms, checking availability, reserving with Pay on Arrival, and guest-admin communication.
 Double-booking prevention is enforced primarily at database level with transactional booking flows and idempotency.
@@ -10,6 +11,7 @@ Offline behavior is limited to previously fetched booking details and graceful f
 Security and operations include RBAC, validation, audit logs, rate limiting, and observability.
 
 ## Definition of Done
+
 - [ ] MVP milestones 0–6 complete with passing CI (typecheck, unit, e2e)
 - [ ] Zero overlapping bookings possible for the same unit in production DB
 - [ ] Booking service depends on payment interface, not provider-specific logic
@@ -20,6 +22,7 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - [ ] MVP excludes online payments, marketplace, reviews/ratings, and FX conversion
 
 ## Explicit Assumptions
+
 - Assumption: MVP uses exactly one `Property` record, but schema remains extensible for future multi-property support.
 - Assumption: Testimonials on the landing page are static marketing content, not user-submitted reviews.
 - Assumption: Availability is enforced at `Unit` (physical room) level and surfaced by `UnitType` in listings.
@@ -27,20 +30,22 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - Assumption: Offline mode is read-only for booking details; create/cancel requires internet in MVP.
 
 ## Top 5 Risks + Mitigations
+
 1. **Risk:** Concurrent booking requests create race conditions.
-Mitigation: PostgreSQL exclusion constraint + transactional booking flow + idempotency + concurrency tests.
+   Mitigation: PostgreSQL exclusion constraint + transactional booking flow + idempotency + concurrency tests.
 2. **Risk:** Payment concerns leak into booking logic and hinder future providers.
-Mitigation: Define `PaymentService` interface and provider adapters from MVP start, with Pay-on-Arrival as default provider.
+   Mitigation: Define `PaymentService` interface and provider adapters from MVP start, with Pay-on-Arrival as default provider.
 3. **Risk:** Admin mutations are not traceable.
-Mitigation: Centralized audit logging for every admin write path, enforced in service/API layer and tested.
+   Mitigation: Centralized audit logging for every admin write path, enforced in service/API layer and tested.
 4. **Risk:** SEO/performance regressions from client-heavy rendering.
-Mitigation: Server Components for public pages, metadata/sitemap coverage, image optimization, and performance checks.
+   Mitigation: Server Components for public pages, metadata/sitemap coverage, image optimization, and performance checks.
 5. **Risk:** Offline caching produces stale or inconsistent behavior.
-Mitigation: Cache only booking-detail routes/assets with explicit invalidation and deterministic fallback UI.
+   Mitigation: Cache only booking-detail routes/assets with explicit invalidation and deterministic fallback UI.
 
 ## Milestone 0 — Repo & Tooling Foundation
 
 ### Task 001
+
 - **ID:** 001
 - **Feature Area:** Infra
 - **Title:** Initialize project baseline and enforce strict TypeScript
@@ -56,6 +61,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 002
+
 - **ID:** 002
 - **Feature Area:** Infra
 - **Title:** Configure Prisma, Neon connection, and migration workflow
@@ -71,6 +77,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 003
+
 - **ID:** 003
 - **Feature Area:** Infra
 - **Title:** Install and configure shadcn/ui + Tailwind design tokens
@@ -86,6 +93,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 004
+
 - **ID:** 004
 - **Feature Area:** Security
 - **Title:** Configure Auth.js with ADMIN/GUEST roles and route protection skeleton
@@ -101,6 +109,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 005
+
 - **ID:** 005
 - **Feature Area:** Infra
 - **Title:** Add request validation framework with Zod wrappers
@@ -116,6 +125,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 006
+
 - **ID:** 006
 - **Feature Area:** Observability
 - **Title:** Implement structured logging and request correlation IDs
@@ -131,6 +141,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 007
+
 - **ID:** 007
 - **Feature Area:** Observability
 - **Title:** Integrate Sentry for errors and performance tracing
@@ -146,6 +157,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 008
+
 - **ID:** 008
 - **Feature Area:** Security
 - **Title:** Add Upstash Redis rate limiter utility for public APIs
@@ -161,6 +173,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 009
+
 - **ID:** 009
 - **Feature Area:** QA
 - **Title:** Set up Vitest, RTL, Playwright, and baseline CI workflow
@@ -175,9 +188,25 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Dependencies:** 001
 - **Estimate:** M
 
+### Task 009A
+
+- **ID:** 009A
+- **Feature Area:** DX
+- **Title:** Repo hygiene: Prettier + lint-staged
+- **Context:** Prevent messy PRs and enforce baseline quality.
+- **Scope Included:** Formatting + pre-commit hooks.
+- **Scope Excluded:** CI integration.
+- **Acceptance Criteria:**
+- [x] `prettier` runs
+- [x] `lint-staged` runs on staged files
+- **Implementation Notes:** Configure `lint-staged` to run `eslint --fix` + `prettier` on staged files.
+- **Dependencies:** T-001
+- **Estimate:** S
+
 ## Milestone 1 — Core Data Model & Inventory
 
 ### Task 010
+
 - **ID:** 010
 - **Feature Area:** Data
 - **Title:** Model core entities in Prisma schema
@@ -193,6 +222,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 011
+
 - **ID:** 011
 - **Feature Area:** Booking
 - **Title:** Add PostgreSQL exclusion constraint for non-overlapping bookings per unit
@@ -208,6 +238,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 012
+
 - **ID:** 012
 - **Feature Area:** Booking
 - **Title:** Implement booking/payment status enums and transition guards
@@ -223,6 +254,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 013
+
 - **ID:** 013
 - **Feature Area:** Pricing
 - **Title:** Implement PriceSnapshot creation at booking time
@@ -238,6 +270,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 014
+
 - **ID:** 014
 - **Feature Area:** Inventory
 - **Title:** Build availability query helpers and inventory repository
@@ -253,6 +286,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 015
+
 - **ID:** 015
 - **Feature Area:** Data
 - **Title:** Seed single-property inventory and baseline units
@@ -268,6 +302,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 016
+
 - **ID:** 016
 - **Feature Area:** QA
 - **Title:** Add concurrency tests for double-booking protection
@@ -285,6 +320,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 ## Milestone 2 — Listings & SEO Pages
 
 ### Task 017
+
 - **ID:** 017
 - **Feature Area:** Listings
 - **Title:** Implement public layout, header, footer, and responsive navigation
@@ -300,6 +336,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 018
+
 - **ID:** 018
 - **Feature Area:** Listings
 - **Title:** Build landing page sections (hero, amenities, categories, featured rooms)
@@ -315,6 +352,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 019
+
 - **ID:** 019
 - **Feature Area:** Listings
 - **Title:** Create rooms listing page with availability filters
@@ -330,6 +368,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 020
+
 - **ID:** 020
 - **Feature Area:** Listings
 - **Title:** Build room details page with gallery, amenities, and reserve CTA
@@ -345,6 +384,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 021
+
 - **ID:** 021
 - **Feature Area:** SEO
 - **Title:** Add metadata, Open Graph tags, sitemap, and robots
@@ -360,6 +400,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 022
+
 - **ID:** 022
 - **Feature Area:** Performance
 - **Title:** Optimize image handling and performance budgets for listing pages
@@ -375,6 +416,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 023
+
 - **ID:** 023
 - **Feature Area:** QA
 - **Title:** Add e2e tests for listing discovery and room-detail navigation
@@ -392,6 +434,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 ## Milestone 3 — Booking Engine (Pay on Arrival)
 
 ### Task 024
+
 - **ID:** 024
 - **Feature Area:** Booking
 - **Title:** Define booking API schemas with Zod
@@ -407,6 +450,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 025
+
 - **ID:** 025
 - **Feature Area:** Payments
 - **Title:** Implement payment provider interface and Pay-on-Arrival adapter
@@ -422,6 +466,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 026
+
 - **ID:** 026
 - **Feature Area:** Booking
 - **Title:** Implement transactional BookingService reserve flow
@@ -437,6 +482,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 027
+
 - **ID:** 027
 - **Feature Area:** Booking
 - **Title:** Implement `POST /bookings` endpoint with rate limiting
@@ -452,6 +498,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 028
+
 - **ID:** 028
 - **Feature Area:** Booking
 - **Title:** Build checkout/reservation UI for Pay on Arrival
@@ -467,6 +514,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 029
+
 - **ID:** 029
 - **Feature Area:** Booking
 - **Title:** Implement guest booking APIs (`/bookings/me`, `/bookings/:id`, cancel)
@@ -482,6 +530,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 030
+
 - **ID:** 030
 - **Feature Area:** QA
 - **Title:** Add unit tests for BookingService and payment abstraction boundaries
@@ -497,6 +546,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 031
+
 - **ID:** 031
 - **Feature Area:** QA
 - **Title:** Add e2e tests for reserve-now and cancellation flow
@@ -514,6 +564,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 ## Milestone 4 — Admin Portal
 
 ### Task 032
+
 - **ID:** 032
 - **Feature Area:** Admin
 - **Title:** Build admin shell, navigation, and RBAC route guards
@@ -529,6 +580,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 033
+
 - **ID:** 033
 - **Feature Area:** Admin
 - **Title:** Implement admin bookings list and lifecycle update workflow
@@ -544,6 +596,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 034
+
 - **ID:** 034
 - **Feature Area:** Admin
 - **Title:** Implement units CRUD for inventory operations
@@ -559,6 +612,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 035
+
 - **ID:** 035
 - **Feature Area:** Security
 - **Title:** Implement centralized audit logging service for admin actions
@@ -574,6 +628,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 036
+
 - **ID:** 036
 - **Feature Area:** Admin
 - **Title:** Add admin audit log viewer page
@@ -589,6 +644,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 037
+
 - **ID:** 037
 - **Feature Area:** QA
 - **Title:** Add admin RBAC and audit e2e coverage
@@ -606,6 +662,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 ## Milestone 5 — Messaging & Emails
 
 ### Task 038
+
 - **ID:** 038
 - **Feature Area:** Messaging
 - **Title:** Implement messaging domain service and persistence wiring
@@ -621,6 +678,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 039
+
 - **ID:** 039
 - **Feature Area:** Messaging
 - **Title:** Expose guest/admin messaging APIs with validation and rate limiting
@@ -636,6 +694,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 040
+
 - **ID:** 040
 - **Feature Area:** Messaging
 - **Title:** Build guest and admin messaging UI views
@@ -651,6 +710,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 041
+
 - **ID:** 041
 - **Feature Area:** Notifications
 - **Title:** Implement transactional email templates and Resend integration
@@ -666,6 +726,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 042
+
 - **ID:** 042
 - **Feature Area:** QA
 - **Title:** Add integration tests for messaging permissions and email triggers
@@ -683,6 +744,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 ## Milestone 6 — PWA & Offline Support
 
 ### Task 043
+
 - **ID:** 043
 - **Feature Area:** PWA
 - **Title:** Configure web app manifest and installability baseline
@@ -698,6 +760,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 044
+
 - **ID:** 044
 - **Feature Area:** PWA
 - **Title:** Implement service-worker caching for offline booking-detail access
@@ -713,6 +776,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ### Task 045
+
 - **ID:** 045
 - **Feature Area:** PWA
 - **Title:** Add global offline indicator and degraded UX states
@@ -728,6 +792,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 046
+
 - **ID:** 046
 - **Feature Area:** QA
 - **Title:** Add e2e tests for installability and offline booking-detail access
@@ -745,6 +810,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 ## Milestone 7 — Future-Ready Stubs (Payments, Multi-Currency)
 
 ### Task 047
+
 - **ID:** 047
 - **Feature Area:** Payments
 - **Title:** Add Stripe and Mobile Money provider stubs behind payment interface
@@ -760,6 +826,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 048
+
 - **ID:** 048
 - **Feature Area:** Payments
 - **Title:** Create webhook endpoint skeletons for Stripe and Mobile Money
@@ -775,6 +842,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 049
+
 - **ID:** 049
 - **Feature Area:** Currency
 - **Title:** Harden currency invariants without enabling FX conversion
@@ -790,6 +858,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** S
 
 ### Task 050
+
 - **ID:** 050
 - **Feature Area:** QA
 - **Title:** Add contract tests for provider interchangeability and currency invariants
@@ -805,6 +874,7 @@ Mitigation: Cache only booking-detail routes/assets with explicit invalidation a
 - **Estimate:** M
 
 ## Immediate Next Actions (Start Milestone 0)
+
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.
 2. Implement Task 005 and Task 008 next so validation and rate limiting are in place before public write endpoints.
 3. Complete Task 009 immediately afterward to gate all subsequent milestones with CI, unit tests, and e2e smoke coverage.

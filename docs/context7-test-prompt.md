@@ -13,6 +13,7 @@ Task:
 ```
 
 Pass criteria:
+
 - The response includes the exact sentinel line.
 - The response includes an official Next.js docs source link.
 - The response content matches current docs conventions.

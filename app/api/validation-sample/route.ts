@@ -18,8 +18,6 @@ export async function POST(request: Request) {
       return toErrorResponse(error);
     }
 
-    return toErrorResponse(
-      new HttpError(500, "INTERNAL_SERVER_ERROR", "Unexpected server error.")
-    );
+    return toErrorResponse(new HttpError(500, "INTERNAL_SERVER_ERROR", "Unexpected server error."));
   }
 }

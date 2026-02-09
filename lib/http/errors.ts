@@ -38,12 +38,7 @@ export class HttpError extends Error {
 
 export function validationErrorFromZod(error: z.ZodError): HttpError {
   const { fieldErrors } = z.flattenError(error);
-  return new HttpError(
-    400,
-    "VALIDATION_ERROR",
-    "Validation failed for request data.",
-    fieldErrors
-  );
+  return new HttpError(400, "VALIDATION_ERROR", "Validation failed for request data.", fieldErrors);
 }
 
 export function toErrorResponse(error: HttpError): Response {

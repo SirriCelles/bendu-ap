@@ -1,7 +1,9 @@
 # BookEasy — Design Document
 
 ## Design Basis
+
 This design specification is based on the following provided screens:
+
 - Landing Page
 - Apartments / Rooms Listing Page
 - Apartment Details Page
@@ -12,6 +14,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ---
 
 ## Design Principles
+
 - Luxury hospitality look and feel
 - Calm, neutral color palette
 - Strong imagery
@@ -21,12 +24,15 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ---
 
 ## Global UI Elements
+
 ### Navigation
+
 - Logo (left)
 - Menu links
 - Primary CTA: Book / Reserve
 
 ### Footer
+
 - Contact information
 - Social links
 - Brand description
@@ -34,6 +40,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ---
 
 ## Color System
+
 - Primary: Deep Navy Blue
 - Background: Warm Ivory / Cream
 - Surface: Light Beige
@@ -43,6 +50,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ---
 
 ## Typography
+
 - Headings: Elegant serif or refined sans-serif
 - Body: Clean sans-serif
 - Pricing: Large, bold emphasis
@@ -52,6 +60,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ## Page Specifications
 
 ### Home / Landing Page
+
 - Hero image with headline
 - Amenities icons
 - Room categories
@@ -59,12 +68,14 @@ These designs define the visual hierarchy, layout, and interaction flow.
 - Testimonials
 
 ### Rooms Listing Page
+
 - Grid layout
 - Room cards with image, rating, price
 - Availability badges
 - Book Now CTA
 
 ### Room Details Page
+
 - Image gallery
 - Amenities list
 - Price per night
@@ -72,6 +83,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 - Reserve CTA
 
 ### Checkout Page
+
 - Guest details form
 - Payment method selection (pay on arrival for MVP)
 - Confirmation action
@@ -79,6 +91,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ---
 
 ## UX States
+
 - Loading skeletons
 - Empty availability states
 - Error messaging
@@ -87,6 +100,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 ---
 
 ## PWA Considerations
+
 - Installable app
 - Offline access to booking details
 - Graceful offline fallbacks

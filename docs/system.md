@@ -1,6 +1,7 @@
 # BookEasy — System Architecture Blueprint
 
 ## Overview
+
 BookEasy is a full-stack booking platform for a **single guest house** located in **Buea, Cameroon**, supporting **apartments, studios, and single rooms**.
 
 The MVP uses a **Reserve Now / Pay on Arrival** model with **XAF (FCFA)**.  
@@ -9,6 +10,7 @@ The architecture is explicitly designed to support future **online payments (EUR
 ---
 
 ## Architecture Goals
+
 - Prevent double-booking under all conditions
 - Be SEO-ready from day one
 - Separate booking logic from payment logic
@@ -64,6 +66,7 @@ Images       Rate Limit   Emails
 ## Technology Stack (Option A – Approved)
 
 ### Core
+
 - Next.js (App Router)
 - TypeScript (strict)
 - PostgreSQL (Neon)
@@ -71,6 +74,7 @@ Images       Rate Limit   Emails
 - shadcn/ui + Tailwind CSS
 
 ### Infrastructure
+
 - Vercel (deployment)
 - Cloudinary (images + CDN)
 - Resend (transactional email)
@@ -78,6 +82,7 @@ Images       Rate Limit   Emails
 - Sentry (observability)
 
 ### Authentication & Security
+
 - Auth.js (NextAuth)
 - Role-based access control (ADMIN / GUEST)
 - Zod validation
@@ -87,6 +92,7 @@ Images       Rate Limit   Emails
 ## Core Domain Model
 
 ### Entities
+
 - Property (single row for MVP)
 - UnitType (Apartment | Studio | Single Room)
 - Unit (physical rooms)
@@ -103,6 +109,7 @@ Images       Rate Limit   Emails
 ## Booking & Payment Model
 
 ### Booking Lifecycle
+
 ```
 DRAFT
 → RESERVED
@@ -113,6 +120,7 @@ DRAFT
 ```
 
 ### Payment Lifecycle
+
 ```
 NOT_REQUIRED (MVP)
 PENDING
@@ -122,15 +130,18 @@ REFUNDED
 ```
 
 ### MVP Rule
+
 - Bookings may be CONFIRMED without payment
 - Payment status is NOT_REQUIRED
 
 ### Future Rule
+
 - Booking confirmation requires successful payment
 
 ---
 
 ## Currency Strategy
+
 - Supported currencies:
   - XAF (FCFA) — MVP
   - EUR / USD — future
@@ -144,9 +155,11 @@ REFUNDED
 ## Double-Booking Prevention
 
 ### Strategy
+
 - PostgreSQL exclusion constraints on date ranges per unit
 
 ### Outcome
+
 - Zero overlapping bookings
 - No race conditions
 - No app-level locking required
@@ -156,6 +169,7 @@ REFUNDED
 ## API Surface
 
 ### Guest
+
 - GET /rooms
 - GET /rooms/:id
 - POST /bookings
@@ -165,12 +179,14 @@ REFUNDED
 - POST /messages
 
 ### Admin
+
 - GET /admin/bookings
 - PATCH /admin/bookings/:id
 - CRUD /admin/units
 - GET /admin/messages
 
 ### Webhooks (future)
+
 - POST /api/webhooks/stripe
 - POST /api/webhooks/momo
 
@@ -218,6 +234,7 @@ REFUNDED
 ---
 
 ## PWA & Offline Support
+
 - Installable PWA
 - Offline access to booking details and confirmations
 - Offline indicator and graceful fallbacks
@@ -225,6 +242,7 @@ REFUNDED
 ---
 
 ## Observability & Operations
+
 - Sentry for error tracking and performance
 - Structured logs with requestId and bookingId
 - Audit logs for admin actions
@@ -234,6 +252,7 @@ REFUNDED
 ## Roadmap
 
 ### MVP
+
 - Listings & SEO pages
 - Booking engine (pay on arrival)
 - Admin dashboard
@@ -242,6 +261,7 @@ REFUNDED
 - PWA
 
 ### Phase 2
+
 - Stripe payments (EUR/USD)
 - MTN & Orange Mobile Money
 - Currency selector
@@ -251,6 +271,7 @@ REFUNDED
 ---
 
 ## Status
+
 - Product: Defined
 - Design: Approved
 - Tech Stack: Locked
@@ -260,6 +281,7 @@ REFUNDED
 ---
 
 ## Next Steps
+
 1. Generate Prisma schema
 2. Create GitHub issues for Sprint 1
 3. Initialize repository with this system.md

@@ -1,11 +1,13 @@
 # BookEasy — Technology Stack (Option A)
 
 ## Overview
+
 This document defines the approved, production-ready technology stack for BookEasy using **free-tier tools** and **Next.js full-stack architecture**.
 
 ---
 
 ## Core Stack
+
 - Next.js (App Router)
 - TypeScript (strict)
 - shadcn/ui + Tailwind CSS
@@ -15,6 +17,7 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## Backend & APIs
+
 - Next.js Route Handlers
 - Server Actions
 - Zod for validation
@@ -22,22 +25,27 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## Authentication
+
 - Auth.js (NextAuth)
 - Role-based access control
 
 ---
 
 ## Payments
+
 ### MVP
+
 - Reserve Now / Pay on Arrival
 
 ### Future
+
 - Stripe (EUR/USD)
 - MTN & Orange Mobile Money (via aggregator)
 
 ---
 
 ## Currency Handling
+
 - XAF default
 - EUR / USD future
 - Integer-based amount storage
@@ -46,6 +54,7 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## Media & Email
+
 - Cloudinary (images)
 - Resend (transactional emails)
 - React Email templates
@@ -53,6 +62,7 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## Observability & Security
+
 - Sentry (errors + performance)
 - Upstash Redis (rate limiting)
 - Audit logs for admin actions
@@ -60,6 +70,7 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## Testing
+
 - Vitest (unit)
 - React Testing Library
 - Playwright (e2e)
@@ -67,6 +78,7 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## CI/CD & Deployment
+
 - GitHub Actions
 - Vercel deployment
 - Environment-based configuration
@@ -74,4 +86,5 @@ This document defines the approved, production-ready technology stack for BookEa
 ---
 
 ## Status
+
 This stack is approved for MVP and future scale.
