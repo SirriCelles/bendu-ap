@@ -193,7 +193,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-009 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** QA
 - **Context:** Critical flows require early automated quality gates.
