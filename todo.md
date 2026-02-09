@@ -48,7 +48,7 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 <!-- issue: bookeasy:T-001 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Infra
 - **Context:** Establish a reliable baseline aligned with locked stack decisions.
@@ -66,7 +66,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-002 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Infra
 - **Context:** Stable migration workflow is required before domain modeling.
@@ -120,7 +120,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-005 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Infra
 - **Context:** Validation consistency reduces runtime and security risk.
