@@ -1,5 +1,5 @@
 {
-  "name": "bendu-app",
+  "name": "bookeasy",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,8 @@
     "test": "echo \"No tests configured\"",
     "prisma": "prisma",
     "migrate:dev": "prisma migrate dev",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "todo:sync": "node scripts/todo-sync.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

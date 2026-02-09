@@ -1,9 +1,9 @@
-name: Todo Sync
+name: Sync todo.md to GitHub Issues
 
 on:
   push:
-    branches:
-      - "**"
+    paths:
+      - "todo.md"
 
 permissions:
   contents: read
@@ -19,9 +19,15 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 24
 
-      - name: Sync todo.md to issues
+      - name: Install deps
+        run: npm ci
+
+      - name: Sync issues from todo.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TODO_PATH: todo.md
+          # If your todo is in /docs instead, set:
+          # TODO_PATH: docs/todo.md
         run: node scripts/todo-sync.mjs
