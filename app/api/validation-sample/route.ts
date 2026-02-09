@@ -1,18 +1,47 @@
 import { HttpError, toErrorResponse } from "@/http/errors";
+import {
+  createRateLimitError,
+  getRequestIdentifier,
+  limitRequest,
+  rateLimitHeaders,
+} from "@/security/rate-limit";
 import { parseJsonBody } from "@/validation/parser";
 import { sampleReservationSchema } from "@/validation/sample-reservation";
 
 export async function POST(request: Request) {
   try {
+    const rateLimitResult = await limitRequest("sample_write", getRequestIdentifier(request));
+    if (!rateLimitResult.success) {
+      const errorResponse = toErrorResponse(createRateLimitError(rateLimitResult));
+      const headers = new Headers(errorResponse.headers);
+      const limitHeaders = rateLimitHeaders(rateLimitResult);
+      for (const [key, value] of Object.entries(limitHeaders)) {
+        headers.set(key, value);
+      }
+      return new Response(errorResponse.body, {
+        status: errorResponse.status,
+        headers,
+      });
+    }
+
     const payload = await parseJsonBody(request, sampleReservationSchema);
 
-    return Response.json(
+    const successResponse = Response.json(
       {
         ok: true,
         data: payload,
       },
       { status: 201 }
     );
+    const headers = new Headers(successResponse.headers);
+    const limitHeaders = rateLimitHeaders(rateLimitResult);
+    for (const [key, value] of Object.entries(limitHeaders)) {
+      headers.set(key, value);
+    }
+    return new Response(successResponse.body, {
+      status: successResponse.status,
+      headers,
+    });
   } catch (error) {
     if (error instanceof HttpError) {
       return toErrorResponse(error);

@@ -174,7 +174,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-008 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Security
 - **Context:** Public write endpoints require abuse protection.
