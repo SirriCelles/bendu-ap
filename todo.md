@@ -44,11 +44,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 0 — Repo & Tooling Foundation
 
-### Task 001
+## T-001 — Initialize project baseline and enforce strict TypeScript
 
-- **ID:** 001
+<!-- issue: bookeasy:T-001 -->
+
+Status: TODO
+
 - **Feature Area:** Infra
-- **Title:** Initialize project baseline and enforce strict TypeScript
 - **Context:** Establish a reliable baseline aligned with locked stack decisions.
 - **Scope Included:** Validate Next.js App Router baseline, strict TypeScript, path aliases, core scripts.
 - **Scope Excluded:** Feature implementation.
@@ -60,11 +62,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** None
 - **Estimate:** S
 
-### Task 002
+## T-002 — Configure Prisma, Neon connection, and migration workflow
 
-- **ID:** 002
+<!-- issue: bookeasy:T-002 -->
+
+Status: TODO
+
 - **Feature Area:** Infra
-- **Title:** Configure Prisma, Neon connection, and migration workflow
 - **Context:** Stable migration workflow is required before domain modeling.
 - **Scope Included:** Prisma setup, environment schema, migration scripts.
 - **Scope Excluded:** Final domain table definitions.
@@ -76,11 +80,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** S
 
-### Task 003
+## T-003 — Install and configure shadcn/ui + Tailwind design tokens
 
-- **ID:** 003
+<!-- issue: bookeasy:T-003 -->
+
+Status: TODO
+
 - **Feature Area:** Infra
-- **Title:** Install and configure shadcn/ui + Tailwind design tokens
 - **Context:** UI foundation must reflect approved visual direction.
 - **Scope Included:** Tailwind setup, color/typography tokens, base UI primitives.
 - **Scope Excluded:** Full page implementations.
@@ -92,11 +98,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** M
 
-### Task 004
+## T-004 — Configure Auth.js with ADMIN/GUEST roles and route protection skeleton
 
-- **ID:** 004
+<!-- issue: bookeasy:T-004 -->
+
+Status: TODO
+
 - **Feature Area:** Security
-- **Title:** Configure Auth.js with ADMIN/GUEST roles and route protection skeleton
 - **Context:** RBAC is required for admin security.
 - **Scope Included:** Auth setup, role typing, middleware guards for admin routes.
 - **Scope Excluded:** Admin feature pages.
@@ -108,11 +116,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** M
 
-### Task 005
+## T-005 — Add request validation framework with Zod wrappers
 
-- **ID:** 005
+<!-- issue: bookeasy:T-005 -->
+
+Status: TODO
+
 - **Feature Area:** Infra
-- **Title:** Add request validation framework with Zod wrappers
 - **Context:** Validation consistency reduces runtime and security risk.
 - **Scope Included:** Shared schema parsing helpers for route handlers and server actions.
 - **Scope Excluded:** Endpoint-specific schema content.
@@ -124,11 +134,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** S
 
-### Task 006
+## T-006 — Implement structured logging and request correlation IDs
 
-- **ID:** 006
+<!-- issue: bookeasy:T-006 -->
+
+Status: TODO
+
 - **Feature Area:** Observability
-- **Title:** Implement structured logging and request correlation IDs
 - **Context:** Booking and support workflows need request traceability.
 - **Scope Included:** Logger utility, requestId propagation, bookingId tagging.
 - **Scope Excluded:** External log dashboards.
@@ -140,11 +152,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** S
 
-### Task 007
+## T-007 — Integrate Sentry for errors and performance tracing
 
-- **ID:** 007
+<!-- issue: bookeasy:T-007 -->
+
+Status: TODO
+
 - **Feature Area:** Observability
-- **Title:** Integrate Sentry for errors and performance tracing
 - **Context:** Error/performance monitoring is a non-functional requirement.
 - **Scope Included:** Server/client Sentry setup, environment tags, release metadata.
 - **Scope Excluded:** Custom alert routing.
@@ -156,11 +170,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 006
 - **Estimate:** M
 
-### Task 008
+## T-008 — Add Upstash Redis rate limiter utility for public APIs
 
-- **ID:** 008
+<!-- issue: bookeasy:T-008 -->
+
+Status: TODO
+
 - **Feature Area:** Security
-- **Title:** Add Upstash Redis rate limiter utility for public APIs
 - **Context:** Public write endpoints require abuse protection.
 - **Scope Included:** Generic limiter by IP+route key, local fallback behavior.
 - **Scope Excluded:** Final tuning of all limits.
@@ -172,11 +188,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** S
 
-### Task 009
+## T-009 — Set up Vitest, RTL, Playwright, and baseline CI workflow
 
-- **ID:** 009
+<!-- issue: bookeasy:T-009 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Set up Vitest, RTL, Playwright, and baseline CI workflow
 - **Context:** Critical flows require early automated quality gates.
 - **Scope Included:** Test runners, smoke tests, GitHub Actions pipeline.
 - **Scope Excluded:** Complete scenario coverage.
@@ -188,11 +206,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 001
 - **Estimate:** M
 
-### Task 009A
+## T-009A — Repo hygiene: Prettier + lint-staged
 
-- **ID:** 009A
+<!-- issue: bookeasy:T-009A -->
+
+Status: DONE
+
 - **Feature Area:** DX
-- **Title:** Repo hygiene: Prettier + lint-staged
 - **Context:** Prevent messy PRs and enforce baseline quality.
 - **Scope Included:** Formatting + pre-commit hooks.
 - **Scope Excluded:** CI integration.
@@ -203,11 +223,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** T-001
 - **Estimate:** S
 
-### Task 009B
+## T-009B — Fix todo-sync issue creation parsing
 
-- **ID:** 009B
+<!-- issue: bookeasy:T-009B -->
+
+Status: DONE
+
 - **Feature Area:** Chore
-- **Title:** Fix todo-sync issue creation parsing
 - **Context:** GitHub Actions workflow runs, but issues are not created from `todo.md` checkboxes.
 - **Scope Included:** Update checkbox parsing logic in sync script and verify matching against current markdown format.
 - **Scope Excluded:** Workflow redesign or CI policy changes.
@@ -220,11 +242,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 1 — Core Data Model & Inventory
 
-### Task 010
+## T-010 — Model core entities in Prisma schema
 
-- **ID:** 010
+<!-- issue: bookeasy:T-010 -->
+
+Status: TODO
+
 - **Feature Area:** Data
-- **Title:** Model core entities in Prisma schema
 - **Context:** Domain model must be explicit before feature work.
 - **Scope Included:** `Property`, `UnitType`, `Unit`, `Booking`, `PriceSnapshot`, `PaymentIntent`, `PaymentTransaction`, `MessageThread`, `Message`, `AuditLog`.
 - **Scope Excluded:** Non-MVP entities.
@@ -236,11 +260,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 002
 - **Estimate:** M
 
-### Task 011
+## T-011 — Add PostgreSQL exclusion constraint for non-overlapping bookings per unit
 
-- **ID:** 011
+<!-- issue: bookeasy:T-011 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Add PostgreSQL exclusion constraint for non-overlapping bookings per unit
 - **Context:** Robust double-booking prevention must be DB-enforced.
 - **Scope Included:** Range-based exclusion constraint migration with status awareness.
 - **Scope Excluded:** App-level locking mechanisms.
@@ -252,11 +278,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010
 - **Estimate:** M
 
-### Task 012
+## T-012 — Implement booking/payment status enums and transition guards
 
-- **ID:** 012
+<!-- issue: bookeasy:T-012 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Implement booking/payment status enums and transition guards
 - **Context:** Lifecycle control prevents invalid state changes.
 - **Scope Included:** Transition map and reusable guard helpers.
 - **Scope Excluded:** API/UI wiring.
@@ -268,11 +296,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010
 - **Estimate:** S
 
-### Task 013
+## T-013 — Implement PriceSnapshot creation at booking time
 
-- **ID:** 013
+<!-- issue: bookeasy:T-013 -->
+
+Status: TODO
+
 - **Feature Area:** Pricing
-- **Title:** Implement PriceSnapshot creation at booking time
 - **Context:** Price history must be immutable per booking.
 - **Scope Included:** Snapshot generation from current room pricing with stored currency.
 - **Scope Excluded:** Dynamic pricing engine.
@@ -284,11 +314,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010
 - **Estimate:** S
 
-### Task 014
+## T-014 — Build availability query helpers and inventory repository
 
-- **ID:** 014
+<!-- issue: bookeasy:T-014 -->
+
+Status: TODO
+
 - **Feature Area:** Inventory
-- **Title:** Build availability query helpers and inventory repository
 - **Context:** Listings and booking flows depend on consistent availability logic.
 - **Scope Included:** Date-range availability queries by unit and unit type.
 - **Scope Excluded:** Calendar UX components.
@@ -300,11 +332,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 011
 - **Estimate:** M
 
-### Task 015
+## T-015 — Seed single-property inventory and baseline units
 
-- **ID:** 015
+<!-- issue: bookeasy:T-015 -->
+
+Status: TODO
+
 - **Feature Area:** Data
-- **Title:** Seed single-property inventory and baseline units
 - **Context:** MVP needs seeded inventory for development and test consistency.
 - **Scope Included:** One property, required unit categories, starter amenity metadata.
 - **Scope Excluded:** Multi-property seed permutations.
@@ -316,11 +350,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010
 - **Estimate:** S
 
-### Task 016
+## T-016 — Add concurrency tests for double-booking protection
 
-- **ID:** 016
+<!-- issue: bookeasy:T-016 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add concurrency tests for double-booking protection
 - **Context:** Race-condition protection must be validated, not assumed.
 - **Scope Included:** Parallel booking creation tests for overlapping and non-overlapping ranges.
 - **Scope Excluded:** Browser e2e tests.
@@ -334,11 +370,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 2 — Listings & SEO Pages
 
-### Task 017
+## T-017 — Implement public layout, header, footer, and responsive navigation
 
-- **ID:** 017
+<!-- issue: bookeasy:T-017 -->
+
+Status: TODO
+
 - **Feature Area:** Listings
-- **Title:** Implement public layout, header, footer, and responsive navigation
 - **Context:** Shared public UX scaffolding is needed before page-specific work.
 - **Scope Included:** Public route layout and nav/footer components.
 - **Scope Excluded:** Admin layouts.
@@ -350,11 +388,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 003
 - **Estimate:** M
 
-### Task 018
+## T-018 — Build landing page sections (hero, amenities, categories, featured rooms)
 
-- **ID:** 018
+<!-- issue: bookeasy:T-018 -->
+
+Status: TODO
+
 - **Feature Area:** Listings
-- **Title:** Build landing page sections (hero, amenities, categories, featured rooms)
 - **Context:** Landing page drives discovery and conversion.
 - **Scope Included:** Hero, amenities, category blocks, featured inventory cards, static testimonial content.
 - **Scope Excluded:** Dynamic reviews/ratings system.
@@ -366,11 +406,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 015, 017
 - **Estimate:** M
 
-### Task 019
+## T-019 — Create rooms listing page with availability filters
 
-- **ID:** 019
+<!-- issue: bookeasy:T-019 -->
+
+Status: TODO
+
 - **Feature Area:** Listings
-- **Title:** Create rooms listing page with availability filters
 - **Context:** Guests need filtered inventory discovery before booking.
 - **Scope Included:** SSR room grid, date filters, availability badge states.
 - **Scope Excluded:** Personalized ranking.
@@ -382,11 +424,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 014, 017
 - **Estimate:** M
 
-### Task 020
+## T-020 — Build room details page with gallery, amenities, and reserve CTA
 
-- **ID:** 020
+<!-- issue: bookeasy:T-020 -->
+
+Status: TODO
+
 - **Feature Area:** Listings
-- **Title:** Build room details page with gallery, amenities, and reserve CTA
 - **Context:** Users need detailed room context before reservation.
 - **Scope Included:** SSR room detail, image gallery, amenities, pricing, reserve CTA.
 - **Scope Excluded:** Payment capture UI.
@@ -398,11 +442,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 015, 017
 - **Estimate:** M
 
-### Task 021
+## T-021 — Add metadata, Open Graph tags, sitemap, and robots
 
-- **ID:** 021
+<!-- issue: bookeasy:T-021 -->
+
+Status: TODO
+
 - **Feature Area:** SEO
-- **Title:** Add metadata, Open Graph tags, sitemap, and robots
 - **Context:** SEO-first requirement must be explicit and verifiable.
 - **Scope Included:** Route metadata and search indexing primitives.
 - **Scope Excluded:** Paid SEO tooling and backlink workflows.
@@ -414,11 +460,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 018, 019, 020
 - **Estimate:** S
 
-### Task 022
+## T-022 — Optimize image handling and performance budgets for listing pages
 
-- **ID:** 022
+<!-- issue: bookeasy:T-022 -->
+
+Status: TODO
+
 - **Feature Area:** Performance
-- **Title:** Optimize image handling and performance budgets for listing pages
 - **Context:** Listing pages should meet target load performance.
 - **Scope Included:** Responsive image sizing, lazy loading, format optimization.
 - **Scope Excluded:** CDN vendor migration.
@@ -430,11 +478,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 018, 019, 020
 - **Estimate:** S
 
-### Task 023
+## T-023 — Add e2e tests for listing discovery and room-detail navigation
 
-- **ID:** 023
+<!-- issue: bookeasy:T-023 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add e2e tests for listing discovery and room-detail navigation
 - **Context:** Public funnel should be protected from regression.
 - **Scope Included:** Landing -> listing -> details journey and empty-availability path.
 - **Scope Excluded:** Booking submission.
@@ -448,11 +498,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 3 — Booking Engine (Pay on Arrival)
 
-### Task 024
+## T-024 — Define booking API schemas with Zod
 
-- **ID:** 024
+<!-- issue: bookeasy:T-024 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Define booking API schemas with Zod
 - **Context:** Booking contracts require strict validation and predictable errors.
 - **Scope Included:** Guest details, dates, unit ID, currency, idempotency key.
 - **Scope Excluded:** Online payment payload fields.
@@ -464,11 +516,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 005, 012
 - **Estimate:** S
 
-### Task 025
+## T-025 — Implement payment provider interface and Pay-on-Arrival adapter
 
-- **ID:** 025
+<!-- issue: bookeasy:T-025 -->
+
+Status: TODO
+
 - **Feature Area:** Payments
-- **Title:** Implement payment provider interface and Pay-on-Arrival adapter
 - **Context:** Payment abstraction is required even with MVP offline payment model.
 - **Scope Included:** Provider contract, registry, Pay-on-Arrival implementation.
 - **Scope Excluded:** Live Stripe/Mobile Money logic.
@@ -480,11 +534,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010
 - **Estimate:** M
 
-### Task 026
+## T-026 — Implement transactional BookingService reserve flow
 
-- **ID:** 026
+<!-- issue: bookeasy:T-026 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Implement transactional BookingService reserve flow
 - **Context:** Core booking workflow must enforce invariants consistently.
 - **Scope Included:** Availability check, snapshot creation, booking insert, payment hook, idempotency.
 - **Scope Excluded:** Admin-side lifecycle updates.
@@ -496,11 +552,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 011, 013, 024, 025
 - **Estimate:** M
 
-### Task 027
+## T-027 — Implement `POST /bookings` endpoint with rate limiting
 
-- **ID:** 027
+<!-- issue: bookeasy:T-027 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Implement `POST /bookings` endpoint with rate limiting
 - **Context:** Public booking endpoint needs both correctness and abuse controls.
 - **Scope Included:** Validation, limiter integration, service call, error mapping.
 - **Scope Excluded:** Checkout UI.
@@ -512,11 +570,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 008, 024, 026
 - **Estimate:** S
 
-### Task 028
+## T-028 — Build checkout/reservation UI for Pay on Arrival
 
-- **ID:** 028
+<!-- issue: bookeasy:T-028 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Build checkout/reservation UI for Pay on Arrival
 - **Context:** MVP checkout must reserve without online payment.
 - **Scope Included:** Guest details form, date/unit review, payment method selection fixed to pay-on-arrival.
 - **Scope Excluded:** Card/mobile-money payment form fields.
@@ -528,11 +588,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 019, 020, 027
 - **Estimate:** M
 
-### Task 029
+## T-029 — Implement guest booking APIs (`/bookings/me`, `/bookings/:id`, cancel)
 
-- **ID:** 029
+<!-- issue: bookeasy:T-029 -->
+
+Status: TODO
+
 - **Feature Area:** Booking
-- **Title:** Implement guest booking APIs (`/bookings/me`, `/bookings/:id`, cancel)
 - **Context:** Guests need to view and manage their own reservations.
 - **Scope Included:** Self-only booking retrieval and cancellation workflow.
 - **Scope Excluded:** Refund processing.
@@ -544,11 +606,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 012, 014, 026
 - **Estimate:** M
 
-### Task 030
+## T-030 — Add unit tests for BookingService and payment abstraction boundaries
 
-- **ID:** 030
+<!-- issue: bookeasy:T-030 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add unit tests for BookingService and payment abstraction boundaries
 - **Context:** Booking correctness and separation-of-concerns require direct unit coverage.
 - **Scope Included:** Success, conflict, idempotent retry, provider contract tests.
 - **Scope Excluded:** Browser e2e tests.
@@ -560,11 +624,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 025, 026
 - **Estimate:** M
 
-### Task 031
+## T-031 — Add e2e tests for reserve-now and cancellation flow
 
-- **ID:** 031
+<!-- issue: bookeasy:T-031 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add e2e tests for reserve-now and cancellation flow
 - **Context:** Primary conversion path must be tested end-to-end.
 - **Scope Included:** Room selection to reservation confirmation to cancellation.
 - **Scope Excluded:** Online payment scenarios.
@@ -578,11 +644,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 4 — Admin Portal
 
-### Task 032
+## T-032 — Build admin shell, navigation, and RBAC route guards
 
-- **ID:** 032
+<!-- issue: bookeasy:T-032 -->
+
+Status: TODO
+
 - **Feature Area:** Admin
-- **Title:** Build admin shell, navigation, and RBAC route guards
 - **Context:** Admin workflows need secure boundaries and navigation structure.
 - **Scope Included:** Admin layout, route guards, nav links.
 - **Scope Excluded:** Detailed page functionality.
@@ -594,11 +662,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 004
 - **Estimate:** S
 
-### Task 033
+## T-033 — Implement admin bookings list and lifecycle update workflow
 
-- **ID:** 033
+<!-- issue: bookeasy:T-033 -->
+
+Status: TODO
+
 - **Feature Area:** Admin
-- **Title:** Implement admin bookings list and lifecycle update workflow
 - **Context:** Operations must manage booking lifecycle states.
 - **Scope Included:** Booking list/filter UI and status update API.
 - **Scope Excluded:** Financial analytics dashboard.
@@ -610,11 +680,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 012, 032
 - **Estimate:** M
 
-### Task 034
+## T-034 — Implement units CRUD for inventory operations
 
-- **ID:** 034
+<!-- issue: bookeasy:T-034 -->
+
+Status: TODO
+
 - **Feature Area:** Admin
-- **Title:** Implement units CRUD for inventory operations
 - **Context:** Admin must maintain room inventory and availability.
 - **Scope Included:** Create/edit/archive units and adjust base pricing metadata.
 - **Scope Excluded:** Bulk import workflows.
@@ -626,11 +698,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 014, 032
 - **Estimate:** M
 
-### Task 035
+## T-035 — Implement centralized audit logging service for admin actions
 
-- **ID:** 035
+<!-- issue: bookeasy:T-035 -->
+
+Status: TODO
+
 - **Feature Area:** Security
-- **Title:** Implement centralized audit logging service for admin actions
 - **Context:** Auditable admin behavior is a hard requirement.
 - **Scope Included:** Audit write utility and enforced integration in admin mutations.
 - **Scope Excluded:** External SIEM forwarding.
@@ -642,11 +716,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010, 006, 007, 032
 - **Estimate:** M
 
-### Task 036
+## T-036 — Add admin audit log viewer page
 
-- **ID:** 036
+<!-- issue: bookeasy:T-036 -->
+
+Status: TODO
+
 - **Feature Area:** Admin
-- **Title:** Add admin audit log viewer page
 - **Context:** Teams need visibility into logged admin actions.
 - **Scope Included:** Paginated audit log table with basic filters.
 - **Scope Excluded:** Advanced analytics.
@@ -658,11 +734,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 035
 - **Estimate:** S
 
-### Task 037
+## T-037 — Add admin RBAC and audit e2e coverage
 
-- **ID:** 037
+<!-- issue: bookeasy:T-037 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add admin RBAC and audit e2e coverage
 - **Context:** Security-sensitive admin flows need e2e verification.
 - **Scope Included:** Unauthorized denial tests and successful mutation+audit tests.
 - **Scope Excluded:** Visual regression testing.
@@ -676,11 +754,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 5 — Messaging & Emails
 
-### Task 038
+## T-038 — Implement messaging domain service and persistence wiring
 
-- **ID:** 038
+<!-- issue: bookeasy:T-038 -->
+
+Status: TODO
+
 - **Feature Area:** Messaging
-- **Title:** Implement messaging domain service and persistence wiring
 - **Context:** Guest-admin communication is part of MVP core features.
 - **Scope Included:** Thread creation and reply methods with role-aware access checks.
 - **Scope Excluded:** Realtime messaging.
@@ -692,11 +772,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010, 032
 - **Estimate:** M
 
-### Task 039
+## T-039 — Expose guest/admin messaging APIs with validation and rate limiting
 
-- **ID:** 039
+<!-- issue: bookeasy:T-039 -->
+
+Status: TODO
+
 - **Feature Area:** Messaging
-- **Title:** Expose guest/admin messaging APIs with validation and rate limiting
 - **Context:** Messaging endpoints must be safe and abuse-resistant.
 - **Scope Included:** `POST /messages`, admin message retrieval APIs, validation, limiter.
 - **Scope Excluded:** File attachments.
@@ -708,11 +790,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 005, 008, 038
 - **Estimate:** M
 
-### Task 040
+## T-040 — Build guest and admin messaging UI views
 
-- **ID:** 040
+<!-- issue: bookeasy:T-040 -->
+
+Status: TODO
+
 - **Feature Area:** Messaging
-- **Title:** Build guest and admin messaging UI views
 - **Context:** Messaging must be usable from both guest and admin sides.
 - **Scope Included:** Guest send form/thread view and admin inbox/thread view.
 - **Scope Excluded:** Typing indicators/realtime updates.
@@ -724,11 +808,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 039
 - **Estimate:** M
 
-### Task 041
+## T-041 — Implement transactional email templates and Resend integration
 
-- **ID:** 041
+<!-- issue: bookeasy:T-041 -->
+
+Status: TODO
+
 - **Feature Area:** Notifications
-- **Title:** Implement transactional email templates and Resend integration
 - **Context:** Booking and messaging events require transactional notifications.
 - **Scope Included:** Booking confirmation, cancellation, new-message alert emails.
 - **Scope Excluded:** Marketing email campaigns.
@@ -740,11 +826,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 007, 026, 038
 - **Estimate:** M
 
-### Task 042
+## T-042 — Add integration tests for messaging permissions and email triggers
 
-- **ID:** 042
+<!-- issue: bookeasy:T-042 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add integration tests for messaging permissions and email triggers
 - **Context:** Prevent unauthorized thread access and notification regressions.
 - **Scope Included:** Messaging auth tests and mocked email dispatch assertions.
 - **Scope Excluded:** Live provider integration tests.
@@ -758,11 +846,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 6 — PWA & Offline Support
 
-### Task 043
+## T-043 — Configure web app manifest and installability baseline
 
-- **ID:** 043
+<!-- issue: bookeasy:T-043 -->
+
+Status: TODO
+
 - **Feature Area:** PWA
-- **Title:** Configure web app manifest and installability baseline
 - **Context:** Installable PWA behavior is required for MVP.
 - **Scope Included:** Manifest metadata, icons, display mode, theme color.
 - **Scope Excluded:** Native app packaging.
@@ -774,11 +864,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 017
 - **Estimate:** S
 
-### Task 044
+## T-044 — Implement service-worker caching for offline booking-detail access
 
-- **ID:** 044
+<!-- issue: bookeasy:T-044 -->
+
+Status: TODO
+
 - **Feature Area:** PWA
-- **Title:** Implement service-worker caching for offline booking-detail access
 - **Context:** Offline access to booking details is a non-negotiable requirement.
 - **Scope Included:** Cache booking-detail routes/data and critical static assets.
 - **Scope Excluded:** Offline write queue for create/cancel actions.
@@ -790,11 +882,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 029, 043
 - **Estimate:** M
 
-### Task 045
+## T-045 — Add global offline indicator and degraded UX states
 
-- **ID:** 045
+<!-- issue: bookeasy:T-045 -->
+
+Status: TODO
+
 - **Feature Area:** PWA
-- **Title:** Add global offline indicator and degraded UX states
 - **Context:** Users need explicit connectivity feedback and safe action gating.
 - **Scope Included:** Offline banner, disabled mutating actions when offline, fallback messaging.
 - **Scope Excluded:** Background sync implementation.
@@ -806,11 +900,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 044
 - **Estimate:** S
 
-### Task 046
+## T-046 — Add e2e tests for installability and offline booking-detail access
 
-- **ID:** 046
+<!-- issue: bookeasy:T-046 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add e2e tests for installability and offline booking-detail access
 - **Context:** Offline behavior must be verified in automated tests.
 - **Scope Included:** Installability checks, cached/offline booking detail flow, uncached fallback check.
 - **Scope Excluded:** Broad multi-browser matrix.
@@ -824,11 +920,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 ## Milestone 7 — Future-Ready Stubs (Payments, Multi-Currency)
 
-### Task 047
+## T-047 — Add Stripe and Mobile Money provider stubs behind payment interface
 
-- **ID:** 047
+<!-- issue: bookeasy:T-047 -->
+
+Status: TODO
+
 - **Feature Area:** Payments
-- **Title:** Add Stripe and Mobile Money provider stubs behind payment interface
 - **Context:** Future provider onboarding should not require booking refactors.
 - **Scope Included:** Typed, non-live adapter stubs and registry wiring.
 - **Scope Excluded:** Live payment API calls.
@@ -840,11 +938,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 025
 - **Estimate:** S
 
-### Task 048
+## T-048 — Create webhook endpoint skeletons for Stripe and Mobile Money
 
-- **ID:** 048
+<!-- issue: bookeasy:T-048 -->
+
+Status: TODO
+
 - **Feature Area:** Payments
-- **Title:** Create webhook endpoint skeletons for Stripe and Mobile Money
 - **Context:** API surface should be reserved for future payment rollout.
 - **Scope Included:** Route stubs, placeholder signature validation contracts, structured logs.
 - **Scope Excluded:** Actual booking/payment mutation logic from webhook events.
@@ -856,11 +956,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 007, 047
 - **Estimate:** S
 
-### Task 049
+## T-049 — Harden currency invariants without enabling FX conversion
 
-- **ID:** 049
+<!-- issue: bookeasy:T-049 -->
+
+Status: TODO
+
 - **Feature Area:** Currency
-- **Title:** Harden currency invariants without enabling FX conversion
 - **Context:** Future EUR/USD support needs schema readiness while preserving MVP scope.
 - **Scope Included:** Supported currency enum paths and validation hardening.
 - **Scope Excluded:** FX conversion, exchange-rate ingestion.
@@ -872,11 +974,13 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - **Dependencies:** 010, 013, 024
 - **Estimate:** S
 
-### Task 050
+## T-050 — Add contract tests for provider interchangeability and currency invariants
 
-- **ID:** 050
+<!-- issue: bookeasy:T-050 -->
+
+Status: TODO
+
 - **Feature Area:** QA
-- **Title:** Add contract tests for provider interchangeability and currency invariants
 - **Context:** Future-readiness must be protected by automated tests.
 - **Scope Included:** Shared payment-provider contract tests and currency invariant tests.
 - **Scope Excluded:** Live third-party API integration tests.
