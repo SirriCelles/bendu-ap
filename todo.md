@@ -49,6 +49,7 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 <!-- issue: bookeasy:T-001 -->
 
 Status: DONE
+Verification: 2026-02-09 (`pnpm lint` ✅, `pnpm build` ✅)
 
 - **Feature Area:** Infra
 - **Context:** Establish a reliable baseline aligned with locked stack decisions.
