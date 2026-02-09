@@ -1,9 +1,12 @@
 name: Sync todo.md to GitHub Issues
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - "todo.md"
+      - "scripts/todo-sync.mjs"
+      - ".github/workflows/todo-sync.yml"
 
 permissions:
   contents: read
@@ -16,18 +19,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
+          cache: pnpm
 
       - name: Install deps
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Sync issues from todo.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TODO_PATH: todo.md
-          # If your todo is in /docs instead, set:
-          # TODO_PATH: docs/todo.md
-        run: node scripts/todo-sync.mjs
+        run: pnpm todo:sync

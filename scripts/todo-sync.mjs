@@ -3,6 +3,7 @@ import path from "node:path";
 
 const API_BASE = "https://api.github.com";
 const LABEL = "todo-sync";
+const TODO_PATH = process.env.TODO_PATH ?? "todo.md";
 
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
@@ -35,19 +36,11 @@ async function gh(pathname, options = {}) {
     throw new Error(`${options.method ?? "GET"} ${pathname} failed: ${res.status} ${text}`);
   }
 
-  return res.json();
-}
+  if (res.status === 204) {
+    return null;
+  }
 
-async function listExistingIssuesByTitle(title) {
-  const q = [
-    `repo:${owner}/${repoName}`,
-    "type:issue",
-    `in:title`,
-    `"${title.replace(/"/g, '\\"')}"`,
-    `label:${LABEL}`,
-  ].join(" ");
-  const data = await gh(`/search/issues?q=${encodeURIComponent(q)}`);
-  return data.items ?? [];
+  return res.json();
 }
 
 async function ensureLabel() {
@@ -61,6 +54,27 @@ async function ensureLabel() {
   }
 }
 
+async function listSyncedIssues() {
+  const issues = [];
+  let page = 1;
+
+  while (true) {
+    const data = await gh(
+      `/repos/${owner}/${repoName}/issues?state=all&labels=${encodeURIComponent(LABEL)}&per_page=100&page=${page}`
+    );
+    const batch = (data ?? []).filter((item) => !item.pull_request);
+    issues.push(...batch);
+
+    if (batch.length < 100) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return issues;
+}
+
 async function createIssue(title, body) {
   return gh(`/repos/${owner}/${repoName}/issues`, {
     method: "POST",
@@ -72,104 +86,155 @@ async function createIssue(title, body) {
   });
 }
 
-async function updateIssue(number, body) {
+async function patchIssue(number, meta) {
   return gh(`/repos/${owner}/${repoName}/issues/${number}`, {
     method: "PATCH",
-    body: JSON.stringify({ body }),
+    body: JSON.stringify(meta),
   });
 }
 
-async function walk(dir, files = []) {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.name.startsWith(".")) continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      await walk(full, files);
-    } else if (entry.isFile() && entry.name === "todo.md") {
-      files.push(full);
-    }
-  }
-  return files;
-}
-
-function parseTodo(content, filePath) {
-  const items = [];
+function parseTasks(content, filePath) {
+  const tasks = [];
   const lines = content.split(/\r?\n/);
-  let currentSection = "";
 
   for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
-    const headingMatch = /^#{1,6}\s+(.*)$/.exec(line);
-    if (headingMatch) {
-      currentSection = headingMatch[1].trim();
+    const headingMatch = /^##\s+(T-[^\s]+)\s+—\s+(.+)$/.exec(lines[i]);
+    if (!headingMatch) {
       continue;
     }
 
-    const taskMatch = /^\s*-\s+\[([ xX])\]\s+(.*)$/.exec(line);
-    if (!taskMatch) continue;
+    const id = headingMatch[1].trim();
+    const title = headingMatch[2].trim();
+    const lineNumber = i + 1;
 
-    const checked = taskMatch[1].toLowerCase() === "x";
-    const title = taskMatch[2].trim();
-    if (!title) continue;
+    let issueKey = "";
+    let status = "TODO";
 
-    items.push({
-      checked,
+    for (let j = i + 1; j < Math.min(i + 8, lines.length); j += 1) {
+      const markerMatch = /^<!--\s*issue:\s*([^\s]+)\s*-->$/.exec(lines[j]);
+      if (markerMatch) {
+        issueKey = markerMatch[1].trim();
+      }
+
+      const statusMatch = /^Status:\s*(TODO|IN_PROGRESS|DONE)\s*$/.exec(lines[j]);
+      if (statusMatch) {
+        status = statusMatch[1];
+      }
+    }
+
+    let end = i + 1;
+    while (
+      end < lines.length &&
+      !/^##\s+T-[^\s]+\s+—\s+/.test(lines[end]) &&
+      !/^##\s+Milestone\b/.test(lines[end]) &&
+      !/^##\s+Immediate Next Actions\b/.test(lines[end])
+    ) {
+      end += 1;
+    }
+
+    const block = lines.slice(i, end).join("\n").trim();
+
+    tasks.push({
+      id,
       title,
-      section: currentSection,
+      issueKey: issueKey || `bookeasy:${id}`,
+      status,
       filePath,
-      lineNumber: i + 1,
+      lineNumber,
+      block,
     });
   }
 
-  return items;
+  return tasks;
 }
 
-function issueTitle(item) {
-  return `TODO: ${item.title}`;
+function issueTitle(task) {
+  return `${task.id} — ${task.title}`;
 }
 
-function issueBody(item) {
-  const section = item.section ? `## Section\n${item.section}\n\n` : "";
+function issueBody(task) {
   return [
     "This issue is synced from `todo.md`.",
     "",
-    section,
+    `<!-- issue: ${task.issueKey} -->`,
+    "",
     "## Source",
-    `- File: \`${item.filePath}\``,
-    `- Line: ${item.lineNumber}`,
+    `- File: \`${task.filePath}\``,
+    `- Line: ${task.lineNumber}`,
     "",
     "## Status",
-    item.checked ? "- [x] Completed in todo.md" : "- [ ] Not completed in todo.md",
+    `- ${task.status}`,
+    "",
+    "## Task Block",
+    "```md",
+    task.block,
+    "```",
   ].join("\n");
+}
+
+function extractIssueKeyFromBody(body) {
+  if (!body) return null;
+  const match = /<!--\s*issue:\s*([^\s]+)\s*-->/i.exec(body);
+  return match ? match[1].trim() : null;
 }
 
 async function run() {
   await ensureLabel();
 
-  const todoFiles = await walk(process.cwd());
-  const allItems = [];
-
-  for (const filePath of todoFiles) {
-    const content = await fs.readFile(filePath, "utf8");
-    allItems.push(...parseTodo(content, path.relative(process.cwd(), filePath)));
+  const todoAbsPath = path.resolve(process.cwd(), TODO_PATH);
+  let content;
+  try {
+    content = await fs.readFile(todoAbsPath, "utf8");
+  } catch (error) {
+    throw new Error(`Unable to read TODO_PATH "${TODO_PATH}": ${error.message}`);
   }
 
-  const pending = allItems.filter((item) => !item.checked);
+  const relativePath = path.relative(process.cwd(), todoAbsPath);
+  const tasks = parseTasks(content, relativePath);
+  const existingIssues = await listSyncedIssues();
 
-  for (const item of pending) {
-    const title = issueTitle(item);
-    const body = issueBody(item);
-    const existing = await listExistingIssuesByTitle(title);
+  const issuesByKey = new Map();
+  const issuesByTitle = new Map();
 
-    if (existing.length === 0) {
-      await createIssue(title, body);
+  for (const issue of existingIssues) {
+    const key = extractIssueKeyFromBody(issue.body);
+    if (key && !issuesByKey.has(key)) {
+      issuesByKey.set(key, issue);
+    }
+
+    if (!issuesByTitle.has(issue.title)) {
+      issuesByTitle.set(issue.title, issue);
+    }
+  }
+
+  for (const task of tasks) {
+    const title = issueTitle(task);
+    const body = issueBody(task);
+    const desiredState = task.status === "DONE" ? "closed" : "open";
+
+    const existing = issuesByKey.get(task.issueKey) ?? issuesByTitle.get(title) ?? null;
+
+    if (!existing) {
+      const created = await createIssue(title, body);
+      if (desiredState === "closed") {
+        await patchIssue(created.number, { state: "closed" });
+      }
       continue;
     }
 
-    const issue = existing[0];
-    if (issue.body !== body) {
-      await updateIssue(issue.number, body);
+    const patch = {};
+    if (existing.title !== title) {
+      patch.title = title;
+    }
+    if (existing.body !== body) {
+      patch.body = body;
+    }
+    if (existing.state !== desiredState) {
+      patch.state = desiredState;
+    }
+
+    if (Object.keys(patch).length > 0) {
+      await patchIssue(existing.number, patch);
     }
   }
 }
