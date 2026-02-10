@@ -103,7 +103,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-004 -->
 
-Status: TODO
+Status: IN_PROGRESS
 
 - **Feature Area:** Security
 - **Context:** RBAC is required for admin security.
