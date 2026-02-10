@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function HeroSection() {
   return (
-    <section className="relative isolate overflow-hidden">
+    <section className="relative isolate overflow-hidden shadow-xl/20">
       <div className="relative min-h-[68svh] w-full md:min-h-[74svh]">
         <Image
           src="/images/landing/hero-bg-image.png"

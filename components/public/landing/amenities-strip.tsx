@@ -25,11 +25,14 @@ const amenities = [
 
 export function AmenitiesStrip() {
   return (
-    <section className="bg-background py-10 md:pt-12 md:pb-6">
+    <section className="bg-background py-10 md:py-12">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
           {amenities.map((item) => (
-            <article key={item.title} className="text-center">
+            <article
+              key={item.title}
+              className="text-center rounded-lg bg-card p-4 shadow-sm md:p-6"
+            >
               <div className="relative mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center md:mb-6 md:h-20 md:w-20">
                 <Image
                   src="/icons/amenities-icon-bg.svg"
