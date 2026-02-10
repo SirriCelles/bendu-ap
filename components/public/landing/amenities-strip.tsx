@@ -3,7 +3,7 @@ import Image from "next/image";
 const amenities = [
   {
     icon: "/icons/mingcute_location-3-line.svg",
-    title: "Located In the Heart of the City",
+    title: "Secure Location in Upstation Bamenda",
     description: "Ideally located in the city's heart for easy access and convenience",
   },
   {
@@ -13,12 +13,12 @@ const amenities = [
   },
   {
     icon: "/icons/medical-icon_i-care-staff-area.svg",
-    title: "Customer support/care",
+    title: "Customer Care",
     description: "Our friendly and welcoming staff ensure a delightful stay every time",
   },
   {
     icon: "/icons/ion_wallet-sharp.svg",
-    title: "Best prices and Great offers",
+    title: "Great Prices and Offers",
     description: "Enjoy unbeatable prices with great offers tailored just for you.",
   },
 ];
