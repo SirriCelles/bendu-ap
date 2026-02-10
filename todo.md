@@ -48,7 +48,7 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 <!-- issue: bookeasy:T-001 -->
 
-Status: DONE
+Status: IN_PROGRESS
 Verification: 2026-02-09 (`pnpm lint` ✅, `pnpm build` ✅)
 
 - **Feature Area:** Infra
@@ -375,16 +375,16 @@ Status: TODO
 
 <!-- issue: bookeasy:T-017 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Listings
 - **Context:** Shared public UX scaffolding is needed before page-specific work.
 - **Scope Included:** Public route layout and nav/footer components.
 - **Scope Excluded:** Admin layouts.
 - **Acceptance Criteria:**
-- [ ] Header/footer match design requirements
-- [ ] Primary CTA routes to reservation flow
-- [ ] Mobile and desktop nav both function correctly
+- [x] Header/footer match design requirements
+- [x] Primary CTA routes to reservation flow
+- [x] Mobile and desktop nav both function correctly
 - **Implementation Notes:** Add `app/(public)/layout.tsx` and `components/public/*`.
 - **Dependencies:** 003
 - **Estimate:** M
