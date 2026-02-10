@@ -29,6 +29,7 @@
 
   --info: 205 37% 78%;
   --info-foreground: 216 28% 12%;
+  --overlay-50: 0 0% 0% / 0.5;
 
   --radius: 0.75rem;
 }
@@ -58,5 +59,11 @@
     font-family: "Instrument Sans", "Avenir Next", Avenir, "Segoe UI", "Helvetica Neue", sans-serif;
     letter-spacing: -0.02em;
     color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .bg-overlay-50 {
+    background-color: hsl(var(--overlay-50));
   }
 }

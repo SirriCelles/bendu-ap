@@ -21,18 +21,18 @@ export function MobileNav() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="text-white hover:bg-background/20 hover:text-white md:hidden"
           aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xs bg-card p-6">
-        <DialogTitle className="text-xl">Navigate</DialogTitle>
+        <DialogTitle></DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
-          Explore rooms and start a reservation.
+          Explore Apartments and start a reservation.
         </DialogDescription>
         <nav className="mt-4 flex flex-col gap-3">
           {primaryNavItems.map((item) => (

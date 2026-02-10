@@ -6,7 +6,7 @@ export type PublicNavItem = {
 export const primaryNavItems: PublicNavItem[] = [
   { href: "/", label: "Home" },
   { href: "/rooms", label: "Browse" },
-  { href: "/rooms", label: "Apartments" },
+  { href: "/rooms", label: "Restaurant" },
 ];
 
 export const primaryCta = {

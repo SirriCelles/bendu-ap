@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 
 export function PublicHeader() {
   return (
-    <header className="border-b border-border bg-card/95">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-8">
-        <Link href="/" className="text-lg font-semibold tracking-wide">
+    <header className="absolute inset-x-0 top-0 z-40 bg-transparent">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:h-20 md:px-8">
+        <Link href="/" className="text-lg font-semibold tracking-wide text-white">
           BookEasy
         </Link>
 
@@ -17,7 +17,7 @@ export function PublicHeader() {
             <Link
               key={item.href + item.label}
               href={item.href}
-              className="text-sm text-foreground hover:text-primary"
+              className="text-xl font-medium text-white hover:opacity-85"
             >
               {item.label}
             </Link>
@@ -25,7 +25,7 @@ export function PublicHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild className="hidden md:inline-flex">
+          <Button asChild className="hidden font-bold md:inline-flex">
             <Link href={primaryCta.href}>{primaryCta.label}</Link>
           </Button>
           <MobileNav />
