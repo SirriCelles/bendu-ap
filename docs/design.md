@@ -19,7 +19,8 @@ These designs define the visual hierarchy, layout, and interaction flow.
 - Calm, neutral color palette
 - Strong imagery
 - Clear primary CTAs
-- Mobile-first responsiveness
+- This is a mobile-first app.
+- All pages must be mobile responsive by default, then enhanced for larger screens.
 
 ---
 
@@ -51,13 +52,16 @@ These designs define the visual hierarchy, layout, and interaction flow.
 
 ## Typography
 
-- Headings: Elegant serif or refined sans-serif
-- Body: Clean sans-serif
+- Primary app typeface: Instrument Sans
+- Fallbacks: "Avenir Next", Avenir, "Segoe UI", "Helvetica Neue", sans-serif
+- Headings and body both use the same Instrument Sans-first stack
 - Pricing: Large, bold emphasis
 
 ---
 
 ## Page Specifications
+
+- Global requirement for all pages: mobile-first responsive behavior across phone, tablet, and desktop breakpoints.
 
 ### Home / Landing Page
 
@@ -66,6 +70,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 - Room categories
 - Featured rooms
 - Testimonials
+- Must remain readable and actionable on mobile first, without horizontal scrolling.
 
 ### Rooms Listing Page
 
@@ -73,6 +78,7 @@ These designs define the visual hierarchy, layout, and interaction flow.
 - Room cards with image, rating, price
 - Availability badges
 - Book Now CTA
+- Grid and controls must collapse cleanly for mobile and progressively enhance at `md+`.
 
 ### Room Details Page
 
@@ -81,12 +87,14 @@ These designs define the visual hierarchy, layout, and interaction flow.
 - Price per night
 - Date picker
 - Reserve CTA
+- Gallery, pricing block, and reserve CTA must stack and remain usable on small screens.
 
 ### Checkout Page
 
 - Guest details form
 - Payment method selection (pay on arrival for MVP)
 - Confirmation action
+- Form fields and actions must be fully mobile-accessible and responsive.
 
 ---
 

@@ -30,8 +30,9 @@ Use these variables in `:root` and map them to Tailwind utilities.
 
 ## Typography Tokens
 
-- `--font-heading`: Playfair Display
-- `--font-body`: Inter
+- Primary app typography: `Instrument Sans`
+- Fallback stack: `"Avenir Next", Avenir, "Segoe UI", "Helvetica Neue", sans-serif`
+- Rule: all app text (headings and body) should use the same primary typography with fallback only.
 
 Type scale:
 

@@ -8,6 +8,7 @@ Purpose: keep UI implementation consistent and prevent style drift as more pages
 2. Prefer shadcn/ui primitives over custom base components.
 3. Use the approved spacing scale only.
 4. Reuse approved image + card composition patterns.
+5. Build mobile-first and ensure every page is responsive at phone, tablet, and desktop sizes.
 
 If a screen cannot be built with these rules, propose a token or primitive update first. Do not ship one-off styles.
 
@@ -78,8 +79,8 @@ Pattern C: Detail Hero Card
 
 ## Typography and Surface Guidance
 
-- Heading styles use the configured heading stack from `app/globals.css`.
-- Body text uses the configured body stack from `app/globals.css`.
+- Primary typography for the full app is `Instrument Sans` with fallback stack only.
+- Heading and body styles both inherit the same `Instrument Sans`-first stack from `app/globals.css`.
 - Light theme is the default baseline; dark mode is optional and must follow the same semantic token rules.
 
 ## PR Review Checklist (Quick Pass)
