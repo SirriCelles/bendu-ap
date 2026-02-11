@@ -17,7 +17,7 @@ export function FeaturedRoomsSection() {
     <section className="bg-featured-bg py-14 md:py-20 shadow-sm">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="mx-auto text-center">
-          <p className="text-lg font-semibold uppercase tracking-wide text-muted-foreground md:text-xl">
+          <p className="text-icon-fill text-lg font-semibold uppercase tracking-wide md:text-xl">
             Exquisite and luxurious
           </p>
           <h2 className="mt-2 text-3xl font-semibold uppercase md:text-4xl">
@@ -49,9 +49,12 @@ export function FeaturedRoomsSection() {
                     <Button
                       variant="outline"
                       asChild
-                      className="w-full sm:w-auto font-semibold uppercase"
+                      className="w-full border-deep-navy text-deep-navy sm:w-auto font-semibold uppercase"
                     >
-                      <Link href="/rooms">
+                      <Link
+                        href="/rooms"
+                        className="inline-flex items-center gap-2 text-deep-navy bg-white"
+                      >
                         View Room
                         <Image
                           src="/icons/basil_arrow-right-solid.svg"

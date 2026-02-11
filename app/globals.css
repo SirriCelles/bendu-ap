@@ -30,6 +30,7 @@
   --info: 205 37% 78%;
   --info-foreground: 216 28% 12%;
   --icon-fill: 211 22% 42%;
+  --deep-navy: 214 34% 23%;
   --featured-bg: 35 2% 92%;
   --room-category-bg: 33 3% 98%;
   --amenities-bg: 29 1% 99%;
@@ -77,6 +78,14 @@
 
   .text-icon-fill {
     color: hsl(var(--icon-fill));
+  }
+
+  .text-deep-navy {
+    color: hsl(var(--deep-navy));
+  }
+
+  .border-deep-navy {
+    border-color: hsl(var(--deep-navy));
   }
 
   .bg-featured-bg {
