@@ -3,6 +3,7 @@ import { FacilitiesAmenitiesSection } from "@/components/public/landing/faciliti
 import { FeaturedRoomsSection } from "@/components/public/landing/featured-rooms-section";
 import { HeroSection } from "@/components/public/landing/hero-section";
 import { RoomCategoriesSection } from "@/components/public/landing/room-categories-section";
+import { StatsRibbonSection } from "@/components/public/landing/stats-ribbon-section";
 
 export default function PublicPage() {
   return (
@@ -12,6 +13,7 @@ export default function PublicPage() {
       <RoomCategoriesSection />
       <FeaturedRoomsSection />
       <FacilitiesAmenitiesSection />
+      <StatsRibbonSection />
     </main>
   );
 }
