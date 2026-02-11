@@ -139,7 +139,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-006 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Observability
 - **Context:** Booking and support workflows need request traceability.
@@ -400,9 +400,9 @@ Status: TODO
 - **Scope Included:** Hero, amenities, category blocks, featured inventory cards, static testimonial content.
 - **Scope Excluded:** Dynamic reviews/ratings system.
 - **Acceptance Criteria:**
-- [ ] Hero and primary CTA render above fold
-- [ ] Featured cards show image, room info, and XAF-formatted price
-- [ ] Any testimonial section is static content only
+- [x] Hero and primary CTA render above fold
+- [x] Featured cards show image, room info, and XAF-formatted price
+- [x] Any testimonial section is static content only
 - **Implementation Notes:** Build in `app/(public)/page.tsx` with server-side data fetch for featured units.
 - **Dependencies:** 015, 017
 - **Estimate:** M

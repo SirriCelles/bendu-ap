@@ -25,7 +25,7 @@ const amenities = [
 
 export function AmenitiesStrip() {
   return (
-    <section className="bg-amenities-bg py-10 md:py-12 shadow-md">
+    <section className="relative z-10 bg-amenities-bg py-10 shadow-md md:py-12">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
           {amenities.map((item) => (

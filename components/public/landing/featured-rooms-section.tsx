@@ -13,6 +13,8 @@ const featuredRooms = [
 ];
 
 export function FeaturedRoomsSection() {
+  const formatXaf = (amount: number) => `XAF ${new Intl.NumberFormat("en-CM").format(amount)}`;
+
   return (
     <section className="bg-featured-bg py-14 md:py-20 shadow-sm">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
@@ -20,7 +22,7 @@ export function FeaturedRoomsSection() {
           <p className="text-icon-fill text-lg font-semibold uppercase tracking-wide md:text-xl">
             Exquisite and luxurious
           </p>
-          <h2 className="mt-2 text-3xl font-semibold uppercase md:text-4xl">
+          <h2 className="mt-4 text-3xl font-semibold uppercase md:text-4xl">
             Apartment and Suite Collection
           </h2>
         </div>
@@ -31,10 +33,13 @@ export function FeaturedRoomsSection() {
               <div className="grid grid-cols-1 md:grid-cols-5">
                 <div className="p-5 md:col-span-3 md:p-12">
                   <h3 className="text-xl font-semibold md:text-3xl">{room.name}</h3>
+                  <p className="mt-2 text-sm font-medium uppercase tracking-wide text-muted-foreground md:text-base">
+                    {formatXaf(room.price)} / PER NIGHT
+                  </p>
                   <p className="mt-3 text-base text-foreground md:text-lg">{room.description}</p>
 
                   <div className="mt-12 flex flex-col gap-3 sm:flex-row">
-                    <Button asChild className="w-full sm:w-auto font-semibold uppercase">
+                    <Button asChild className="w-full min-h-11 sm:w-auto font-semibold uppercase">
                       <Link href="/rooms" className="inline-flex items-center gap-2 text-white">
                         <Image
                           src="/icons/tdesign_calendar-2-filled.svg"
@@ -49,7 +54,7 @@ export function FeaturedRoomsSection() {
                     <Button
                       variant="outline"
                       asChild
-                      className="w-full border-deep-navy text-deep-navy sm:w-auto font-semibold uppercase"
+                      className="w-full min-h-11 border-deep-navy text-deep-navy sm:w-auto font-semibold uppercase"
                     >
                       <Link
                         href="/rooms"

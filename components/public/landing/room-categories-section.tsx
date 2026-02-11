@@ -17,7 +17,7 @@ const roomCategories = [
 
 export function RoomCategoriesSection() {
   return (
-    <section className="py-12 md:py-16 shadow-sm">
+    <section className="bg-room-category-bg py-12 md:py-16 shadow-xl">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-semibold uppercase md:text-4xl">The Apartments We Offer</h2>

@@ -15,19 +15,19 @@ const stats = [
   },
   {
     icon: "/icons/fluent_people-call-16-regular.svg",
-    value: "20",
+    value: "25",
     label: "Full time hospitable staff",
   },
   {
     icon: "/icons/mdi_food.svg",
-    value: "20+",
+    value: "10+",
     label: "Delicious traditional delicacies",
   },
 ];
 
 export function StatsRibbonSection() {
   return (
-    <section className="shadow-xl/30">
+    <section className="bg-background shadow-xl/20">
       <div className="mx-auto w-full">
         <div className="bg-primary px-4 py-8 shadow-sm md:px-8 md:py-10">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">

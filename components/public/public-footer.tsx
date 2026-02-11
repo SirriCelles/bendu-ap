@@ -17,21 +17,18 @@ const quickLinks = [
 
 export function PublicFooter() {
   return (
-    <footer
-      className="mt-12 text-white md:mt-16"
-      style={{ fontFamily: '"Instrument Sans", sans-serif' }}
-    >
+    <footer className="text-white" style={{ fontFamily: '"Instrument Sans", sans-serif' }}>
       <div className="bg-[#1A3D63]">
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 px-4 py-8 sm:grid-cols-2 sm:gap-8 sm:px-6 sm:py-10 md:grid-cols-4 md:gap-10 md:px-8 md:py-16">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-6 sm:grid-cols-2 sm:gap-8 sm:px-6 sm:py-10 md:grid-cols-4 md:gap-10 md:px-8 md:py-16">
           <section>
-            <h2 className="text-[clamp(1.5rem,7vw,2.125rem)] font-semibold leading-tight text-white">
+            <h2 className="text-xl font-semibold leading-tight text-white sm:text-2xl md:text-[2.125rem]">
               Hotel
             </h2>
-            <p className="mt-4 max-w-md text-[clamp(0.95rem,3.8vw,1.125rem)] font-normal leading-snug text-white md:mt-8">
+            <p className="mt-3 max-w-md text-sm font-normal leading-snug text-white sm:text-base md:mt-8 md:text-[1.125rem]">
               Come And Experience Luxury Like Never Before, With Our Pristine Services, Modern
               Facilities, And Hospitable Staff.
             </p>
-            <div className="mt-6 flex items-center gap-2.5 md:mt-12 md:gap-4">
+            <div className="mt-5 flex items-center gap-2 md:mt-12 md:gap-4">
               <Link
                 href="https://facebook.com"
                 aria-label="Facebook"
@@ -57,10 +54,10 @@ export function PublicFooter() {
           </section>
 
           <section>
-            <h2 className="text-[clamp(1.5rem,7vw,2.125rem)] font-semibold leading-tight text-white">
+            <h2 className="text-xl font-semibold leading-tight text-white sm:text-2xl md:text-[2.125rem]">
               Pages
             </h2>
-            <ul className="mt-4 space-y-3 text-[clamp(0.95rem,3.8vw,1.125rem)] font-normal md:mt-8 md:space-y-6">
+            <ul className="mt-3 space-y-2 text-sm font-normal sm:text-base md:mt-8 md:space-y-6 md:text-[1.125rem]">
               {pages.map((item) => (
                 <li key={item.href + item.label}>
                   <Link href={item.href} className="text-white hover:opacity-80">
@@ -72,10 +69,10 @@ export function PublicFooter() {
           </section>
 
           <section>
-            <h2 className="text-[clamp(1.5rem,7vw,2.125rem)] font-semibold leading-tight text-white">
+            <h2 className="text-xl font-semibold leading-tight text-white sm:text-2xl md:text-[2.125rem]">
               Quick Links
             </h2>
-            <ul className="mt-4 space-y-3 text-[clamp(0.95rem,3.8vw,1.125rem)] font-normal md:mt-8 md:space-y-6">
+            <ul className="mt-3 space-y-2 text-sm font-normal sm:text-base md:mt-8 md:space-y-6 md:text-[1.125rem]">
               {quickLinks.map((item) => (
                 <li key={item.href + item.label}>
                   <Link href={item.href} className="text-white hover:opacity-80">
@@ -87,10 +84,10 @@ export function PublicFooter() {
           </section>
 
           <section>
-            <h2 className="text-[clamp(1.5rem,7vw,2.125rem)] font-semibold leading-tight text-white">
+            <h2 className="text-xl font-semibold leading-tight text-white sm:text-2xl md:text-[2.125rem]">
               Contact Us
             </h2>
-            <ul className="mt-4 space-y-3 text-[clamp(0.95rem,3.8vw,1.125rem)] font-normal text-white md:mt-8 md:space-y-6">
+            <ul className="mt-3 space-y-2 text-sm font-normal text-white sm:text-base md:mt-8 md:space-y-6 md:text-[1.125rem]">
               <li>+237 675 830 461</li>
               <li>Contact@gmail.com</li>
               <li>Bamenda, Cameroon</li>
