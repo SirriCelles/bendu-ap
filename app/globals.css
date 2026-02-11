@@ -34,6 +34,8 @@
   --featured-bg: 35 2% 92%;
   --room-category-bg: 33 3% 98%;
   --amenities-bg: 29 1% 99%;
+  --facility-card-bg-1: 50 86% 94%;
+  --facility-card-bg-2: 50 88% 90%;
   --overlay-50: 0 0% 0% / 0.5;
 
   --radius: 0.75rem;
@@ -98,5 +100,13 @@
 
   .bg-amenities-bg {
     background-color: hsl(var(--amenities-bg));
+  }
+
+  .bg-facility-card-1 {
+    background-color: hsl(var(--facility-card-bg-1));
+  }
+
+  .bg-facility-card-2 {
+    background-color: hsl(var(--facility-card-bg-2));
   }
 }
