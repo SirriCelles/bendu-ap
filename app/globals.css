@@ -71,6 +71,10 @@
     background-color: hsl(var(--overlay-50));
   }
 
+  .font-hina {
+    font-family: "Hina Mincho", "Times New Roman", serif;
+  }
+
   .text-icon-fill {
     color: hsl(var(--icon-fill));
   }
