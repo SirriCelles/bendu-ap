@@ -34,36 +34,36 @@ const facilityBackgrounds: Record<string, string> = {
 
 export function FacilitiesAmenitiesSection() {
   return (
-    <section className="bg-white py-12 md:py-16 shadow-md">
+    <section className="bg-white py-10 shadow-md md:py-16">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="mx-auto text-center">
-          <p className="text-icon-fill text-lg font-semibold uppercase tracking-wide md:text-xl">
+          <p className="text-icon-fill text-base font-semibold uppercase tracking-wide md:text-xl">
             Modern and comfortable
           </p>
-          <h2 className="mt-4 text-3xl font-semibold uppercase md:text-4xl">
+          <h2 className="mt-3 text-2xl font-semibold uppercase md:mt-4 md:text-4xl">
             Facilities and Amenities
           </h2>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-4 md:mt-10 md:grid-cols-2 md:gap-6">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:mt-10 md:grid-cols-2 md:gap-6">
           {facilities.map((item) => {
             const backgroundClass = facilityBackgrounds[item.slug] ?? "bg-facility-card-1";
 
             return (
-              <article key={item.title} className={`${backgroundClass} p-5 shadow-sm md:p-8`}>
+              <article key={item.title} className={`${backgroundClass} p-4 shadow-sm md:p-8`}>
                 <div className="flex items-start gap-4 md:gap-5">
                   <Image
                     src={item.icon}
                     alt=""
                     width={68}
                     height={68}
-                    className="h-12 w-12 shrink-0 opacity-70 md:h-16 md:w-16"
+                    className="h-10 w-10 shrink-0 opacity-70 md:h-16 md:w-16"
                   />
                   <div>
-                    <h3 className="text-2xl font-semibold text-foreground md:text-4xl">
+                    <h3 className="text-xl font-semibold text-foreground md:text-4xl">
                       {item.title}
                     </h3>
-                    <p className="mt-2 text-base text-foreground/85 md:text-2xl">
+                    <p className="mt-2 text-sm text-foreground/85 md:text-2xl">
                       {item.description}
                     </p>
                   </div>

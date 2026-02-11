@@ -16,29 +16,31 @@ export function FeaturedRoomsSection() {
   const formatXaf = (amount: number) => `XAF ${new Intl.NumberFormat("en-CM").format(amount)}`;
 
   return (
-    <section className="bg-featured-bg py-14 md:py-20 shadow-sm">
+    <section className="bg-featured-bg py-10 shadow-sm md:py-20">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="mx-auto text-center">
-          <p className="text-icon-fill text-lg font-semibold uppercase tracking-wide md:text-xl">
+          <p className="text-icon-fill text-base font-semibold uppercase tracking-wide md:text-xl">
             Exquisite and luxurious
           </p>
-          <h2 className="mt-4 text-3xl font-semibold uppercase md:text-4xl">
+          <h2 className="mt-3 text-2xl font-semibold uppercase md:mt-4 md:text-4xl">
             Apartment and Suite Collection
           </h2>
         </div>
 
-        <div className="mt-8 space-y-6 md:mt-10 md:space-y-8">
+        <div className="mt-6 space-y-4 md:mt-10 md:space-y-8">
           {featuredRooms.map((room) => (
             <article key={room.name} className="overflow-hidden bg-white shadow-md">
               <div className="grid grid-cols-1 md:grid-cols-5">
-                <div className="p-5 md:col-span-3 md:p-12">
-                  <h3 className="text-xl font-semibold md:text-3xl">{room.name}</h3>
-                  <p className="mt-2 text-sm font-medium uppercase tracking-wide text-muted-foreground md:text-base">
+                <div className="p-4 md:col-span-3 md:p-12">
+                  <h3 className="text-lg font-semibold md:text-3xl">{room.name}</h3>
+                  <p className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground md:text-base">
                     {formatXaf(room.price)} / PER NIGHT
                   </p>
-                  <p className="mt-3 text-base text-foreground md:text-lg">{room.description}</p>
+                  <p className="mt-2 text-sm text-foreground md:mt-3 md:text-lg">
+                    {room.description}
+                  </p>
 
-                  <div className="mt-12 flex flex-col gap-3 sm:flex-row">
+                  <div className="mt-8 flex flex-col gap-2 sm:flex-row md:mt-12 md:gap-3">
                     <Button asChild className="w-full min-h-11 sm:w-auto font-semibold uppercase">
                       <Link href="/rooms" className="inline-flex items-center gap-2 text-white">
                         <Image
@@ -73,7 +75,7 @@ export function FeaturedRoomsSection() {
                   </div>
                 </div>
 
-                <div className="relative min-h-64 md:col-span-2 md:min-h-full">
+                <div className="relative min-h-52 md:col-span-2 md:min-h-full">
                   <Image
                     src="/images/landing/room-image.jpg"
                     alt={`${room.name} featured room image`}

@@ -25,12 +25,12 @@ const amenities = [
 
 export function AmenitiesStrip() {
   return (
-    <section className="relative z-10 bg-amenities-bg py-10 shadow-md md:py-12">
+    <section className="relative z-10 bg-amenities-bg py-8 shadow-md md:py-12">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
           {amenities.map((item) => (
-            <article key={item.title} className="text-center rounded-lg p-4 md:p-6">
-              <div className="relative mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center md:mb-6 md:h-20 md:w-20">
+            <article key={item.title} className="rounded-lg p-3 text-center md:p-6">
+              <div className="relative mx-auto mb-3 inline-flex h-14 w-14 items-center justify-center md:mb-6 md:h-20 md:w-20">
                 <Image
                   src="/icons/amenities-icon-bg.svg"
                   alt=""
@@ -43,13 +43,15 @@ export function AmenitiesStrip() {
                   alt=""
                   width={44}
                   height={44}
-                  className="relative z-10 h-8 w-8 md:h-11 md:w-11"
+                  className="relative z-10 h-7 w-7 md:h-11 md:w-11"
                 />
               </div>
-              <h2 className="text-base font-semibold text-foreground sm:text-lg md:text-[1.5rem] md:leading-tight">
+              <h2 className="text-sm font-semibold text-foreground sm:text-base md:text-[1.5rem] md:leading-tight">
                 {item.title}
               </h2>
-              <p className="mt-3 text-sm text-foreground sm:text-base">{item.description}</p>
+              <p className="mt-2 text-xs text-foreground sm:text-sm md:text-base">
+                {item.description}
+              </p>
             </article>
           ))}
         </div>

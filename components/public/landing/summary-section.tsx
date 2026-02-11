@@ -7,15 +7,15 @@ const summaryItems = [
 
 export function SummarySection() {
   return (
-    <section className="shadow-sm bg-room-category-bg py-8 md:py-10">
+    <section className="bg-room-category-bg py-6 shadow-sm md:py-10">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 text-center md:grid-cols-4 md:gap-10">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-center md:grid-cols-4 md:gap-10">
           {summaryItems.map((item) => (
             <article key={item.label}>
-              <p className="text-3xl font-semibold leading-none text-foreground sm:text-4xl md:text-5xl">
+              <p className="text-2xl font-semibold leading-none text-foreground sm:text-3xl md:text-5xl">
                 {item.value}
               </p>
-              <p className="mt-3 text-base leading-tight text-primary md:mt-4 md:text-2xl">
+              <p className="mt-2 text-sm leading-tight text-primary md:mt-4 md:text-2xl">
                 {item.label}
               </p>
             </article>
