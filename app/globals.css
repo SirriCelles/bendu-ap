@@ -29,6 +29,10 @@
 
   --info: 205 37% 78%;
   --info-foreground: 216 28% 12%;
+  --icon-fill: 211 22% 42%;
+  --featured-bg: 35 2% 92%;
+  --room-category-bg: 33 3% 98%;
+  --amenities-bg: 29 1% 99%;
   --overlay-50: 0 0% 0% / 0.5;
 
   --radius: 0.75rem;
@@ -65,5 +69,21 @@
 @layer utilities {
   .bg-overlay-50 {
     background-color: hsl(var(--overlay-50));
+  }
+
+  .text-icon-fill {
+    color: hsl(var(--icon-fill));
+  }
+
+  .bg-featured-bg {
+    background-color: hsl(var(--featured-bg));
+  }
+
+  .bg-room-category-bg {
+    background-color: hsl(var(--room-category-bg));
+  }
+
+  .bg-amenities-bg {
+    background-color: hsl(var(--amenities-bg));
   }
 }

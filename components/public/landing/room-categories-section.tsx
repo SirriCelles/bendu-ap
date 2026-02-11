@@ -17,7 +17,7 @@ const roomCategories = [
 
 export function RoomCategoriesSection() {
   return (
-    <section className="bg-background py-12 md:py-16 shadow-xl">
+    <section className="py-12 md:py-16 shadow-sm">
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-semibold uppercase md:text-4xl">The Apartments We Offer</h2>
@@ -27,9 +27,9 @@ export function RoomCategoriesSection() {
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-12 lg:grid-cols-4 lg:gap-6 xl:gap-8">
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-12 lg:grid-cols-4 lg:gap-4 xl:gap-6">
           {roomCategories.map((room) => (
-            <article key={room.name} className="overflow-hidden bg-card">
+            <article key={room.name} className="overflow-hidden bg-white shadow-md">
               <div className="relative aspect-[4/3] w-full">
                 <Image
                   src="/images/landing/hero-bg-image.png"
@@ -40,10 +40,8 @@ export function RoomCategoriesSection() {
                 />
               </div>
               <div className="px-4 py-6 text-center md:px-6 md:py-8">
-                <h3 className="text-2xl font-semibold uppercase md:text-xl lg:text-xl">
-                  {room.name}
-                </h3>
-                <p className="mt-2 text-lg text-foreground md:text-lg">{room.pricePerNight}</p>
+                <h3 className="text-md font-medium uppercase md:text-md lg:text-md">{room.name}</h3>
+                <p className="mt-2 text-sm text-foreground md:text-sm">{room.pricePerNight}</p>
               </div>
             </article>
           ))}

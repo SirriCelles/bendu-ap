@@ -21,7 +21,7 @@ export function HeroSection() {
               ALONTA TOWERS
             </h1>
             <div className="mx-auto mt-3 h-px w-48 bg-primary-foreground/70 md:mt-4 md:w-80" />
-            <p className="mt-4 text-xl font-semibold text-primary-foreground sm:text-2xl md:mt-5 md:text-4xl">
+            <p className="mt-4 text-xl font-medium text-primary-foreground sm:text-2xl md:mt-5 md:text-4xl">
               Guest House - Hotel
             </p>
           </div>
