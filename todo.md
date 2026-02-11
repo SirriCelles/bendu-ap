@@ -393,7 +393,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-018 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Listings
 - **Context:** Landing page drives discovery and conversion.
