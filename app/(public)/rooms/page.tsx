@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { parseRoomsSearchParams, type RawSearchParams } from "@/validation/rooms-search-params";
 
 const roomCards = Array.from({ length: 6 }).map((_, index) => ({
   id: `room-${index + 1}`,
@@ -21,7 +22,13 @@ const stripItems = [
   "Restaurant & Bar",
 ];
 
-export default function RoomsPage() {
+type RoomsPageProps = {
+  searchParams: Promise<RawSearchParams>;
+};
+
+export default async function RoomsPage({ searchParams }: RoomsPageProps) {
+  const { filters, errors } = parseRoomsSearchParams(await searchParams);
+
   return (
     <main className="overflow-x-hidden bg-background">
       <section className="relative min-h-40 overflow-hidden md:min-h-56">
@@ -44,18 +51,23 @@ export default function RoomsPage() {
       <section className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 md:py-10">
         <div className="rounded-xl bg-card p-4 shadow-sm md:p-6">
           <h2 className="text-base font-semibold md:text-lg">Availability Filters</h2>
+          {errors.length > 0 ? (
+            <p className="mt-2 text-sm text-destructive">
+              Invalid filter query. Using safe defaults for now.
+            </p>
+          ) : null}
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Check-in
+              Check-in: <span className="text-foreground">{filters.checkIn ?? "Not set"}</span>
             </div>
             <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Check-out
+              Check-out: <span className="text-foreground">{filters.checkOut ?? "Not set"}</span>
             </div>
             <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Guests
+              Guests: <span className="text-foreground">{filters.guests}</span>
             </div>
             <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Unit Type
+              Unit Type: <span className="text-foreground">{filters.type ?? "Any"}</span>
             </div>
           </div>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
