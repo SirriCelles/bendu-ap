@@ -247,7 +247,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-010 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Data
 - **Context:** Domain model must be explicit before feature work.
