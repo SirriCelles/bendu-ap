@@ -3,10 +3,63 @@
 
 datasource db {
   provider = "postgresql"
-
 }
 
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
+}
+
+enum Role {
+  ADMIN
+  GUEST
+}
+
+enum Currency {
+  XAF
+  EUR
+  USD
+}
+
+enum BookingStatus {
+  DRAFT
+  RESERVED
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  NOT_REQUIRED
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum UnitTypeStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+model Property {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  description     String?
+  city            String
+  country         String
+  addressLine1    String?
+  addressLine2    String?
+  postalCode      String?
+  timezone        String   @default("Africa/Douala")
+  defaultCurrency Currency @default(XAF)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([city, country])
 }
