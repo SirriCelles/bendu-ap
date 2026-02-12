@@ -48,17 +48,17 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 
 <!-- issue: bookeasy:T-001 -->
 
-Status: IN_PROGRESS
-Verification: 2026-02-09 (`pnpm lint` ✅, `pnpm build` ✅)
+Status: DONE
+Verification: 2026-02-12 (`pnpm build` ✅)
 
 - **Feature Area:** Infra
 - **Context:** Establish a reliable baseline aligned with locked stack decisions.
 - **Scope Included:** Validate Next.js App Router baseline, strict TypeScript, path aliases, core scripts.
 - **Scope Excluded:** Feature implementation.
 - **Acceptance Criteria:**
-- [ ] `next build` passes on clean install
-- [ ] TypeScript strict mode is enabled and enforced in CI
-- [ ] Standard scripts exist for `dev`, `build`, `lint`, `test`
+- [x] `next build` passes on clean install
+- [x] TypeScript strict mode is enabled and enforced in CI
+- [x] Standard scripts exist for `dev`, `build`, `lint`, `test`
 - **Implementation Notes:** Check `tsconfig.json`, `next.config.*`, `package.json`; add `@/*` alias for `app`, `lib`, `components`.
 - **Dependencies:** None
 - **Estimate:** S
