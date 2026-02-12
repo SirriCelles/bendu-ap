@@ -1,26 +1,26 @@
 const testimonials = [
   {
-    id: "ngwa-collins-1",
+    id: "linda-tabi-2",
     quote:
-      "I really love the place, it's so cozy and quiet, the luxury is a different level, staff are friendly and prices are affordable.",
-    name: "Ngwa Collins",
-    location: "Bamenda, Cmr",
+      "Spotless, modern, and incredibly peaceful. I stayed a week and truly felt at home. Seamless service from check-in to checkout.",
+    name: "Linda Tabi",
+    location: "Buea, Cameroon",
     rating: 6,
   },
   {
-    id: "ngwa-collins-2",
+    id: "samuel-njume-2",
     quote:
-      "I really love the place, it's so cozy and quiet, the luxury is a different level, staff are friendly and prices are affordable.",
-    name: "Ngwa Collins",
-    location: "Bamenda, Cmr",
+      "Exceptional comfort and attention to detail. Fast WiFi, secure environment, and real luxury at a fair price.         ",
+    name: "Samuel Njume",
+    location: "Limbe, Cameroon",
     rating: 6,
   },
   {
-    id: "ngwa-collins-3",
+    id: "brenda-akoh-2",
     quote:
-      "I really love the place, it's so cozy and quiet, the luxury is a different level, staff are friendly and prices are affordable.",
-    name: "Ngwa Collins",
-    location: "Bamenda, Cmr",
+      "Elegant, quiet, and fully equipped. I extended my stay because everything exceeded expectations. Highly recommended.",
+    name: "Brenda Akoh",
+    location: "Douala, Cameroon",
     rating: 6,
   },
 ];
@@ -53,7 +53,7 @@ export function TestimonialsSection() {
                   <p className="text-lg font-semibold leading-tight text-foreground md:text-2xl">
                     {item.name}
                   </p>
-                  <p className="text-base leading-tight text-muted-foreground md:text-2xl">
+                  <p className="text-base leading-tight text-muted-foreground md:text-xl">
                     {item.location}
                   </p>
                 </div>
