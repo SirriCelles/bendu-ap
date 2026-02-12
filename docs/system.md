@@ -247,6 +247,13 @@ REFUNDED
 - Structured logs with requestId and bookingId
 - Audit logs for admin actions
 
+## Database Environment Requirements
+
+- `DATABASE_URL` is required for application runtime database access.
+- `DIRECT_URL` is recommended for Prisma CLI migrations when `DATABASE_URL` is a pooled URL.
+- `SHADOW_DATABASE_URL` is optional and can be used by Prisma Migrate in stricter environments.
+- MVP assumes one primary `Property` row exists, while schema relations remain multi-property extensible.
+
 ---
 
 ## Roadmap

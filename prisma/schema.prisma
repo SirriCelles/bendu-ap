@@ -38,15 +38,41 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum PaymentMethod {
+  PAY_ON_ARRIVAL
+  CARD
+  MOBILE_MONEY
+}
+
+enum PaymentProvider {
+  INTERNAL
+  STRIPE
+  MTN_MOMO
+  ORANGE_MOMO
+  CUSTOM
+}
+
 enum UnitTypeStatus {
   ACTIVE
   INACTIVE
   ARCHIVED
 }
 
+enum UnitStatus {
+  ACTIVE
+  OUT_OF_SERVICE
+  ARCHIVED
+}
+
+enum MessageThreadStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
+
 model Property {
-  id              String   @id @default(cuid())
-  slug            String   @unique
+  id              String          @id @default(cuid())
+  slug            String          @unique
   name            String
   description     String?
   city            String
@@ -54,12 +80,242 @@ model Property {
   addressLine1    String?
   addressLine2    String?
   postalCode      String?
-  timezone        String   @default("Africa/Douala")
-  defaultCurrency Currency @default(XAF)
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  timezone        String          @default("Africa/Douala")
+  defaultCurrency Currency        @default(XAF)
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  unitTypes       UnitType[]
+  units           Unit[]
+  bookings        Booking[]
+  priceSnapshots  PriceSnapshot[]
+  paymentIntents  PaymentIntent[]
+  messageThreads  MessageThread[]
+  auditLogs       AuditLog[]
 
   @@index([isActive])
   @@index([city, country])
+}
+
+model UnitType {
+  id             String         @id @default(cuid())
+  propertyId     String
+  slug           String
+  name           String
+  description    String?
+  status         UnitTypeStatus @default(ACTIVE)
+  maxGuests      Int
+  basePriceMinor Int
+  currency       Currency       @default(XAF)
+  displayOrder   Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  units    Unit[]
+
+  @@unique([propertyId, slug])
+  @@index([propertyId, status])
+  @@index([propertyId, displayOrder])
+}
+
+model Unit {
+  id          String     @id @default(cuid())
+  propertyId  String
+  unitTypeId  String
+  code        String
+  name        String?
+  floor       String?
+  status      UnitStatus @default(ACTIVE)
+  isBookable  Boolean    @default(true)
+  isPublished Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  bookings    Booking[]
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  unitType UnitType @relation(fields: [unitTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([propertyId, code])
+  @@index([propertyId, unitTypeId])
+  @@index([propertyId, status, isBookable, isPublished])
+}
+
+model Booking {
+  id               String          @id @default(cuid())
+  propertyId       String
+  unitId           String
+  idempotencyKey   String?
+  status           BookingStatus   @default(RESERVED)
+  paymentStatus    PaymentStatus   @default(NOT_REQUIRED)
+  checkInDate      DateTime
+  checkOutDate     DateTime
+  guestFullName    String
+  guestEmail       String
+  guestPhone       String
+  adultsCount      Int
+  childrenCount    Int             @default(0)
+  currency         Currency        @default(XAF)
+  totalAmountMinor Int
+  notes            String?
+  cancelledAt      DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  priceSnapshot    PriceSnapshot?
+  paymentIntents   PaymentIntent[]
+  messageThreads   MessageThread[]
+  auditLogs        AuditLog[]
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  unit     Unit     @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  @@unique([idempotencyKey])
+  @@index([propertyId, status, checkInDate])
+  @@index([propertyId, unitId, checkInDate, checkOutDate])
+  @@index([unitId, checkInDate, checkOutDate])
+  @@index([guestEmail, createdAt])
+}
+
+model PriceSnapshot {
+  id               String   @id @default(cuid())
+  propertyId       String
+  bookingId        String   @unique
+  currency         Currency
+  nightsCount      Int
+  nightlyRateMinor Int
+  subtotalMinor    Int
+  discountsMinor   Int      @default(0)
+  taxesMinor       Int      @default(0)
+  feesMinor        Int      @default(0)
+  totalAmountMinor Int
+  pricingVersion   Int      @default(1)
+  promotionCode    String?
+  capturedAt       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, capturedAt])
+  @@index([currency, capturedAt])
+}
+
+model PaymentIntent {
+  id                  String          @id @default(cuid())
+  propertyId          String
+  bookingId           String
+  amountMinor         Int
+  currency            Currency
+  method              PaymentMethod
+  provider            PaymentProvider @default(INTERNAL)
+  status              PaymentStatus   @default(NOT_REQUIRED)
+  providerIntentRef   String?
+  providerCustomerRef String?
+  idempotencyKey      String?
+  metadata            Json?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  property     Property             @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  booking      Booking              @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  transactions PaymentTransaction[]
+
+  @@unique([provider, providerIntentRef])
+  @@unique([idempotencyKey])
+  @@index([propertyId, status, createdAt])
+  @@index([bookingId, createdAt])
+  @@index([provider, providerCustomerRef])
+}
+
+model PaymentTransaction {
+  id                String        @id @default(cuid())
+  paymentIntentId   String
+  status            PaymentStatus
+  amountMinor       Int
+  currency          Currency
+  providerTxnRef    String?
+  externalReference String?
+  message           String?
+  rawPayload        Json?
+  sequence          Int
+  occurredAt        DateTime      @default(now())
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  paymentIntent PaymentIntent @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
+
+  @@unique([paymentIntentId, sequence])
+  @@unique([providerTxnRef])
+  @@index([paymentIntentId, occurredAt])
+  @@index([status, occurredAt])
+  @@index([externalReference, occurredAt])
+}
+
+model MessageThread {
+  id            String              @id @default(cuid())
+  propertyId    String
+  bookingId     String?
+  subject       String?
+  guestFullName String
+  guestEmail    String
+  status        MessageThreadStatus @default(OPEN)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  lastMessageAt DateTime?
+
+  property  Property   @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  booking   Booking?   @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  messages  Message[]
+  auditLogs AuditLog[]
+
+  @@index([propertyId, status, updatedAt])
+  @@index([bookingId, updatedAt])
+  @@index([guestEmail, createdAt])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  threadId       String
+  senderRole     Role
+  senderUserId   String?
+  senderName     String?
+  body           String
+  isInternalNote Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+  @@index([senderRole, createdAt])
+}
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  propertyId      String
+  bookingId       String?
+  messageThreadId String?
+  actorRole       Role
+  actorUserId     String?
+  actorEmail      String?
+  action          String
+  entityType      String
+  entityId        String?
+  requestId       String?
+  ipAddress       String?
+  userAgent       String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  property      Property       @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  booking       Booking?       @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  messageThread MessageThread? @relation(fields: [messageThreadId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId, createdAt])
+  @@index([actorRole, createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@index([bookingId, createdAt])
+  @@index([messageThreadId, createdAt])
+  @@index([requestId, createdAt])
 }

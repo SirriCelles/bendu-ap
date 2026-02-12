@@ -157,7 +157,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-007 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Observability
 - **Context:** Error/performance monitoring is a non-functional requirement.
@@ -254,9 +254,9 @@ Status: TODO
 - **Scope Included:** `Property`, `UnitType`, `Unit`, `Booking`, `PriceSnapshot`, `PaymentIntent`, `PaymentTransaction`, `MessageThread`, `Message`, `AuditLog`.
 - **Scope Excluded:** Non-MVP entities.
 - **Acceptance Criteria:**
-- [ ] Schema compiles and migration is generated
-- [ ] Booking stores `currency` and integer monetary fields
-- [ ] Single-property relation is explicit and future-extensible
+- [x] Schema compiles and migration is generated
+- [x] Booking stores `currency` and integer monetary fields
+- [x] Single-property relation is explicit and future-extensible
 - **Implementation Notes:** Edit `prisma/schema.prisma`; use enums for booking/payment lifecycles.
 - **Dependencies:** 002
 - **Estimate:** M
