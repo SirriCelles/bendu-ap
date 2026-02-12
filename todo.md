@@ -265,16 +265,16 @@ Status: TODO
 
 <!-- issue: bookeasy:T-011 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Booking
 - **Context:** Robust double-booking prevention must be DB-enforced.
 - **Scope Included:** Range-based exclusion constraint migration with status awareness.
 - **Scope Excluded:** App-level locking mechanisms.
 - **Acceptance Criteria:**
-- [ ] Overlapping bookings for same unit are rejected by DB
-- [ ] Non-overlapping bookings succeed
-- [ ] `CANCELLED`/`COMPLETED` records do not block new bookings
+- [x] Overlapping bookings for same unit are rejected by DB
+- [x] Non-overlapping bookings succeed
+- [x] `CANCELLED`/`COMPLETED` records do not block new bookings
 - **Implementation Notes:** Use SQL migration with GiST and range type (`daterange` or `tstzrange`), include `btree_gist` if required.
 - **Dependencies:** 010
 - **Estimate:** M

@@ -1,11 +1,4 @@
 import Image from "next/image";
-import { Inria_Serif } from "next/font/google";
-
-const inriaSerif = Inria_Serif({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
 
 const stats = [
   {
@@ -42,7 +35,8 @@ export function StatsRibbonSection() {
                     className="h-8 w-8 opacity-80 md:h-14 md:w-14"
                   />
                   <p
-                    className={`${inriaSerif.className} text-3xl font-medium text-info md:text-6xl`}
+                    className="text-3xl font-medium text-info md:text-6xl"
+                    style={{ fontFamily: "'Iowan Old Style', 'Palatino Linotype', serif" }}
                   >
                     {item.value}
                   </p>

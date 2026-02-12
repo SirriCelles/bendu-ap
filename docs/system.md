@@ -158,6 +158,35 @@ REFUNDED
 
 - PostgreSQL exclusion constraints on date ranges per unit
 
+### Overlap Policy (SQL Terms)
+
+- Inventory-blocking booking statuses:
+  - `RESERVED`
+  - `CONFIRMED`
+  - `CHECKED_IN`
+- Non-blocking booking statuses:
+  - `CANCELLED`
+  - `COMPLETED`
+- Date boundary rule:
+  - `checkInDate < checkOutDate` must always be true.
+  - Checkout is a non-overlapping boundary, so adjacent stays are allowed:
+    - booking A `[2026-02-10, 2026-02-12)`
+    - booking B `[2026-02-12, 2026-02-14)`
+  - In SQL range terms, overlap checks should use a half-open range with `daterange(check_in, check_out, '[)')`.
+
+Example status predicate used by overlap constraints:
+
+```sql
+status IN ('RESERVED', 'CONFIRMED', 'CHECKED_IN')
+```
+
+### Conflict Mapping Contract (Service Layer Prep)
+
+- Constraint name is deterministic and must remain stable: `booking_no_overlap_active_per_unit`
+- Expected PostgreSQL SQLSTATE for overlap conflicts: `23P01` (`exclusion_violation`)
+- App conflict mapping rule for booking creation:
+  - If SQLSTATE is `23P01` and constraint is `booking_no_overlap_active_per_unit`, map to typed domain conflict (`BookingConflictError` / `UNIT_NOT_AVAILABLE_FOR_DATE_RANGE`)
+
 ### Outcome
 
 - Zero overlapping bookings
