@@ -24,12 +24,10 @@ describe("T-017 public layout smoke validation", () => {
     expect(screen.getByRole("heading", { name: "Contact Us" })).toBeInTheDocument();
   });
 
-  it("renders header and footer on rooms page", () => {
-    render(
-      <PublicLayout>
-        <RoomsPage />
-      </PublicLayout>
-    );
+  it("renders header and footer on rooms page", async () => {
+    const roomsPage = await RoomsPage({ searchParams: Promise.resolve({}) });
+
+    render(<PublicLayout>{roomsPage}</PublicLayout>);
 
     expect(screen.getByRole("heading", { name: "Rooms" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: "Hotel" }).length).toBeGreaterThan(0);

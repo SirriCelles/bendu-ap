@@ -283,16 +283,17 @@ Status: DONE
 
 <!-- issue: bookeasy:T-012 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-13 (`pnpm test:unit tests/unit/domain/booking-status.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Booking
 - **Context:** Lifecycle control prevents invalid state changes.
 - **Scope Included:** Transition map and reusable guard helpers.
 - **Scope Excluded:** API/UI wiring.
 - **Acceptance Criteria:**
-- [ ] Illegal transitions return typed domain errors
-- [ ] MVP defaults to `paymentStatus=NOT_REQUIRED`
-- [ ] Transition helpers have unit test coverage
+- [x] Illegal transitions return typed domain errors
+- [x] MVP defaults to `paymentStatus=NOT_REQUIRED`
+- [x] Transition helpers have unit test coverage
 - **Implementation Notes:** Add `lib/domain/booking-status.ts`, `tests/domain/booking-status.test.ts`.
 - **Dependencies:** 010
 - **Estimate:** S
