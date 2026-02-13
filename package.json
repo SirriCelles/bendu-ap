@@ -2,6 +2,9 @@
   "name": "bookeasy",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "node --experimental-strip-types prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,6 +22,7 @@
     "prisma": "prisma",
     "migrate:dev": "prisma migrate dev",
     "generate": "prisma generate",
+    "seed": "prisma db seed",
     "todo:sync": "node scripts/todo-sync.mjs"
   },
   "lint-staged": {
