@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-BookEasy is a single-property guest-house booking platform for Buea, Cameroon, built with Next.js App Router and PostgreSQL.
+BookEasy is a single-property guest-house booking platform for Bamenda, Northwest Region, Cameroon, built with Next.js App Router and PostgreSQL.
 MVP focuses on browsing rooms, checking availability, reserving with Pay on Arrival, and guest-admin communication.
 Double-booking prevention is enforced primarily at database level with transactional booking flows and idempotency.
 Booking logic and payment logic are separated so future Stripe and Mobile Money providers can plug in cleanly.

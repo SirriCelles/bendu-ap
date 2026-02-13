@@ -4,7 +4,7 @@ const testimonials = [
     quote:
       "Spotless, modern, and incredibly peaceful. I stayed a week and truly felt at home. Seamless service from check-in to checkout.",
     name: "Linda Tabi",
-    location: "Buea, Cameroon",
+    location: "Bamenda, Cameroon",
     rating: 6,
   },
   {

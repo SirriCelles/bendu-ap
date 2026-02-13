@@ -1,10 +1,24 @@
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/index.js";
 
 import { seedMvpInventory } from "./seed-orchestrator";
 import { STARTER_AMENITY_METADATA } from "./seed-data";
 
 async function main(): Promise<void> {
-  const prisma = new PrismaClient();
+  const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("Missing DIRECT_URL or DATABASE_URL for seed execution.");
+  }
+
+  const adapter = new PrismaPg({ connectionString });
+  const prisma = new PrismaClient({
+    adapter,
+    transactionOptions: {
+      maxWait: 20_000,
+      timeout: 60_000,
+    },
+  });
 
   try {
     const summary = await seedMvpInventory(prisma);

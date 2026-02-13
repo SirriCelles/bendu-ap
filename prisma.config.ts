@@ -5,7 +5,7 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-    seed: "node ./prisma/seed-runtime.mjs",
+    seed: "pnpm exec tsx ./prisma/seed.ts",
   },
   datasource: {
     // Use DIRECT_URL for Prisma CLI/migrations when a pooled DATABASE_URL is used in app runtime.

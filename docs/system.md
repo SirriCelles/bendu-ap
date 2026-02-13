@@ -2,7 +2,7 @@
 
 ## Overview
 
-BookEasy is a full-stack booking platform for a **single guest house** located in **Buea, Cameroon**, supporting **apartments, studios, and single rooms**.
+BookEasy is a full-stack booking platform for a **single guest house** located in **Bamenda, Northwest Region, Cameroon**, supporting **apartments, studios, and single rooms**.
 
 The MVP uses a **Reserve Now / Pay on Arrival** model with **XAF (FCFA)**.  
 The architecture is explicitly designed to support future **online payments (EUR/USD)** and **Mobile Money (MTN & Orange)** without refactoring.
