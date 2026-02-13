@@ -302,16 +302,17 @@ Verification: 2026-02-13 (`pnpm test:unit tests/unit/domain/booking-status.test.
 
 <!-- issue: bookeasy:T-013 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-13 (`pnpm test:unit tests/unit/domain/pricing-and-reserve-flow.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Pricing
 - **Context:** Price history must be immutable per booking.
 - **Scope Included:** Snapshot generation from current room pricing with stored currency.
 - **Scope Excluded:** Dynamic pricing engine.
 - **Acceptance Criteria:**
-- [ ] Booking creates immutable `PriceSnapshot`
-- [ ] Monetary amounts are integer values
-- [ ] Currency stored on both booking and snapshot
+- [x] Booking creates immutable `PriceSnapshot`
+- [x] Monetary amounts are integer values
+- [x] Currency stored on both booking and snapshot
 - **Implementation Notes:** Add logic in `lib/domain/pricing.ts` and `lib/domain/booking.ts`.
 - **Dependencies:** 010
 - **Estimate:** S
