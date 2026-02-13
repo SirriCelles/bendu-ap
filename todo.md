@@ -321,16 +321,17 @@ Verification: 2026-02-13 (`pnpm test:unit tests/unit/domain/pricing-and-reserve-
 
 <!-- issue: bookeasy:T-014 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-13 (`pnpm test:unit tests/unit/domain/availability.test.ts tests/unit/db/inventory-repo.test.ts tests/unit/db/inventory-repo.integration.test.ts tests/unit/db/inventory-repo.performance.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Inventory
 - **Context:** Listings and booking flows depend on consistent availability logic.
 - **Scope Included:** Date-range availability queries by unit and unit type.
 - **Scope Excluded:** Calendar UX components.
 - **Acceptance Criteria:**
-- [ ] Valid date range returns available units correctly
-- [ ] Invalid date ranges are rejected
-- [ ] Query performance is acceptable for MVP data size
+- [x] Valid date range returns available units correctly
+- [x] Invalid date ranges are rejected
+- [x] Query performance is acceptable for MVP data size
 - **Implementation Notes:** Add `lib/db/inventory-repo.ts`, `lib/domain/availability.ts`; handle same-day check-out/in boundary.
 - **Dependencies:** 011
 - **Estimate:** M
