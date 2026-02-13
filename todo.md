@@ -340,7 +340,7 @@ Verification: 2026-02-13 (`pnpm test:unit tests/unit/domain/availability.test.ts
 
 <!-- issue: bookeasy:T-015 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Data
 - **Context:** MVP needs seeded inventory for development and test consistency.
