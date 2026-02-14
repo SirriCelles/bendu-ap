@@ -9,6 +9,9 @@ type UnitTypeRow = {
   slug: string;
   name: string;
   description: string;
+  coverImageUrl: string | null;
+  galleryImageUrls: readonly string[];
+  estimatedRating: number;
   maxGuests: number;
   basePriceMinor: number;
   displayOrder: number;
@@ -91,5 +94,10 @@ describe("seedUnitTypesForProperty", () => {
     expect(seeded.map((row) => row.slug).sort()).toEqual(
       UNIT_TYPE_BASELINE_SEED.map((item) => item.slug).sort()
     );
+
+    const standardSeed = UNIT_TYPE_BASELINE_SEED.find((item) => item.slug === "standard-room");
+    expect(standardSeed?.coverImageUrl).toBe("/images/landing/hero-bg-image.png");
+    expect(standardSeed?.galleryImageUrls).toEqual(["/images/landing/hero-bg-image.png"]);
+    expect(standardSeed?.estimatedRating).toBe(4.8);
   });
 });

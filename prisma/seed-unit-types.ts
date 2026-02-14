@@ -9,6 +9,9 @@ export type UnitTypeSeedDbClient = {
         slug: string;
         name: string;
         description: string;
+        coverImageUrl: string | null;
+        galleryImageUrls: readonly string[];
+        estimatedRating: number;
         maxGuests: number;
         basePriceMinor: number;
         displayOrder: number;
@@ -17,6 +20,9 @@ export type UnitTypeSeedDbClient = {
       update: {
         name: string;
         description: string;
+        coverImageUrl: string | null;
+        galleryImageUrls: readonly string[];
+        estimatedRating: number;
         maxGuests: number;
         basePriceMinor: number;
         displayOrder: number;
@@ -45,6 +51,9 @@ export async function seedUnitTypesForProperty(
         slug: unitType.slug,
         name: unitType.name,
         description: unitType.description,
+        coverImageUrl: unitType.coverImageUrl,
+        galleryImageUrls: [...unitType.galleryImageUrls],
+        estimatedRating: unitType.estimatedRating,
         maxGuests: unitType.maxGuests,
         basePriceMinor: unitType.basePriceMinor,
         displayOrder: unitType.displayOrder,
@@ -53,6 +62,9 @@ export async function seedUnitTypesForProperty(
       update: {
         name: unitType.name,
         description: unitType.description,
+        coverImageUrl: unitType.coverImageUrl,
+        galleryImageUrls: [...unitType.galleryImageUrls],
+        estimatedRating: unitType.estimatedRating,
         maxGuests: unitType.maxGuests,
         basePriceMinor: unitType.basePriceMinor,
         displayOrder: unitType.displayOrder,

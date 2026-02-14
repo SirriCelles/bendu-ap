@@ -103,6 +103,9 @@ model UnitType {
   slug           String
   name           String
   description    String?
+  coverImageUrl  String?
+  galleryImageUrls String[]      @default([])
+  estimatedRating Float          @default(4.5)
   status         UnitTypeStatus @default(ACTIVE)
   maxGuests      Int
   basePriceMinor Int

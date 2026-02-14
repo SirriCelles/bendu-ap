@@ -416,16 +416,17 @@ Status: DONE
 
 <!-- issue: bookeasy:T-019 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-14 (`pnpm test:unit tests/unit/validation/rooms-search-params.test.ts tests/unit/domain/rooms-listing.test.ts tests/unit/db/rooms-listing-repo.test.ts tests/unit/public/rooms-page-ssr.test.tsx` ✅, `pnpm test:unit tests/unit/db/inventory-repo.integration.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Listings
 - **Context:** Guests need filtered inventory discovery before booking.
 - **Scope Included:** SSR room grid, date filters, availability badge states.
 - **Scope Excluded:** Personalized ranking.
 - **Acceptance Criteria:**
-- [ ] `/rooms` renders server-side inventory list
-- [ ] Date filters change availability results
-- [ ] Empty-availability state is shown clearly
+- [x] `/rooms` renders server-side inventory list
+- [x] Date filters change availability results
+- [x] Empty-availability state is shown clearly
 - **Implementation Notes:** Implement in `app/(public)/rooms/page.tsx` using `lib/domain/availability.ts`.
 - **Dependencies:** 014, 017
 - **Estimate:** M

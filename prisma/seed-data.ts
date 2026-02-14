@@ -98,6 +98,9 @@ export type UnitTypeBaselineSeed = {
   slug: RequiredUnitTypeSlug;
   name: string;
   description: string;
+  coverImageUrl: string | null;
+  galleryImageUrls: readonly string[];
+  estimatedRating: number;
   maxGuests: number;
   basePriceMinor: number;
   displayOrder: number;
@@ -109,6 +112,9 @@ export const UNIT_TYPE_BASELINE_SEED: ReadonlyArray<UnitTypeBaselineSeed> = Obje
     slug: "standard-room",
     name: "Standard Room",
     description: "Modern, comfortable room (no kitchen).",
+    coverImageUrl: "/images/landing/hero-bg-image.png",
+    galleryImageUrls: ["/images/landing/hero-bg-image.png"],
+    estimatedRating: 4.8,
     maxGuests: 2,
     basePriceMinor: 20000,
     displayOrder: 1,
@@ -118,6 +124,9 @@ export const UNIT_TYPE_BASELINE_SEED: ReadonlyArray<UnitTypeBaselineSeed> = Obje
     slug: "bedsit-chambre-moderne",
     name: "Bedsit (Chambre Moderne)",
     description: "Modern bedsit with kitchen.",
+    coverImageUrl: "/images/landing/hero-bg-image.png",
+    galleryImageUrls: ["/images/landing/hero-bg-image.png"],
+    estimatedRating: 4.7,
     maxGuests: 2,
     basePriceMinor: 25000,
     displayOrder: 2,
@@ -127,6 +136,9 @@ export const UNIT_TYPE_BASELINE_SEED: ReadonlyArray<UnitTypeBaselineSeed> = Obje
     slug: "studio-one-bedroom",
     name: "Studio (One-bedroom Apartment)",
     description: "Private one-bedroom studio apartment.",
+    coverImageUrl: "/images/landing/hero-bg-image.png",
+    galleryImageUrls: ["/images/landing/hero-bg-image.png"],
+    estimatedRating: 4.9,
     maxGuests: 3,
     basePriceMinor: 35000,
     displayOrder: 3,
@@ -136,6 +148,9 @@ export const UNIT_TYPE_BASELINE_SEED: ReadonlyArray<UnitTypeBaselineSeed> = Obje
     slug: "apartment-two-bedroom",
     name: "Apartment (Two-bedroom)",
     description: "Spacious two-bedroom apartment.",
+    coverImageUrl: "/images/landing/hero-bg-image.png",
+    galleryImageUrls: ["/images/landing/hero-bg-image.png"],
+    estimatedRating: 4.6,
     maxGuests: 4,
     basePriceMinor: 60000,
     displayOrder: 4,

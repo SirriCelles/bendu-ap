@@ -1,18 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { Boxes, Star } from "lucide-react";
 
+import { RoomsFiltersForm } from "@/components/public/rooms/rooms-filters-form";
 import { Button } from "@/components/ui/button";
-import { parseRoomsSearchParams, type RawSearchParams } from "@/validation/rooms-search-params";
-
-const roomCards = Array.from({ length: 6 }).map((_, index) => ({
-  id: `room-${index + 1}`,
-  name: "Standard Rooms",
-  rating: 4.9,
-  price: "20,000 XAF",
-  image: "/images/landing/room-image.jpg",
-  status: "Available",
-}));
+import { prisma } from "@/lib/db/prisma";
+import { queryActiveUnitTypeFilterOptions, queryRoomsListing } from "@/lib/db/rooms-listing-repo";
+import type {
+  RoomsListingQueryOutput,
+  RoomsUnitTypeFilterOption,
+} from "@/lib/domain/rooms-listing";
+import {
+  parseRoomsSearchParams,
+  type RawRoomsSearchParams,
+} from "@/lib/validation/rooms-search-params";
 
 const stripItems = [
   "Breakfast Included",
@@ -23,11 +24,66 @@ const stripItems = [
 ];
 
 type RoomsPageProps = {
-  searchParams: Promise<RawSearchParams>;
+  searchParams: Promise<RawRoomsSearchParams>;
 };
 
+function formatMinorUnits(amountMinor: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat("en-CM", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amountMinor);
+  } catch {
+    return `${currency} ${amountMinor}`;
+  }
+}
+
+function availabilityBadgeClass(
+  availabilityState: RoomsListingQueryOutput["roomCards"][number]["availabilityState"]
+): string {
+  if (availabilityState === "AVAILABLE") return "bg-primary";
+  if (availabilityState === "LIMITED") return "bg-accent text-accent-foreground";
+  return "bg-muted text-muted-foreground";
+}
+
+function getBedCountForRoomSlug(slug: string): number {
+  if (slug === "apartment-two-bedroom") {
+    return 2;
+  }
+
+  return 1;
+}
+
+function formatUnitTypeFromSlug(slug: string): string {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+}
+
 export default async function RoomsPage({ searchParams }: RoomsPageProps) {
-  const { filters, errors } = parseRoomsSearchParams(await searchParams);
+  const { input, errors, hasActiveFilters } = parseRoomsSearchParams(await searchParams);
+  let listing: RoomsListingQueryOutput = {
+    query: input,
+    roomCards: [],
+    hasAnyAvailability: false,
+  };
+  let unitTypeOptions: RoomsUnitTypeFilterOption[] = [];
+  let dataError: string | null = null;
+
+  try {
+    const [listingResult, unitTypeOptionsResult] = await Promise.all([
+      queryRoomsListing(prisma, input),
+      queryActiveUnitTypeFilterOptions(prisma),
+    ]);
+    listing = listingResult;
+    unitTypeOptions = unitTypeOptionsResult;
+  } catch (error) {
+    console.error("rooms listing query failed", error);
+    dataError = "Unable to load live inventory right now.";
+  }
 
   return (
     <main className="overflow-x-hidden bg-background">
@@ -56,63 +112,69 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
               Invalid filter query. Using safe defaults for now.
             </p>
           ) : null}
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Check-in: <span className="text-foreground">{filters.checkIn ?? "Not set"}</span>
-            </div>
-            <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Check-out: <span className="text-foreground">{filters.checkOut ?? "Not set"}</span>
-            </div>
-            <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Guests: <span className="text-foreground">{filters.guests}</span>
-            </div>
-            <div className="rounded-md border border-input bg-background p-3 text-sm text-muted-foreground">
-              Unit Type: <span className="text-foreground">{filters.type ?? "Any"}</span>
-            </div>
-          </div>
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <Button disabled className="w-full sm:w-auto">
-              Search Availability
-            </Button>
-            <Button variant="outline" disabled className="w-full sm:w-auto">
-              Reset Filters
-            </Button>
-          </div>
+          {dataError ? <p className="mt-2 text-sm text-destructive">{dataError}</p> : null}
+          <RoomsFiltersForm
+            defaultCheckInDate={input.checkInDate.toISOString().slice(0, 10)}
+            defaultCheckOutDate={input.checkOutDate.toISOString().slice(0, 10)}
+            defaultGuests={input.guestCount}
+            defaultUnitTypeId={input.unitTypeId}
+            unitTypeOptions={unitTypeOptions}
+            hasActiveFilters={hasActiveFilters}
+          />
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {roomCards.map((room) => (
-            <article key={room.id} className="overflow-hidden mb-4">
+          {listing.roomCards.map((room) => (
+            <article key={room.unitTypeId} className="overflow-hidden mb-4">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-bl-lg">
                 <Image
-                  src={room.image}
+                  src={room.coverImageUrl ?? "/images/landing/room-image.jpg"}
                   alt={`${room.name} photo`}
                   fill
                   className="object-cover"
                   sizes="(min-width: 640px) 50vw, 100vw"
                 />
-                <span className="absolute bottom-2 left-2 rounded-lg bg-primary px-3 py-1 text-xs text-primary-foreground">
-                  {room.status}
+                <span
+                  className={`absolute bottom-2 left-2 rounded-lg px-3 py-1 text-xs ${availabilityBadgeClass(room.availabilityState)}`}
+                >
+                  {room.availabilityState}
                 </span>
               </div>
 
               <div className="py-2">
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="text-xl font-semibold text-foreground">{room.name}</h2>
-                  <p className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
+                  <p className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground">
                     <Star className="h-4 w-4 fill-accent text-accent" />
-                    {room.rating}
+                    {room.estimatedRating.toFixed(1)}
                   </p>
                 </div>
+                <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+                  Unit Type: {formatUnitTypeFromSlug(room.slug)}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {room.description ??
+                    "Comfort-focused room with essential amenities for your stay."}
+                </p>
 
                 <div className="mt-2 flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold uppercase text-foreground">{room.price}</p>
+                  <p className="text-sm font-semibold uppercase text-foreground">
+                    {formatMinorUnits(room.nightlyRateMinor, room.currency)}
+                  </p>
                   <Button
                     size="sm"
                     asChild
                     className="h-7 from-primary to-secondary px-3 text-xs font-semibold text-primary-foreground"
                   >
-                    <Link href="/rooms">Book Now</Link>
+                    <Link
+                      href={`/rooms/${room.slug}?${new URLSearchParams({
+                        checkInDate: listing.query.checkInDate.toISOString().slice(0, 10),
+                        checkOutDate: listing.query.checkOutDate.toISOString().slice(0, 10),
+                        guests: String(listing.query.guestCount),
+                      }).toString()}`}
+                    >
+                      Book Now
+                    </Link>
                   </Button>
                 </div>
 
@@ -125,7 +187,7 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
                       height={12}
                       className="h-5 w-5"
                     />
-                    1 Bed
+                    {getBedCountForRoomSlug(room.slug)} Bed
                   </p>
                   <p className="inline-flex items-center gap-1">
                     <Image
@@ -135,23 +197,32 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
                       height={12}
                       className="h-5 w-5"
                     />
-                    1 Kitchen
+                    {room.maxGuests} Guests
                   </p>
                   <p className="inline-flex items-center gap-1">
-                    <Image
-                      src="/icons/Bath-tub.svg"
-                      alt=""
-                      width={12}
-                      height={12}
-                      className="h-5 w-5"
-                    />
-                    2 Bath
+                    <Boxes className="h-5 w-5" aria-hidden />
+                    {room.availableUnitsCount} Units left
                   </p>
                 </div>
               </div>
             </article>
           ))}
         </div>
+        {!dataError && listing.roomCards.length === 0 ? (
+          <div className="mt-6 rounded-xl border border-input bg-card p-6 text-center">
+            <h3 className="text-base font-semibold text-foreground">No rooms match your filters</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Try changing your dates, room type, or guest count to see more availability.
+            </p>
+            {hasActiveFilters ? (
+              <div className="mt-4">
+                <Button variant="outline" asChild>
+                  <Link href="/rooms">Clear filters and show all rooms</Link>
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       <section className="bg-primary py-3">

@@ -3,6 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/index.js";
 
 import { seedMvpInventory } from "./seed-orchestrator";
+import type { SeedDbClient } from "./seed-orchestrator";
 import { STARTER_AMENITY_METADATA } from "./seed-data";
 
 async function main(): Promise<void> {
@@ -21,7 +22,7 @@ async function main(): Promise<void> {
   });
 
   try {
-    const summary = await seedMvpInventory(prisma);
+    const summary = await seedMvpInventory(prisma as unknown as SeedDbClient);
     console.log(`Property: created=${summary.property.created}, reused=${summary.property.reused}`);
     console.log(
       `UnitTypes: created=${summary.unitTypes.created}, reused=${summary.unitTypes.reused}`

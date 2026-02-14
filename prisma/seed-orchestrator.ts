@@ -27,7 +27,14 @@ export type SeedTxClient = {
   Parameters<typeof seedUnitsForProperty>[0];
 
 export type SeedDbClient = {
-  $transaction<TResult>(fn: (tx: SeedTxClient) => Promise<TResult>): Promise<TResult>;
+  $transaction<TResult>(
+    fn: (tx: SeedTxClient) => Promise<TResult>,
+    options?: {
+      maxWait?: number;
+      timeout?: number;
+      isolationLevel?: unknown;
+    }
+  ): Promise<TResult>;
 };
 
 export type SeedSummary = {
