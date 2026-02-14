@@ -359,16 +359,17 @@ Status: DONE
 
 <!-- issue: bookeasy:T-016 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-14 (`pnpm typecheck` ✅, `pnpm exec vitest run tests/unit/integration/booking-concurrency.test.ts` ✅)
 
 - **Feature Area:** QA
 - **Context:** Race-condition protection must be validated, not assumed.
 - **Scope Included:** Parallel booking creation tests for overlapping and non-overlapping ranges.
 - **Scope Excluded:** Browser e2e tests.
 - **Acceptance Criteria:**
-- [ ] Concurrent overlapping attempts result in one deterministic conflict
-- [ ] Concurrent non-overlapping attempts succeed
-- [ ] DB conflict maps to domain conflict error
+- [x] Concurrent overlapping attempts result in one deterministic conflict
+- [x] Concurrent non-overlapping attempts succeed
+- [x] DB conflict maps to domain conflict error
 - **Implementation Notes:** Add `tests/integration/booking-concurrency.test.ts`.
 - **Dependencies:** 011, 012, 013, 014
 - **Estimate:** M

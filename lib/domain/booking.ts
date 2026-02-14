@@ -8,6 +8,21 @@ import {
 import type { BuildPriceSnapshotInput, PriceSnapshotPersistencePayload } from "./pricing";
 import { buildPriceSnapshot } from "./pricing";
 
+export type BookingConflictErrorCode = "BOOKING_CONFLICT";
+export type BookingConflictReason = "OVERLAPPING_BOOKING" | "IDEMPOTENCY_KEY_REUSED";
+
+export class BookingConflictError extends Error {
+  readonly code: BookingConflictErrorCode;
+  readonly reason: BookingConflictReason;
+
+  constructor(reason: BookingConflictReason, message: string) {
+    super(message);
+    this.code = "BOOKING_CONFLICT";
+    this.reason = reason;
+    this.name = "BookingConflictError";
+  }
+}
+
 export type BookingStatusUpdate = {
   status: BookingStatus;
   cancelledAt: Date | null;
@@ -78,6 +93,87 @@ export type BookingReservationDbClient<TBookingRecord> = {
   ): Promise<TResult>;
 };
 
+function extractErrorMetadata(error: unknown): {
+  code?: string;
+  message?: string;
+  target?: unknown;
+  constraint?: string;
+} {
+  if (!error || typeof error !== "object") {
+    return {};
+  }
+
+  const candidate = error as {
+    code?: string;
+    message?: string;
+    meta?: { target?: unknown; constraint?: string };
+    constraint?: string;
+  };
+
+  return {
+    code: candidate.code,
+    message: candidate.message,
+    target: candidate.meta?.target,
+    constraint: candidate.meta?.constraint ?? candidate.constraint,
+  };
+}
+
+function isIdempotencyConstraintConflict(error: unknown): boolean {
+  const metadata = extractErrorMetadata(error);
+  if (metadata.code === "23505") {
+    return true;
+  }
+
+  if (metadata.code === "P2002") {
+    if (Array.isArray(metadata.target)) {
+      return metadata.target.some((entry) => String(entry).includes("idempotencyKey"));
+    }
+    return String(metadata.target ?? "").includes("idempotencyKey");
+  }
+
+  return (
+    String(metadata.constraint ?? "").includes("idempotency") ||
+    String(metadata.message ?? "").includes("idempotency")
+  );
+}
+
+function isOverlapConstraintConflict(error: unknown): boolean {
+  const metadata = extractErrorMetadata(error);
+  if (metadata.code === "23P01") {
+    return true;
+  }
+
+  if (metadata.code === "P2004") {
+    return (
+      String(metadata.constraint ?? "").includes("booking_no_overlap_active_per_unit") ||
+      String(metadata.message ?? "").includes("booking_no_overlap_active_per_unit")
+    );
+  }
+
+  return (
+    String(metadata.constraint ?? "").includes("booking_no_overlap_active_per_unit") ||
+    String(metadata.message ?? "").includes("booking_no_overlap_active_per_unit")
+  );
+}
+
+function mapBookingPersistenceConflict(error: unknown): BookingConflictError | null {
+  if (isIdempotencyConstraintConflict(error)) {
+    return new BookingConflictError(
+      "IDEMPOTENCY_KEY_REUSED",
+      "A booking already exists for this idempotency key."
+    );
+  }
+
+  if (isOverlapConstraintConflict(error)) {
+    return new BookingConflictError(
+      "OVERLAPPING_BOOKING",
+      "Requested dates overlap with an existing active booking."
+    );
+  }
+
+  return null;
+}
+
 // Centralized booking status mutation path backed by transition guards.
 export function createBookingStatusUpdate(
   from: BookingStatus,
@@ -120,41 +216,49 @@ export async function reserveBookingWithSnapshot<TBookingRecord>(
   const snapshot = buildPriceSnapshot(input.pricing);
   const bookingCurrency = snapshot.currency;
 
-  return db.$transaction(async (tx) => {
-    return tx.booking.create({
-      data: {
-        propertyId: input.propertyId,
-        unitId: input.unitId,
-        idempotencyKey: input.idempotencyKey ?? null,
-        status: "RESERVED",
-        paymentStatus: PAYMENT_STATUS_DEFAULT,
-        checkInDate: input.checkInDate,
-        checkOutDate: input.checkOutDate,
-        guestFullName: input.guestFullName,
-        guestEmail: input.guestEmail,
-        guestPhone: input.guestPhone,
-        adultsCount: input.adultsCount,
-        childrenCount: input.childrenCount ?? 0,
-        currency: bookingCurrency,
-        totalAmountMinor: snapshot.totalAmountMinor,
-        notes: input.notes ?? null,
-        priceSnapshot: {
-          create: {
-            propertyId: input.propertyId,
-            currency: bookingCurrency,
-            nightsCount: snapshot.nightsCount,
-            nightlyRateMinor: snapshot.nightlyRateMinor,
-            subtotalMinor: snapshot.subtotalMinor,
-            discountsMinor: snapshot.discountsMinor,
-            taxesMinor: snapshot.taxesMinor,
-            feesMinor: snapshot.feesMinor,
-            totalAmountMinor: snapshot.totalAmountMinor,
-            pricingVersion: snapshot.pricingVersion,
-            promotionCode: snapshot.promotionCode,
-            capturedAt: snapshot.capturedAt,
+  try {
+    return await db.$transaction(async (tx) => {
+      return tx.booking.create({
+        data: {
+          propertyId: input.propertyId,
+          unitId: input.unitId,
+          idempotencyKey: input.idempotencyKey ?? null,
+          status: "RESERVED",
+          paymentStatus: PAYMENT_STATUS_DEFAULT,
+          checkInDate: input.checkInDate,
+          checkOutDate: input.checkOutDate,
+          guestFullName: input.guestFullName,
+          guestEmail: input.guestEmail,
+          guestPhone: input.guestPhone,
+          adultsCount: input.adultsCount,
+          childrenCount: input.childrenCount ?? 0,
+          currency: bookingCurrency,
+          totalAmountMinor: snapshot.totalAmountMinor,
+          notes: input.notes ?? null,
+          priceSnapshot: {
+            create: {
+              propertyId: input.propertyId,
+              currency: bookingCurrency,
+              nightsCount: snapshot.nightsCount,
+              nightlyRateMinor: snapshot.nightlyRateMinor,
+              subtotalMinor: snapshot.subtotalMinor,
+              discountsMinor: snapshot.discountsMinor,
+              taxesMinor: snapshot.taxesMinor,
+              feesMinor: snapshot.feesMinor,
+              totalAmountMinor: snapshot.totalAmountMinor,
+              pricingVersion: snapshot.pricingVersion,
+              promotionCode: snapshot.promotionCode,
+              capturedAt: snapshot.capturedAt,
+            },
           },
         },
-      },
+      });
     });
-  });
+  } catch (error) {
+    const domainConflict = mapBookingPersistenceConflict(error);
+    if (domainConflict) {
+      throw domainConflict;
+    }
+    throw error;
+  }
 }
