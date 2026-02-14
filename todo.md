@@ -103,16 +103,17 @@ Status: DONE
 
 <!-- issue: bookeasy:T-004 -->
 
-Status: IN_PROGRESS
+Status: DONE
+Verification: 2026-02-14 (`pnpm typecheck` ✅, `pnpm exec vitest run tests/unit/security/auth-role.test.ts tests/unit/security/auth-callbacks.test.ts tests/unit/security/rbac.test.ts tests/unit/security/admin-session.test.ts tests/unit/security/admin-middleware-access.test.ts tests/unit/security/admin-bookings-route.test.ts` ✅)
 
 - **Feature Area:** Security
 - **Context:** RBAC is required for admin security.
 - **Scope Included:** Auth setup, role typing, middleware guards for admin routes.
 - **Scope Excluded:** Admin feature pages.
 - **Acceptance Criteria:**
-- [ ] Unauthenticated users cannot access `/admin/*`
-- [ ] Session contains role field
-- [ ] Role guard utility is reusable in services/routes
+- [x] Unauthenticated users cannot access `/admin/*`
+- [x] Session contains role field
+- [x] Role guard utility is reusable in services/routes
 - **Implementation Notes:** Add `auth.ts`, `middleware.ts`, `lib/security/rbac.ts`; keep authorization server-side.
 - **Dependencies:** 001
 - **Estimate:** M
