@@ -435,27 +435,28 @@ Verification: 2026-02-14 (`pnpm test:unit tests/unit/validation/rooms-search-par
 
 <!-- issue: bookeasy:T-019A -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-14 (`pnpm test:unit tests/unit/public/rooms-loading.test.tsx tests/unit/public/rooms-page-ssr.test.tsx tests/unit/db/rooms-listing-repo.test.ts tests/unit/domain/rooms-listing.test.ts tests/unit/validation/rooms-search-params.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Listings/Performance
 - **Context:** `/rooms` should feel responsive while server data resolves.
 - **Scope Included:** Route-level streaming, section-level fallbacks, loading states for filter/list results.
 - **Scope Excluded:** Client-side data fetching rewrite.
 - **Acceptance Criteria:**
-- [ ] `/rooms` starts rendering immediately with loading fallback(s) before full data resolves
-- [ ] Critical sections (filters/results) stream independently or route streams as a whole
-- [ ] Loading UI is accessible and does not cause layout jumps
-- [ ] Existing filter URL behavior and SSR results remain correct after streaming changes
+- [x] `/rooms` starts rendering immediately with loading fallback(s) before full data resolves
+- [x] Critical sections (filters/results) stream independently or route streams as a whole
+- [x] Loading UI is accessible and does not cause layout jumps
+- [x] Existing filter URL behavior and SSR results remain correct after streaming changes
 - **Implementation Notes:** Prefer App Router streaming (`loading.tsx`) plus section `Suspense` where helpful.
 - **Dependencies:** 019
 - **Estimate:** M
 - **Subtasks:**
-- [ ] `T-019A.1` Define streaming strategy for `/rooms` (whole-page `loading.tsx` vs section `Suspense`) and identify async boundaries.
-- [ ] `T-019A.2` Add route-level loading UI (`app/(public)/rooms/loading.tsx`) with accessible skeleton/fallback content.
-- [ ] `T-019A.3` Refactor rooms page into streamable server components (for example filters shell + results section) wrapped in `Suspense`.
-- [ ] `T-019A.4` Ensure filter submit/reset URL behavior remains deterministic with streaming enabled.
-- [ ] `T-019A.5` Add tests for streaming render states (loading fallback + final content + empty state path).
-- [ ] `T-019A.6` Verification and backlog update (`pnpm test:unit` relevant suites, `pnpm typecheck`, mark `T-019A` DONE with date/commands).
+- [x] `T-019A.1` Define streaming strategy for `/rooms` (whole-page `loading.tsx` vs section `Suspense`) and identify async boundaries.
+- [x] `T-019A.2` Add route-level loading UI (`app/(public)/rooms/loading.tsx`) with accessible skeleton/fallback content.
+- [x] `T-019A.3` Implement whole-page route streaming boundary via App Router `loading.tsx` (section-level `Suspense` deferred for future optimization).
+- [x] `T-019A.4` Ensure filter submit/reset URL behavior remains deterministic with streaming enabled.
+- [x] `T-019A.5` Add tests for streaming render states (loading fallback + final content + empty state path).
+- [x] `T-019A.6` Verification and backlog update (`pnpm test:unit` relevant suites, `pnpm typecheck`, mark `T-019A` DONE with date/commands).
 
 ## T-020 — Build room details page with gallery, amenities, and reserve CTA
 
