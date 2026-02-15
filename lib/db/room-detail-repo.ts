@@ -54,6 +54,20 @@ export type RoomDetailReadDbClient = InventoryReadDbClient & {
       select: Record<string, unknown>;
     }): Promise<Record<string, unknown> | null>;
   };
+  unit: {
+    findMany(args: {
+      where: {
+        propertyId: string;
+        unitTypeId: string;
+        status: "ACTIVE";
+        isBookable: boolean;
+        isPublished: boolean;
+      };
+      select: {
+        id: true;
+      };
+    }): Promise<Array<{ id: string }>>;
+  };
 };
 
 function isMissingUnitTypeFieldError(error: unknown): boolean {
@@ -132,7 +146,7 @@ export async function queryRoomDetail(
     return null;
   }
 
-  let availableUnitsCount = unitType._count.units;
+  let availableUnitsCount = 0;
   if (input.bookingContext) {
     const availability = await findAvailability(db, {
       propertyId: unitType.propertyId,
@@ -141,6 +155,20 @@ export async function queryRoomDetail(
       checkOutDate: input.bookingContext.checkOutDate,
     });
     availableUnitsCount = availability.availableByUnitType[0]?.availableUnitsCount ?? 0;
+  } else {
+    const activePublishedUnits = await db.unit.findMany({
+      where: {
+        propertyId: unitType.propertyId,
+        unitTypeId: unitType.id,
+        status: "ACTIVE",
+        isBookable: true,
+        isPublished: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+    availableUnitsCount = activePublishedUnits.length;
   }
 
   const galleryImageUrls =

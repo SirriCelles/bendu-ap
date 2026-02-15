@@ -462,16 +462,17 @@ Verification: 2026-02-14 (`pnpm test:unit tests/unit/public/rooms-loading.test.t
 
 <!-- issue: bookeasy:T-020 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-15 (`pnpm test:unit tests/unit/domain/room-detail.test.ts tests/unit/db/room-detail-repo.test.ts tests/unit/public/room-detail-page-ssr.test.tsx tests/unit/public/rooms-page-ssr.test.tsx` ✅, `pnpm test:unit tests/unit/db/inventory-repo.integration.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Listings
 - **Context:** Users need detailed room context before reservation.
 - **Scope Included:** SSR room detail, image gallery, amenities, pricing, reserve CTA.
 - **Scope Excluded:** Payment capture UI.
 - **Acceptance Criteria:**
-- [ ] `/rooms/[id]` renders room details and amenities
-- [ ] Reserve CTA carries room/date context into checkout
-- [ ] Invalid room id shows not-found state
+- [x] `/rooms/[id]` renders room details and amenities
+- [x] Reserve CTA carries room/date context into checkout
+- [x] Invalid room id shows not-found state
 - **Implementation Notes:** Implement in `app/(public)/rooms/[id]/page.tsx`; optimize Cloudinary images.
 - **Dependencies:** 015, 017
 - **Estimate:** M

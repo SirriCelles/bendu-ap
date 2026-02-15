@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarCheck2, CreditCard, Sparkles, Star } from "lucide-react";
 
@@ -12,6 +13,30 @@ type RoomDetailPageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<RawRoomDetailSearchParams>;
 };
+
+function formatRoomTitleFromIdentifier(identifier: string): string {
+  if (identifier.startsWith("c")) {
+    return "Room Details";
+  }
+
+  return identifier
+    .split("-")
+    .filter(Boolean)
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(" ");
+}
+
+export async function generateMetadata({
+  params,
+}: Pick<RoomDetailPageProps, "params">): Promise<Metadata> {
+  const { id } = await params;
+  const title = formatRoomTitleFromIdentifier(id);
+
+  return {
+    title: `${title} | BookEasy`,
+    description: "Room details, amenities, pricing, and reservation options for your stay.",
+  };
+}
 
 function formatMinorUnits(amountMinor: number, currency: string): string {
   try {
@@ -27,6 +52,23 @@ function formatMinorUnits(amountMinor: number, currency: string): string {
 
 function formatDateForForm(date: Date): string {
   return date.toISOString().slice(0, 10);
+}
+
+function buildReserveHref(
+  roomSlug: string,
+  bookingContext: { checkInDate: Date; checkOutDate: Date; guestCount: number } | undefined
+): string {
+  const params = new URLSearchParams({
+    room: roomSlug,
+  });
+
+  if (bookingContext) {
+    params.set("checkInDate", formatDateForForm(bookingContext.checkInDate));
+    params.set("checkOutDate", formatDateForForm(bookingContext.checkOutDate));
+    params.set("guests", String(bookingContext.guestCount));
+  }
+
+  return `/reserve?${params.toString()}`;
 }
 
 export default async function RoomDetailPage({ params, searchParams }: RoomDetailPageProps) {
@@ -226,9 +268,11 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                     <CreditCard className="h-4 w-4 stroke-[2.5]" aria-hidden />
                     Pay Now
                   </Button>
-                  <Button type="button" className="w-full">
-                    <CalendarCheck2 className="h-4 w-4" aria-hidden />
-                    Reserve Now
+                  <Button asChild className="w-full">
+                    <Link href={buildReserveHref(room.slug, parsed.input.bookingContext)}>
+                      <CalendarCheck2 className="h-4 w-4" aria-hidden />
+                      Reserve Now
+                    </Link>
                   </Button>
                 </div>
               </div>
