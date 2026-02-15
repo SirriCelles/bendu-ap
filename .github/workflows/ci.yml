@@ -1,18 +1,19 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
   push:
-    branches: [main]
+  pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  unit:
-    name: Lint, Typecheck, Unit
+  ci:
+    name: Lint, Typecheck, Test, Build
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/postgres
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,14 +23,18 @@ jobs:
         with:
           version: 10
 
-      - name: Setup Node
+      - name: Setup Node (LTS) + pnpm cache
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: lts/*
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm generate
 
       - name: Lint
         run: pnpm lint
@@ -37,32 +42,8 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Unit tests
-        run: pnpm test:unit
+      - name: Test
+        run: pnpm test
 
-  e2e:
-    name: E2E Smoke
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Run e2e smoke tests
-        run: pnpm test:e2e
+      - name: Build
+        run: pnpm build

@@ -55,14 +55,6 @@ function getBedCountForRoomSlug(slug: string): number {
   return 1;
 }
 
-function formatUnitTypeFromSlug(slug: string): string {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
-    .join(" ");
-}
-
 export default async function RoomsPage({ searchParams }: RoomsPageProps) {
   const { input, errors, hasActiveFilters } = parseRoomsSearchParams(await searchParams);
   let listing: RoomsListingQueryOutput = {

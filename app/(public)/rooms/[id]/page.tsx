@@ -83,7 +83,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
 
   try {
     room = await queryRoomDetail(prisma, parsed.input);
-  } catch (error) {
+  } catch {
     console.warn("room detail query unavailable; rendering fallback shell");
     dataError = "Unable to load full room details right now.";
   }

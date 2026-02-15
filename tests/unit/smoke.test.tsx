@@ -6,6 +6,6 @@ import PublicPage from "../../app/(public)/page";
 describe("PublicPage", () => {
   it("renders the landing heading", () => {
     render(<PublicPage />);
-    expect(screen.getByRole("heading", { name: "Welcome" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "ALONTA TOWERS" })).toBeInTheDocument();
   });
 });
