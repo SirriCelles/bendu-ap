@@ -481,16 +481,17 @@ Verification: 2026-02-15 (`pnpm test:unit tests/unit/domain/room-detail.test.ts 
 
 <!-- issue: bookeasy:T-021 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-15 (`pnpm typecheck` ✅)
 
 - **Feature Area:** SEO
 - **Context:** SEO-first requirement must be explicit and verifiable.
 - **Scope Included:** Route metadata and search indexing primitives.
 - **Scope Excluded:** Paid SEO tooling and backlink workflows.
 - **Acceptance Criteria:**
-- [ ] Landing, listing, and detail pages have title/description/OG metadata
-- [ ] `/sitemap.xml` and `/robots.txt` are generated
-- [ ] Canonical URLs are set for indexable pages
+- [x] Landing, listing, and detail pages have title/description/OG metadata
+- [x] `/sitemap.xml` and `/robots.txt` are generated
+- [x] Canonical URLs are set for indexable pages
 - **Implementation Notes:** Add `app/sitemap.ts`, `app/robots.ts`, and route metadata exports.
 - **Dependencies:** 018, 019, 020
 - **Estimate:** S

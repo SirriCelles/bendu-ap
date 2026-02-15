@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Boxes, Star } from "lucide-react";
 
 import { RoomsFiltersForm } from "@/components/public/rooms/rooms-filters-form";
@@ -14,6 +15,7 @@ import {
   parseRoomsSearchParams,
   type RawRoomsSearchParams,
 } from "@/lib/validation/rooms-search-params";
+import { absoluteUrl } from "@/lib/seo";
 
 const stripItems = [
   "Breakfast Included",
@@ -25,6 +27,29 @@ const stripItems = [
 
 type RoomsPageProps = {
   searchParams: Promise<RawRoomsSearchParams>;
+};
+
+export const metadata: Metadata = {
+  title: "Rooms & Suites",
+  description:
+    "Browse available rooms and suites, apply date and guest filters, and find your best stay option in Bamenda.",
+  alternates: {
+    canonical: "/rooms",
+  },
+  openGraph: {
+    type: "website",
+    title: "Rooms & Suites - BookEasy",
+    description:
+      "Explore real-time room availability, compare options, and continue to reservation on BookEasy.",
+    url: absoluteUrl("/rooms"),
+    siteName: "BookEasy",
+    images: [
+      {
+        url: absoluteUrl("/images/landing/hero-bg-image.png"),
+        alt: "BookEasy rooms listing hero image",
+      },
+    ],
+  },
 };
 
 function formatMinorUnits(amountMinor: number, currency: string): string {

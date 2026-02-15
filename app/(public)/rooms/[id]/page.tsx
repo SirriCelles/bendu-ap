@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db/prisma";
 import { queryRoomDetail } from "@/lib/db/room-detail-repo";
 import { parseRoomDetailQuery, type RawRoomDetailSearchParams } from "@/lib/domain/room-detail";
+import { absoluteUrl } from "@/lib/seo";
 
 type RoomDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -33,8 +34,24 @@ export async function generateMetadata({
   const title = formatRoomTitleFromIdentifier(id);
 
   return {
-    title: `${title} | BookEasy`,
+    title,
     description: "Room details, amenities, pricing, and reservation options for your stay.",
+    alternates: {
+      canonical: `/rooms/${id}`,
+    },
+    openGraph: {
+      type: "website",
+      title: `${title} - BookEasy`,
+      description: "Room details, amenities, pricing, and reservation options for your stay.",
+      url: absoluteUrl(`/rooms/${id}`),
+      siteName: "BookEasy",
+      images: [
+        {
+          url: absoluteUrl("/images/landing/room-image.jpg"),
+          alt: `${title} room image`,
+        },
+      ],
+    },
   };
 }
 
