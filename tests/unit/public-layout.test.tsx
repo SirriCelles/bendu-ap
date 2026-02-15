@@ -29,7 +29,7 @@ describe("T-017 public layout smoke validation", () => {
 
     render(<PublicLayout>{roomsPage}</PublicLayout>);
 
-    expect(screen.getByRole("heading", { name: "Rooms" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Rooms & Suites" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: "Hotel" }).length).toBeGreaterThan(0);
   });
 
@@ -42,12 +42,12 @@ describe("T-017 public layout smoke validation", () => {
 
     const homeLinks = screen.getAllByRole("link", { name: "Home" });
     const browseLinks = screen.getAllByRole("link", { name: "Browse" });
-    const apartmentLinks = screen.getAllByRole("link", { name: "Apartments" });
+    const restaurantLinks = screen.getAllByRole("link", { name: "Restaurant" });
     const cta = screen.getAllByRole("link", { name: "Book Now" })[0];
 
     expect(homeLinks.some((link) => link.getAttribute("href") === "/")).toBe(true);
     expect(browseLinks.some((link) => link.getAttribute("href") === "/rooms")).toBe(true);
-    expect(apartmentLinks.some((link) => link.getAttribute("href") === "/rooms")).toBe(true);
+    expect(restaurantLinks.some((link) => link.getAttribute("href") === "/rooms")).toBe(true);
     expect(cta).toHaveAttribute("href", "/rooms");
   });
 
@@ -60,7 +60,7 @@ describe("T-017 public layout smoke validation", () => {
 
     fireEvent.click(screen.getAllByRole("button", { name: "Open navigation menu" })[0]);
 
-    expect(screen.getByText("Navigate")).toBeInTheDocument();
+    expect(screen.getByText("Explore Apartments and start a reservation.")).toBeInTheDocument();
 
     const mobileHome = screen
       .getAllByRole("link", { name: "Home" })
