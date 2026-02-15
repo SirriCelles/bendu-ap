@@ -54,11 +54,13 @@ function formatDateForForm(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function buildReserveHref(
+function buildComingSoonHref(
+  action: "pay-now" | "reserve",
   roomSlug: string,
   bookingContext: { checkInDate: Date; checkOutDate: Date; guestCount: number } | undefined
 ): string {
   const params = new URLSearchParams({
+    action,
     room: roomSlug,
   });
 
@@ -68,7 +70,7 @@ function buildReserveHref(
     params.set("guests", String(bookingContext.guestCount));
   }
 
-  return `/reserve?${params.toString()}`;
+  return `/coming-soon?${params.toString()}`;
 }
 
 export default async function RoomDetailPage({ params, searchParams }: RoomDetailPageProps) {
@@ -262,14 +264,20 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
 
                 <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <Button
-                    type="button"
+                    asChild
                     className="w-full border border-transparent bg-accent font-bold text-accent-foreground hover:opacity-90"
                   >
-                    <CreditCard className="h-4 w-4 stroke-[2.5]" aria-hidden />
-                    Pay Now
+                    <Link
+                      href={buildComingSoonHref("pay-now", room.slug, parsed.input.bookingContext)}
+                    >
+                      <CreditCard className="h-4 w-4 stroke-[2.5]" aria-hidden />
+                      Pay Now
+                    </Link>
                   </Button>
                   <Button asChild className="w-full">
-                    <Link href={buildReserveHref(room.slug, parsed.input.bookingContext)}>
+                    <Link
+                      href={buildComingSoonHref("reserve", room.slug, parsed.input.bookingContext)}
+                    >
                       <CalendarCheck2 className="h-4 w-4" aria-hidden />
                       Reserve Now
                     </Link>

@@ -31,7 +31,7 @@ describe("RoomDetailPage SSR states", () => {
     vi.clearAllMocks();
   });
 
-  it("renders room details SSR content and reserve CTA with context params", async () => {
+  it("routes pay/reserve CTAs to coming-soon with context params", async () => {
     mocks.queryRoomDetailMock.mockResolvedValue({
       unitTypeId: "type-a",
       slug: "standard-room",
@@ -71,9 +71,14 @@ describe("RoomDetailPage SSR states", () => {
     expect(screen.getByRole("heading", { name: "ROOM DETAILS" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Standard Room" })).toBeInTheDocument();
 
+    const payNowLink = screen.getByRole("link", { name: "Pay Now" });
+    expect(payNowLink.getAttribute("href")).toBe(
+      "/coming-soon?action=pay-now&room=standard-room&checkInDate=2026-11-10&checkOutDate=2026-11-12&guests=2"
+    );
+
     const reserveLink = screen.getByRole("link", { name: "Reserve Now" });
     expect(reserveLink.getAttribute("href")).toBe(
-      "/reserve?room=standard-room&checkInDate=2026-11-10&checkOutDate=2026-11-12&guests=2"
+      "/coming-soon?action=reserve&room=standard-room&checkInDate=2026-11-10&checkOutDate=2026-11-12&guests=2"
     );
   });
 
@@ -120,8 +125,11 @@ describe("RoomDetailPage SSR states", () => {
     });
     render(page);
 
+    const payNowLink = screen.getByRole("link", { name: "Pay Now" });
+    expect(payNowLink.getAttribute("href")).toBe("/coming-soon?action=pay-now&room=standard-room");
+
     const reserveLink = screen.getByRole("link", { name: "Reserve Now" });
-    expect(reserveLink.getAttribute("href")).toBe("/reserve?room=standard-room");
+    expect(reserveLink.getAttribute("href")).toBe("/coming-soon?action=reserve&room=standard-room");
   });
 
   it("renders controlled fallback on data access failure", async () => {
