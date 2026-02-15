@@ -531,6 +531,32 @@ Status: TODO
 - **Dependencies:** 019, 020, 021
 - **Estimate:** S
 
+## T-023A — Implement Coming Soon page and route Pay/Reserve CTAs to it
+
+<!-- issue: bookeasy:T-023A -->
+
+Status: TODO
+
+- **Feature Area:** Listings/UX
+- **Context:** Some conversion actions are not fully available yet and need a clear temporary user path.
+- **Scope Included:** Build a branded `/coming-soon` page and route `Pay Now`/`Reserve` button clicks to this page.
+- **Scope Excluded:** Actual online payment flow or final reservation submission logic.
+- **Acceptance Criteria:**
+- [ ] `/coming-soon` renders a complete mobile/desktop experience with clear message and next-step CTA(s)
+- [ ] Clicking `Pay Now` routes to `/coming-soon`
+- [ ] Clicking `Reserve` routes to `/coming-soon`
+- [ ] Coming Soon page provides safe navigation back to discovery/reservation context (e.g., Home/Rooms)
+- [ ] Basic unit/integration coverage verifies CTA routing behavior and page render
+- **Implementation Notes:** Add `app/(public)/coming-soon/page.tsx`; update CTA sources in listing/detail/checkout-related components to route to `/coming-soon` until flows are enabled.
+- **Dependencies:** 017, 019, 020
+- **Estimate:** S
+- **Subtasks:**
+- [ ] `T-023A.1` Define UX copy and visual structure for Coming Soon page (title, description, primary/secondary CTAs).
+- [ ] `T-023A.2` Implement `app/(public)/coming-soon/page.tsx` with responsive, accessible layout.
+- [ ] `T-023A.3` Identify all `Pay Now` and `Reserve` buttons in public flows and update destinations to `/coming-soon`.
+- [ ] `T-023A.4` Add tests for CTA click-through routing and Coming Soon page rendering.
+- [ ] `T-023A.5` Verify no regressions in existing listing/detail navigation and update `todo.md` status when complete.
+
 ## Milestone 3 — Booking Engine (Pay on Arrival)
 
 ## T-024 — Define booking API schemas with Zod
