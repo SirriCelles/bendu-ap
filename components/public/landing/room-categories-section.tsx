@@ -1,18 +1,32 @@
 import Image from "next/image";
 
-const roomCategories = [
+type RoomCategory = {
+  name: string;
+  description: string;
+  pricePerNight: string;
+};
+
+const roomCategories: RoomCategory[] = [
   {
     name: "Standard Room",
     description: "Standard Room without kitchen",
     pricePerNight: "20,000 / PER NIGHT",
   },
   {
-    name: "Bedsits(chambre moderne)",
-    description: "Bedsits(chambre moderne) with kitchen",
+    name: "Bedsit (Chambre Moderne)",
+    description: "Bedsit (Chambre Moderne) with kitchen",
     pricePerNight: "25,000 / PER NIGHT",
   },
-  { name: "Studio", description: "One-bedroom apartment", pricePerNight: "35,000 / PER NIGHT" },
-  { name: "Apartment", description: "Two-bedroom apartment", pricePerNight: "60,000 / PER NIGHT" },
+  {
+    name: "Studio",
+    description: "One-bedroom apartment",
+    pricePerNight: "35,000 / PER NIGHT",
+  },
+  {
+    name: "Apartment",
+    description: "Two-bedroom apartment",
+    pricePerNight: "60,000 / PER NIGHT",
+  },
 ];
 
 export function RoomCategoriesSection() {
@@ -41,6 +55,7 @@ export function RoomCategoriesSection() {
               </div>
               <div className="px-4 py-5 text-center md:px-6 md:py-8">
                 <h3 className="text-sm font-medium uppercase md:text-base">{room.name}</h3>
+                <p className="mt-1 text-xs text-muted-foreground md:text-sm">{room.description}</p>
                 <p className="mt-2 text-xs text-foreground md:text-sm">{room.pricePerNight}</p>
               </div>
             </article>
