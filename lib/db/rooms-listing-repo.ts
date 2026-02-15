@@ -62,9 +62,14 @@ function isMissingUnitTypeFieldError(error: unknown): boolean {
     return false;
   }
 
+  const message = error.message;
+
   return (
-    error.message.includes("Unknown field `coverImageUrl`") ||
-    error.message.includes("Unknown field `estimatedRating`")
+    message.includes("Unknown field `coverImageUrl`") ||
+    message.includes("Unknown field `estimatedRating`") ||
+    // Prisma query can compile but fail at runtime when DB is behind the Prisma schema.
+    (message.includes("prisma.unitType.findMany()") &&
+      message.includes("does not exist in the current database"))
   );
 }
 
