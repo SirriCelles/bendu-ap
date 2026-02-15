@@ -73,16 +73,23 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
   let unitTypeOptions: RoomsUnitTypeFilterOption[] = [];
   let dataError: string | null = null;
 
-  try {
-    const [listingResult, unitTypeOptionsResult] = await Promise.all([
-      queryRoomsListing(prisma, input),
-      queryActiveUnitTypeFilterOptions(prisma),
-    ]);
-    listing = listingResult;
-    unitTypeOptions = unitTypeOptionsResult;
-  } catch (error) {
-    console.error("rooms listing query failed", error);
+  const [listingResult, unitTypeOptionsResult] = await Promise.allSettled([
+    queryRoomsListing(prisma, input),
+    queryActiveUnitTypeFilterOptions(prisma),
+  ]);
+
+  if (listingResult.status === "fulfilled") {
+    listing = listingResult.value;
+  } else {
+    console.warn("rooms listing unavailable; rendering empty fallback");
     dataError = "Unable to load live inventory right now.";
+  }
+
+  if (unitTypeOptionsResult.status === "fulfilled") {
+    unitTypeOptions = unitTypeOptionsResult.value;
+  } else {
+    console.warn("unit type filter options unavailable; rendering without options");
+    dataError = dataError ?? "Unable to load live inventory right now.";
   }
 
   return (
@@ -149,9 +156,6 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
                     {room.estimatedRating.toFixed(1)}
                   </p>
                 </div>
-                <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
-                  Unit Type: {formatUnitTypeFromSlug(room.slug)}
-                </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {room.description ??
                     "Comfort-focused room with essential amenities for your stay."}

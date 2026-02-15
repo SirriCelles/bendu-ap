@@ -61,7 +61,6 @@ describe("RoomsPage SSR states", () => {
     expect(screen.getByRole("heading", { name: "Rooms & Suites" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Availability Filters" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Standard Room" })).toBeInTheDocument();
-    expect(screen.getByText("Unit Type: Standard Room")).toBeInTheDocument();
     expect(screen.getByText("2 Guests")).toBeInTheDocument();
     expect(screen.getByText("LIMITED")).toBeInTheDocument();
 
