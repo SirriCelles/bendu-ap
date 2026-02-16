@@ -610,6 +610,19 @@ Status: TODO
 - **Implementation Notes:** Add `lib/domain/payments/index.ts` and `lib/domain/payments/providers/payOnArrival.ts`.
 - **Dependencies:** 010
 - **Estimate:** M
+- **Subtasks:**
+- [ ] `T-025.1` Define payment domain contract types and provider interface (`PaymentService`, provider key/method enums, request/response payload types).
+      Acceptance Criteria: Interface is provider-agnostic, strongly typed, and does not expose provider-specific implementation details to booking domain consumers.
+- [ ] `T-025.2` Implement provider registry/resolver in `lib/domain/payments/index.ts`.
+      Acceptance Criteria: Resolver maps payment method key to provider implementation deterministically; unknown method keys fail with typed domain error.
+- [ ] `T-025.3` Implement Pay-on-Arrival adapter in `lib/domain/payments/providers/payOnArrival.ts`.
+      Acceptance Criteria: Adapter returns payment decision/result with `paymentStatus=NOT_REQUIRED`, no external gateway call, and predictable metadata payload.
+- [ ] `T-025.4` Add domain error model for payment provider failures and unsupported methods.
+      Acceptance Criteria: Errors include stable `code` + message shape usable by service/API layers; unsupported provider path is explicitly testable.
+- [ ] `T-025.5` Integrate payment interface usage in booking domain entry path (without coupling to concrete adapter import in core booking flow).
+      Acceptance Criteria: Booking flow depends on interface/registry contract only; direct references to Pay-on-Arrival implementation are isolated to composition/wiring layer.
+- [ ] `T-025.6` Add unit tests for resolver + Pay-on-Arrival provider contract behavior.
+      Acceptance Criteria: Tests cover provider resolution success/failure, `NOT_REQUIRED` result path, and ensure no external dependency/network call is required.
 
 ## T-026 — Implement transactional BookingService reserve flow
 
