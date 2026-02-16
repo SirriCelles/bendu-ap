@@ -1,4 +1,5 @@
 import type { BookingStatus, PaymentStatus } from "@/generated/prisma";
+import { parseBookingReserveInput } from "@/lib/validation/booking";
 
 import {
   PAYMENT_STATUS_DEFAULT,
@@ -213,31 +214,32 @@ export async function reserveBookingWithSnapshot<TBookingRecord>(
   db: BookingReservationDbClient<TBookingRecord>,
   input: BookingReserveInput
 ): Promise<TBookingRecord> {
-  const snapshot = buildPriceSnapshot(input.pricing);
+  const validatedInput = parseBookingReserveInput(input);
+  const snapshot = buildPriceSnapshot(validatedInput.pricing);
   const bookingCurrency = snapshot.currency;
 
   try {
     return await db.$transaction(async (tx) => {
       return tx.booking.create({
         data: {
-          propertyId: input.propertyId,
-          unitId: input.unitId,
-          idempotencyKey: input.idempotencyKey ?? null,
+          propertyId: validatedInput.propertyId,
+          unitId: validatedInput.unitId,
+          idempotencyKey: validatedInput.idempotencyKey ?? null,
           status: "RESERVED",
           paymentStatus: PAYMENT_STATUS_DEFAULT,
-          checkInDate: input.checkInDate,
-          checkOutDate: input.checkOutDate,
-          guestFullName: input.guestFullName,
-          guestEmail: input.guestEmail,
-          guestPhone: input.guestPhone,
-          adultsCount: input.adultsCount,
-          childrenCount: input.childrenCount ?? 0,
+          checkInDate: validatedInput.checkInDate,
+          checkOutDate: validatedInput.checkOutDate,
+          guestFullName: validatedInput.guestFullName,
+          guestEmail: validatedInput.guestEmail,
+          guestPhone: validatedInput.guestPhone,
+          adultsCount: validatedInput.adultsCount,
+          childrenCount: validatedInput.childrenCount ?? 0,
           currency: bookingCurrency,
           totalAmountMinor: snapshot.totalAmountMinor,
-          notes: input.notes ?? null,
+          notes: validatedInput.notes ?? null,
           priceSnapshot: {
             create: {
-              propertyId: input.propertyId,
+              propertyId: validatedInput.propertyId,
               currency: bookingCurrency,
               nightsCount: snapshot.nightsCount,
               nightlyRateMinor: snapshot.nightlyRateMinor,

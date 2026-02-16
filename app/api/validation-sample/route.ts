@@ -5,8 +5,8 @@ import {
   limitRequest,
   rateLimitHeaders,
 } from "@/security/rate-limit";
-import { parseJsonBody } from "@/validation/parser";
-import { sampleReservationSchema } from "@/validation/sample-reservation";
+import { bookingReservationRequestSchema } from "@/lib/validation/booking";
+import { parseJsonBody } from "@/lib/validation/parser";
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const payload = await parseJsonBody(request, sampleReservationSchema);
+    const payload = await parseJsonBody(request, bookingReservationRequestSchema);
 
     const successResponse = Response.json(
       {

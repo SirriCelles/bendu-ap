@@ -565,19 +565,33 @@ Verification: 2026-02-15 (`pnpm test:unit tests/unit/public/coming-soon-page-ssr
 
 <!-- issue: bookeasy:T-024 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-16 (`pnpm test:unit tests/unit/validation/booking.test.ts tests/unit/domain/pricing-and-reserve-flow.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Booking
 - **Context:** Booking contracts require strict validation and predictable errors.
 - **Scope Included:** Guest details, dates, unit ID, currency, idempotency key.
 - **Scope Excluded:** Online payment payload fields.
 - **Acceptance Criteria:**
-- [ ] Invalid booking payloads fail with stable field errors
-- [ ] Currency defaults to XAF and validates against supported set
-- [ ] Schemas are reused by API and service layer
+- [x] Invalid booking payloads fail with stable field errors
+- [x] Currency defaults to XAF and validates against supported set
+- [x] Schemas are reused by API and service layer
 - **Implementation Notes:** Add `lib/validation/booking.ts`.
 - **Dependencies:** 005, 012
 - **Estimate:** S
+- **Subtasks:**
+- [x] `T-024.1` Define booking schema contract in `lib/validation/booking.ts` (`unitId`, `checkInDate`, `checkOutDate`, guest identity/contact, guest counts, optional `currency`, optional `idempotencyKey`).
+      Acceptance Criteria: Required fields are explicit and typed; schema exports are reusable by API/service layers.
+- [x] `T-024.2` Add date and occupancy validation rules.
+      Acceptance Criteria: `checkInDate` and `checkOutDate` must be valid ISO dates; `checkOutDate > checkInDate`; guest counts are positive and constrained to MVP-safe bounds.
+- [x] `T-024.3` Add currency and idempotency normalization rules.
+      Acceptance Criteria: Missing currency defaults to `XAF`; unsupported currency fails validation; idempotency key is optional but validated for non-empty/length-safe format when present.
+- [x] `T-024.4` Provide stable error mapping helper for booking schema failures.
+      Acceptance Criteria: Validation output is deterministic (`field`, `code`, `message` shape) and consistent with existing shared parser/error conventions.
+- [x] `T-024.5` Add unit tests for valid/invalid payload coverage.
+      Acceptance Criteria: Tests cover happy path, missing required fields, invalid date order, invalid currency, and malformed idempotency key; tests run in CI.
+- [x] `T-024.6` Wire schema into one booking-facing API boundary (or sample route) and one domain/service entry point.
+      Acceptance Criteria: Both layers consume the same schema exports; no duplicate ad-hoc booking payload validation remains in those paths.
 
 ## T-025 — Implement payment provider interface and Pay-on-Arrival adapter
 
