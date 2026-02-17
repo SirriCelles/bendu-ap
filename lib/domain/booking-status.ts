@@ -2,9 +2,30 @@ import type { BookingStatus, PaymentStatus } from "@/generated/prisma";
 
 type TransitionMap<TStatus extends string> = Readonly<Record<TStatus, readonly TStatus[]>>;
 
+export const CANONICAL_BOOKING_STATUSES = [
+  "RESERVED",
+  "CONFIRMED",
+  "CANCELLED",
+  "EXPIRED",
+] as const;
+export type CanonicalBookingStatus = (typeof CANONICAL_BOOKING_STATUSES)[number];
+
+export const CANONICAL_PAYMENT_STATUSES = [
+  "INITIATED",
+  "PENDING",
+  "SUCCEEDED",
+  "FAILED",
+  "CANCELLED",
+  "EXPIRED",
+] as const;
+export type CanonicalPaymentStatus = (typeof CANONICAL_PAYMENT_STATUSES)[number];
+
 export type TransitionErrorCode =
   | "BOOKING_STATUS_TRANSITION_NOT_ALLOWED"
-  | "PAYMENT_STATUS_TRANSITION_NOT_ALLOWED";
+  | "PAYMENT_STATUS_TRANSITION_NOT_ALLOWED"
+  | "CANONICAL_BOOKING_STATUS_TRANSITION_NOT_ALLOWED"
+  | "CANONICAL_PAYMENT_STATUS_TRANSITION_NOT_ALLOWED"
+  | "BOOKING_CONFIRMATION_REQUIRES_PAYMENT_SUCCEEDED";
 
 type TransitionErrorParams<TStatus extends string, TCode extends TransitionErrorCode> = {
   code: TCode;
@@ -46,6 +67,41 @@ export class PaymentStatusTransitionError extends BaseTransitionGuardError<
   constructor(from: PaymentStatus, to: PaymentStatus) {
     super({ code: "PAYMENT_STATUS_TRANSITION_NOT_ALLOWED", from, to });
     this.name = "PaymentStatusTransitionError";
+  }
+}
+
+export class CanonicalBookingStatusTransitionError extends BaseTransitionGuardError<
+  CanonicalBookingStatus,
+  "CANONICAL_BOOKING_STATUS_TRANSITION_NOT_ALLOWED"
+> {
+  constructor(from: CanonicalBookingStatus, to: CanonicalBookingStatus) {
+    super({ code: "CANONICAL_BOOKING_STATUS_TRANSITION_NOT_ALLOWED", from, to });
+    this.name = "CanonicalBookingStatusTransitionError";
+  }
+}
+
+export class CanonicalPaymentStatusTransitionError extends BaseTransitionGuardError<
+  CanonicalPaymentStatus,
+  "CANONICAL_PAYMENT_STATUS_TRANSITION_NOT_ALLOWED"
+> {
+  constructor(from: CanonicalPaymentStatus, to: CanonicalPaymentStatus) {
+    super({ code: "CANONICAL_PAYMENT_STATUS_TRANSITION_NOT_ALLOWED", from, to });
+    this.name = "CanonicalPaymentStatusTransitionError";
+  }
+}
+
+export class BookingConfirmationPaymentInvariantError extends Error {
+  readonly code = "BOOKING_CONFIRMATION_REQUIRES_PAYMENT_SUCCEEDED" as const;
+  readonly bookingTargetStatus: CanonicalBookingStatus;
+  readonly paymentStatus: CanonicalPaymentStatus;
+
+  constructor(bookingTargetStatus: CanonicalBookingStatus, paymentStatus: CanonicalPaymentStatus) {
+    super(
+      `Booking cannot transition to ${bookingTargetStatus} unless payment status is SUCCEEDED (received ${paymentStatus}).`
+    );
+    this.name = "BookingConfirmationPaymentInvariantError";
+    this.bookingTargetStatus = bookingTargetStatus;
+    this.paymentStatus = paymentStatus;
   }
 }
 
@@ -103,6 +159,24 @@ export const PAYMENT_STATUS_TRANSITIONS: TransitionMap<PaymentStatus> = {
   REFUNDED: [],
 };
 
+// Source-of-truth matrix for payment-first flow described in architecture/API docs.
+export const CANONICAL_BOOKING_STATUS_TRANSITIONS: TransitionMap<CanonicalBookingStatus> = {
+  RESERVED: ["CONFIRMED", "CANCELLED", "EXPIRED"],
+  CONFIRMED: [],
+  CANCELLED: [],
+  EXPIRED: [],
+};
+
+// Source-of-truth matrix for provider-agnostic payment lifecycle.
+export const CANONICAL_PAYMENT_STATUS_TRANSITIONS: TransitionMap<CanonicalPaymentStatus> = {
+  INITIATED: ["PENDING", "FAILED", "CANCELLED", "EXPIRED"],
+  PENDING: ["SUCCEEDED", "FAILED", "CANCELLED", "EXPIRED"],
+  SUCCEEDED: [],
+  FAILED: ["PENDING", "CANCELLED", "EXPIRED"],
+  CANCELLED: [],
+  EXPIRED: [],
+};
+
 export function canTransitionBookingStatus(from: BookingStatus, to: BookingStatus): boolean {
   if (from === to) {
     return true;
@@ -128,5 +202,62 @@ export function canTransitionPaymentStatus(from: PaymentStatus, to: PaymentStatu
 export function assertPaymentStatusTransition(from: PaymentStatus, to: PaymentStatus): void {
   if (!canTransitionPaymentStatus(from, to)) {
     throw new PaymentStatusTransitionError(from, to);
+  }
+}
+
+export function canTransitionCanonicalBookingStatus(
+  from: CanonicalBookingStatus,
+  to: CanonicalBookingStatus
+): boolean {
+  if (from === to) {
+    return true;
+  }
+
+  return CANONICAL_BOOKING_STATUS_TRANSITIONS[from].includes(to);
+}
+
+export function assertCanonicalBookingStatusTransition(
+  from: CanonicalBookingStatus,
+  to: CanonicalBookingStatus
+): void {
+  if (!canTransitionCanonicalBookingStatus(from, to)) {
+    throw new CanonicalBookingStatusTransitionError(from, to);
+  }
+}
+
+export function canTransitionCanonicalPaymentStatus(
+  from: CanonicalPaymentStatus,
+  to: CanonicalPaymentStatus
+): boolean {
+  if (from === to) {
+    return true;
+  }
+
+  return CANONICAL_PAYMENT_STATUS_TRANSITIONS[from].includes(to);
+}
+
+export function assertCanonicalPaymentStatusTransition(
+  from: CanonicalPaymentStatus,
+  to: CanonicalPaymentStatus
+): void {
+  if (!canTransitionCanonicalPaymentStatus(from, to)) {
+    throw new CanonicalPaymentStatusTransitionError(from, to);
+  }
+}
+
+export function canConfirmBookingForPaymentStatus(paymentStatus: CanonicalPaymentStatus): boolean {
+  return paymentStatus === "SUCCEEDED";
+}
+
+export function assertBookingConfirmationPaymentInvariant(
+  bookingTargetStatus: CanonicalBookingStatus,
+  paymentStatus: CanonicalPaymentStatus
+): void {
+  if (bookingTargetStatus !== "CONFIRMED") {
+    return;
+  }
+
+  if (!canConfirmBookingForPaymentStatus(paymentStatus)) {
+    throw new BookingConfirmationPaymentInvariantError(bookingTargetStatus, paymentStatus);
   }
 }

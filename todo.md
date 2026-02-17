@@ -825,19 +825,31 @@ Status: TODO
 
 <!-- issue: bookeasy:T-051 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-17 (`pnpm exec vitest run tests/unit/domain/booking-payment-invariants.test.ts tests/unit/domain/booking-status.test.ts tests/unit/domain/booking-transition-guards.test.ts tests/unit/domain/payment-transition-guards.test.ts tests/unit/domain/pricing-and-reserve-flow.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments/Booking
 - **Context:** `/docs/prd.md` and `/docs/payment.md` require canonical transitions where booking confirmation is payment-driven.
 - **Scope Included:** Formalize and enforce `RESERVED -> CONFIRMED` only when payment reaches `SUCCEEDED`; handle failure/cancel/expire transitions.
 - **Scope Excluded:** Provider-specific API calls.
 - **Acceptance Criteria:**
-- [ ] Transition policy is documented in code and rejects illegal transitions with typed domain errors
-- [ ] Booking cannot reach `CONFIRMED` unless related payment status is `SUCCEEDED`
-- [ ] Expired/cancelled payments cannot confirm bookings
-- **Implementation Notes:** Extend domain transition guards in booking/payment services and update unit tests for transition matrix.
+- [x] Transition policy is documented in code and rejects illegal transitions with typed domain errors
+- [x] Booking cannot reach `CONFIRMED` unless related payment status is `SUCCEEDED`
+- [x] Expired/cancelled payments cannot confirm bookings
+- **Implementation Notes:** Canonical statuses and transition matrices are centralized in `lib/domain/booking-status.ts`; service-facing helper APIs are exposed in `lib/domain/booking.ts` (`createCanonicalBookingStatusUpdate`, `createCanonicalPaymentStatusUpdate`, `createCanonicalBookingConfirmationUpdate`); invariant and matrix tests live under `tests/unit/domain/*transition*` and `tests/unit/domain/booking-payment-invariants.test.ts`.
 - **Dependencies:** 012, 024, 025
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-051.1` Define canonical status enums and transition matrix.
+- [x] `T-051.2` Implement booking transition guards with typed domain errors.
+- [x] `T-051.3` Implement payment transition guards with typed domain errors.
+- [x] `T-051.4` Enforce cross-entity invariant: booking `CONFIRMED` only when payment `SUCCEEDED`.
+- [x] `T-051.5` Enforce failed/cancelled/expired payment invariants for booking confirmation.
+- [x] `T-051.6` Add reusable domain-level transition APIs for service/API layers.
+- [x] `T-051.7` Add exhaustive unit transition matrix coverage for canonical booking/payment statuses.
+- [x] `T-051.8` Add cross-entity invariant unit tests for confirmation gating and terminal statuses.
+- [x] `T-051.9` Verify backward compatibility with existing booking reserve flow tests.
+- [x] `T-051.10` Update `todo.md` with traceable completion and verification commands.
 
 ## T-052 — Build Notch Pay adapter implementing provider contract
 

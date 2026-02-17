@@ -5,18 +5,30 @@ import {
   BOOKING_STATUSES,
   BOOKING_STATUS_TRANSITIONS,
   BookingStatusTransitionError,
+  CANONICAL_BOOKING_STATUSES,
+  CANONICAL_BOOKING_STATUS_TRANSITIONS,
+  CANONICAL_PAYMENT_STATUSES,
+  CANONICAL_PAYMENT_STATUS_TRANSITIONS,
+  CanonicalBookingStatusTransitionError,
+  CanonicalPaymentStatusTransitionError,
   PAYMENT_STATUSES,
   PAYMENT_STATUS_DEFAULT,
   PAYMENT_STATUS_TRANSITIONS,
   PaymentStatusTransitionError,
+  assertCanonicalBookingStatusTransition,
+  assertCanonicalPaymentStatusTransition,
   assertBookingStatusTransition,
   assertPaymentStatusTransition,
+  canTransitionCanonicalBookingStatus,
+  canTransitionCanonicalPaymentStatus,
   canTransitionBookingStatus,
   canTransitionPaymentStatus,
 } from "@/lib/domain/booking-status";
 
 const bookingStatuses = [...BOOKING_STATUSES] as BookingStatus[];
 const paymentStatuses = [...PAYMENT_STATUSES] as PaymentStatus[];
+const canonicalBookingStatuses = [...CANONICAL_BOOKING_STATUSES];
+const canonicalPaymentStatuses = [...CANONICAL_PAYMENT_STATUSES];
 
 describe("booking status transitions", () => {
   it("covers valid transitions for all booking states", () => {
@@ -87,5 +99,67 @@ describe("payment status transitions", () => {
     expect(() =>
       assertPaymentStatusTransition(PAYMENT_STATUS_DEFAULT, "NOT_REQUIRED")
     ).not.toThrow();
+  });
+});
+
+describe("canonical payment-first transition matrices", () => {
+  it("covers valid canonical booking transitions", () => {
+    for (const from of canonicalBookingStatuses) {
+      const expectedAllowed = new Set([from, ...CANONICAL_BOOKING_STATUS_TRANSITIONS[from]]);
+      for (const to of canonicalBookingStatuses) {
+        const isAllowed = expectedAllowed.has(to);
+        expect(canTransitionCanonicalBookingStatus(from, to)).toBe(isAllowed);
+        if (isAllowed) {
+          expect(() => assertCanonicalBookingStatusTransition(from, to)).not.toThrow();
+        }
+      }
+    }
+  });
+
+  it("covers invalid canonical booking transitions", () => {
+    for (const from of canonicalBookingStatuses) {
+      const allowed = new Set([from, ...CANONICAL_BOOKING_STATUS_TRANSITIONS[from]]);
+      const invalidTarget = canonicalBookingStatuses.find((candidate) => !allowed.has(candidate));
+      if (!invalidTarget) {
+        continue;
+      }
+      expect(canTransitionCanonicalBookingStatus(from, invalidTarget)).toBe(false);
+      expect(() => assertCanonicalBookingStatusTransition(from, invalidTarget)).toThrow(
+        CanonicalBookingStatusTransitionError
+      );
+    }
+  });
+
+  it("covers valid canonical payment transitions", () => {
+    for (const from of canonicalPaymentStatuses) {
+      const expectedAllowed = new Set([from, ...CANONICAL_PAYMENT_STATUS_TRANSITIONS[from]]);
+      for (const to of canonicalPaymentStatuses) {
+        const isAllowed = expectedAllowed.has(to);
+        expect(canTransitionCanonicalPaymentStatus(from, to)).toBe(isAllowed);
+        if (isAllowed) {
+          expect(() => assertCanonicalPaymentStatusTransition(from, to)).not.toThrow();
+        }
+      }
+    }
+  });
+
+  it("covers invalid canonical payment transitions", () => {
+    for (const from of canonicalPaymentStatuses) {
+      const allowed = new Set([from, ...CANONICAL_PAYMENT_STATUS_TRANSITIONS[from]]);
+      const invalidTarget = canonicalPaymentStatuses.find((candidate) => !allowed.has(candidate));
+      expect(invalidTarget).toBeDefined();
+      expect(
+        canTransitionCanonicalPaymentStatus(
+          from,
+          invalidTarget as (typeof canonicalPaymentStatuses)[number]
+        )
+      ).toBe(false);
+      expect(() =>
+        assertCanonicalPaymentStatusTransition(
+          from,
+          invalidTarget as (typeof canonicalPaymentStatuses)[number]
+        )
+      ).toThrow(CanonicalPaymentStatusTransitionError);
+    }
   });
 });

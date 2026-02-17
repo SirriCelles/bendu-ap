@@ -1,4 +1,5 @@
 import type { Currency } from "@/generated/prisma";
+import { CANONICAL_PAYMENT_STATUSES } from "@/lib/domain/booking-status";
 
 export const PAYMENT_PROVIDER_KEYS = ["NOTCHPAY", "CINETPAY", "STRIPE"] as const;
 export type PaymentProviderKey = (typeof PAYMENT_PROVIDER_KEYS)[number];
@@ -6,14 +7,7 @@ export type PaymentProviderKey = (typeof PAYMENT_PROVIDER_KEYS)[number];
 export const PAYMENT_METHOD_KEYS = ["MOMO", "CARD"] as const;
 export type PaymentMethodKey = (typeof PAYMENT_METHOD_KEYS)[number];
 
-export const PAYMENT_LIFECYCLE_STATUSES = [
-  "INITIATED",
-  "PENDING",
-  "SUCCEEDED",
-  "FAILED",
-  "CANCELLED",
-  "EXPIRED",
-] as const;
+export const PAYMENT_LIFECYCLE_STATUSES = CANONICAL_PAYMENT_STATUSES;
 export type PaymentLifecycleStatus = (typeof PAYMENT_LIFECYCLE_STATUSES)[number];
 
 export type PaymentCustomer = {

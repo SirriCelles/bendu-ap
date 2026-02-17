@@ -7,8 +7,13 @@ import type {
 import { parseBookingReserveInput } from "@/lib/validation/booking";
 
 import {
+  type CanonicalBookingStatus,
+  type CanonicalPaymentStatus,
   PAYMENT_STATUS_DEFAULT,
+  assertBookingConfirmationPaymentInvariant,
   assertBookingStatusTransition,
+  assertCanonicalBookingStatusTransition,
+  assertCanonicalPaymentStatusTransition,
   assertPaymentStatusTransition,
 } from "./booking-status";
 import type { BuildPriceSnapshotInput, PriceSnapshotPersistencePayload } from "./pricing";
@@ -36,6 +41,14 @@ export type BookingStatusUpdate = {
 
 export type PaymentStatusUpdate = {
   paymentStatus: PaymentStatus;
+};
+
+export type CanonicalBookingStatusUpdate = {
+  status: CanonicalBookingStatus;
+};
+
+export type CanonicalPaymentStatusUpdate = {
+  status: CanonicalPaymentStatus;
 };
 
 export type BookingReserveInput = {
@@ -227,6 +240,44 @@ export function createPaymentStatusUpdate(
 
   return {
     paymentStatus: to,
+  };
+}
+
+// Canonical booking transition update for payment-first service flows.
+export function createCanonicalBookingStatusUpdate(
+  from: CanonicalBookingStatus,
+  to: CanonicalBookingStatus
+): CanonicalBookingStatusUpdate {
+  assertCanonicalBookingStatusTransition(from, to);
+
+  return {
+    status: to,
+  };
+}
+
+// Canonical payment transition update for provider lifecycle handling.
+export function createCanonicalPaymentStatusUpdate(
+  from: CanonicalPaymentStatus,
+  to: CanonicalPaymentStatus
+): CanonicalPaymentStatusUpdate {
+  assertCanonicalPaymentStatusTransition(from, to);
+
+  return {
+    status: to,
+  };
+}
+
+// Shared invariant guard for CONFIRMED booking transitions in payment-first flows.
+export function createCanonicalBookingConfirmationUpdate(
+  from: CanonicalBookingStatus,
+  paymentStatus: CanonicalPaymentStatus
+): CanonicalBookingStatusUpdate {
+  const targetStatus: CanonicalBookingStatus = "CONFIRMED";
+  assertCanonicalBookingStatusTransition(from, targetStatus);
+  assertBookingConfirmationPaymentInvariant(targetStatus, paymentStatus);
+
+  return {
+    status: targetStatus,
   };
 }
 
