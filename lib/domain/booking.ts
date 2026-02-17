@@ -1,4 +1,9 @@
-import type { BookingStatus, PaymentStatus } from "@/generated/prisma";
+import type { BookingStatus, Currency, PaymentStatus } from "@/generated/prisma";
+import type {
+  PaymentService,
+  PaymentStartRequest,
+  PaymentStartResult,
+} from "@/lib/domain/payments";
 import { parseBookingReserveInput } from "@/lib/validation/booking";
 
 import {
@@ -92,6 +97,22 @@ export type BookingReservationDbClient<TBookingRecord> = {
   $transaction<TResult>(
     callback: (tx: BookingReservationTransactionClient<TBookingRecord>) => Promise<TResult>
   ): Promise<TResult>;
+};
+
+export type ReserveBookingWithPaymentInput = {
+  booking: BookingReserveInput;
+  payment: Omit<PaymentStartRequest, "bookingId" | "amountMinor" | "currency">;
+};
+
+export type ReserveBookingWithPaymentResult<TBookingRecord> = {
+  booking: TBookingRecord;
+  payment: PaymentStartResult;
+};
+
+export type PaymentBackedBookingRecord = {
+  id: string;
+  currency: Currency;
+  totalAmountMinor: number;
 };
 
 function extractErrorMetadata(error: unknown): {
@@ -263,4 +284,27 @@ export async function reserveBookingWithSnapshot<TBookingRecord>(
     }
     throw error;
   }
+}
+
+// Payment-aware booking entry point that keeps provider implementation details outside the core domain flow.
+export async function reserveBookingWithPayment<TBookingRecord extends PaymentBackedBookingRecord>(
+  deps: {
+    db: BookingReservationDbClient<TBookingRecord>;
+    paymentService: PaymentService;
+  },
+  input: ReserveBookingWithPaymentInput
+): Promise<ReserveBookingWithPaymentResult<TBookingRecord>> {
+  const booking = await reserveBookingWithSnapshot(deps.db, input.booking);
+
+  const payment = await deps.paymentService.startPayment({
+    ...input.payment,
+    bookingId: booking.id,
+    amountMinor: booking.totalAmountMinor,
+    currency: booking.currency,
+  });
+
+  return {
+    booking,
+    payment,
+  };
 }

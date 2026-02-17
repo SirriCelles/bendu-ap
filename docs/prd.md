@@ -1,97 +1,200 @@
-# BookEasy — Product Requirements Document (PRD)
+# BookEasy Product Requirements Document (PRD)
 
-## Overview
+## Version 2.0 — Includes Online Payments
 
-BookEasy is a booking platform for a **single guest house** located in **Bamenda, Northwest Region, Cameroon**, offering **apartments, studios, and single rooms**.
-
-The MVP uses a **Reserve Now / Pay on Arrival** model with **XAF (FCFA)** as the primary currency, while remaining fully prepared for future **online payments (EUR/USD)** and **MTN & Orange Mobile Money**.
-
----
-
-## Goals
-
-- Enable guests to browse, reserve, and manage bookings easily
-- Eliminate double-booking under all conditions
-- Launch fast with zero payment onboarding risk
-- Be SEO-ready from day one
-- Support future online and mobile money payments without refactoring
+Location: Buea, Cameroon
+Primary Currency: XAF (FCFA)
 
 ---
 
-## Success Metrics
+# 1. Product Overview
 
-- 0 double-booking incidents
-- ≥ 95% successful reservation creation
-- < 2s page load on listing pages
-- ≥ 80% booking completion after date selection
+BookEasy is a single-property guest house booking platform allowing users to:
 
----
+- Browse apartments, studios, and single rooms
+- Make reservations
+- Pay online via Mobile Money (MTN MoMo / Orange Money)
+- Receive booking confirmation instantly
 
-## Target Users
+Future expansion:
 
-### Guests
-
-- Local customers in Bamenda paying on arrival
-- Diaspora customers (future) paying online in EUR/USD
-
-### Admin (Operations)
-
-- Manages rooms, pricing, availability, and bookings
-- Communicates with guests
-- Oversees check-in/check-out
+- EUR/USD payments for diaspora customers
+- Multi-gateway support
+- Admin analytics dashboard
 
 ---
 
-## Core Features (MVP)
+# 2. Objectives
 
-- Room browsing and search
-- Room details with amenities and gallery
-- Availability checking
-- Reserve now / pay on arrival booking
-- Admin dashboard
-- Guest messaging
-- Email confirmations
-- PWA with offline booking access
+### Business Goals
 
----
+- Increase confirmed bookings through online payments
+- Reduce no-shows
+- Automate booking confirmation
+- Enable seamless Mobile Money payments
 
-## Booking Rules
+### Technical Goals
 
-- A booking can be **CONFIRMED without payment** in MVP
-- Inventory must be locked at booking time
-- Cancellations update availability immediately
+- Implement provider-agnostic payment architecture
+- Support Notch Pay (MVP)
+- Allow easy swap to CinetPay
+- Ensure secure, reliable webhook processing
 
 ---
 
-## Payment Rules
+# 3. Target Users
 
-- MVP: No online payment required
-- Payment logic is separate from booking logic
-- Future: Stripe (EUR/USD), MTN & Orange Mobile Money
+### Primary
 
----
+- Local customers in Cameroon (MTN MoMo / Orange Money)
 
-## Currency
+### Secondary
 
-- Default: XAF (FCFA)
-- Future: EUR, USD
-- All amounts stored as integers
-- Currency stored per booking
+- Diaspora customers (future EUR/USD support)
 
 ---
 
-## Non-Functional Requirements
+# 4. Core Features
 
-- Security: RBAC, input validation, audit logs
-- Reliability: idempotent booking creation
-- Observability: error tracking and logs
-- Performance: SEO-friendly server rendering
+## 4.1 Public Booking Flow
+
+1. User browses rooms
+2. Selects dates
+3. Proceeds to checkout
+4. Enters required details
+5. Initiates online payment
+6. Redirected to payment gateway
+7. Receives confirmation upon success
 
 ---
 
-## Out of Scope (MVP)
+## 4.2 Online Payment (NEW FEATURE)
 
-- Reviews and ratings
-- Multi-property marketplace
-- FX conversion
-- Channel manager integrations
+### Payment Providers
+
+- MVP: Notch Pay
+- Future: CinetPay
+
+### Payment Methods
+
+- MTN Mobile Money
+- Orange Money
+
+### Payment Flow Requirements
+
+- Booking must not be confirmed until payment succeeds
+- Payment must be idempotent
+- Webhook-driven confirmation
+- Secure signature verification
+- Booking and Payment updated atomically
+
+### Canonical Payment States
+
+- INITIATED
+- PENDING
+- SUCCEEDED
+- FAILED
+- CANCELLED
+- EXPIRED
+
+---
+
+# 5. Functional Requirements
+
+## 5.1 Booking Management
+
+- Create booking in RESERVED state
+- Attach Payment record
+- Transition to CONFIRMED upon successful payment
+- Support failed payment retry
+
+## 5.2 Payment Integration
+
+- Create payment intent
+- Redirect user to provider checkout
+- Process webhook events
+- Prevent duplicate processing
+- Store provider reference
+
+## 5.3 Admin Portal
+
+- View payment status
+- View transaction reference
+- View payment logs
+- Manually verify payment (if needed)
+
+---
+
+# 6. Non-Functional Requirements
+
+### Security
+
+- Verify webhook signatures
+- No card data stored
+- Secure environment variables
+- Rate limiting on webhook endpoints
+
+### Reliability
+
+- Idempotency keys
+- Event deduplication ledger
+- Transaction-safe updates
+- Retry-safe webhook handling
+
+### Performance
+
+- Payment initiation < 2 seconds
+- Webhook processing < 1 second
+- Zero booking confirmation without payment success
+
+---
+
+# 7. Data Model Summary
+
+## Booking
+
+- id
+- status (RESERVED, CONFIRMED, CANCELLED)
+- totalAmount (integer)
+- currency (XAF)
+- paymentStatus
+
+## Payment
+
+- id
+- bookingId
+- provider
+- amount
+- status
+- providerReference
+- idempotencyKey
+
+## ProviderEvent
+
+- provider
+- eventId
+- rawPayload
+- processedAt
+
+---
+
+# 8. Success Metrics
+
+- 95% successful payment processing rate
+- Reduced no-show rate by 50%
+- Payment confirmation latency < 5 seconds
+- Zero duplicate confirmations
+
+---
+
+# 9. Future Enhancements
+
+- Multi-currency support (EUR/USD)
+- Refund handling
+- Partial payments
+- Payment analytics dashboard
+- Payout automation
+
+---
+
+This PRD supersedes previous versions and includes online payment functionality.

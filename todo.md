@@ -2,10 +2,10 @@
 
 ## Project Summary
 
-BookEasy is a single-property guest-house booking platform for Bamenda, Northwest Region, Cameroon, built with Next.js App Router and PostgreSQL.
-MVP focuses on browsing rooms, checking availability, reserving with Pay on Arrival, and guest-admin communication.
+BookEasy is a single-property guest-house booking platform for Buea, Southwest Region, Cameroon, built with Next.js App Router and PostgreSQL.
+MVP focuses on browsing rooms, checking availability, reserving with online payment, and guest-admin communication.
 Double-booking prevention is enforced primarily at database level with transactional booking flows and idempotency.
-Booking logic and payment logic are separated so future Stripe and Mobile Money providers can plug in cleanly.
+Booking logic and payment logic are separated so Notch Pay can ship now and CinetPay can be swapped in later without domain rewrites.
 Public pages are SEO-first and server-rendered, with mobile-first UX and an installable PWA baseline.
 Offline behavior is limited to previously fetched booking details and graceful fallback states.
 Security and operations include RBAC, validation, audit logs, rate limiting, and observability.
@@ -19,7 +19,7 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 - [ ] Admin area is RBAC-protected and all admin mutations are audit-logged
 - [ ] PWA is installable and can show previously loaded booking details offline
 - [ ] Validation, rate limiting, structured logs, and Sentry are active
-- [ ] MVP excludes online payments, marketplace, reviews/ratings, and FX conversion
+- [ ] MVP includes live gateway payments (MTN MoMo, Orange Money, Stripe) before enabling reserve-now/pay-later
 
 ## Explicit Assumptions
 
@@ -34,7 +34,7 @@ Security and operations include RBAC, validation, audit logs, rate limiting, and
 1. **Risk:** Concurrent booking requests create race conditions.
    Mitigation: PostgreSQL exclusion constraint + transactional booking flow + idempotency + concurrency tests.
 2. **Risk:** Payment concerns leak into booking logic and hinder future providers.
-   Mitigation: Define `PaymentService` interface and provider adapters from MVP start, with Pay-on-Arrival as default provider.
+   Mitigation: Define `PaymentService` interface and provider adapters from MVP start, shipping Notch Pay first with CinetPay-ready adapter boundaries.
 3. **Risk:** Admin mutations are not traceable.
    Mitigation: Centralized audit logging for every admin write path, enforced in service/API layer and tested.
 4. **Risk:** SEO/performance regressions from client-heavy rendering.
@@ -518,7 +518,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-023 -->
 
-Status: TODO
+Status: SUPERSEDED
 
 - **Feature Area:** QA
 - **Context:** Public funnel should be protected from regression.
@@ -559,7 +559,9 @@ Verification: 2026-02-15 (`pnpm test:unit tests/unit/public/coming-soon-page-ssr
 - [x] `T-023A.4` Add tests for CTA click-through routing and Coming Soon page rendering.
 - [x] `T-023A.5` Verify no regressions in existing listing/detail navigation and update `todo.md` status when complete.
 
-## Milestone 3 — Booking Engine (Pay on Arrival)
+## Milestone 3 — Booking Engine (Payment-First: MoMo -> Stripe)
+
+Priority Decision: Complete full online payment flows (gateway-backed MTN MoMo + Orange Money, then Stripe) before enabling "reserve now / pay later".
 
 ## T-024 — Define booking API schemas with Zod
 
@@ -593,36 +595,102 @@ Verification: 2026-02-16 (`pnpm test:unit tests/unit/validation/booking.test.ts 
 - [x] `T-024.6` Wire schema into one booking-facing API boundary (or sample route) and one domain/service entry point.
       Acceptance Criteria: Both layers consume the same schema exports; no duplicate ad-hoc booking payload validation remains in those paths.
 
-## T-025 — Implement payment provider interface and Pay-on-Arrival adapter
+## T-025 — Implement payment provider interface and gateway-ready foundation
 
 <!-- issue: bookeasy:T-025 -->
 
 Status: TODO
 
 - **Feature Area:** Payments
-- **Context:** Payment abstraction is required even with MVP offline payment model.
-- **Scope Included:** Provider contract, registry, Pay-on-Arrival implementation.
-- **Scope Excluded:** Live Stripe/Mobile Money logic.
+- **Context:** Payment abstraction must support live gateway integrations without booking-service refactors.
+- **Scope Included:** Provider contract, adapter registry, and gateway-ready service foundation.
+- **Scope Excluded:** Provider-specific endpoint wiring (covered by follow-up tasks).
 - **Acceptance Criteria:**
 - [ ] `PaymentService` resolves provider by method key
-- [ ] Pay-on-Arrival returns `NOT_REQUIRED` payment status
+- [ ] Shared payment contract supports canonical online payment statuses
 - [ ] Booking flow depends on provider interface, not concrete provider
-- **Implementation Notes:** Add `lib/domain/payments/index.ts` and `lib/domain/payments/providers/payOnArrival.ts`.
+- **Implementation Notes:** Add `lib/domain/payments/index.ts` and shared adapter contracts usable by Notch Pay, CinetPay, and Stripe.
 - **Dependencies:** 010
 - **Estimate:** M
 - **Subtasks:**
-- [ ] `T-025.1` Define payment domain contract types and provider interface (`PaymentService`, provider key/method enums, request/response payload types).
+- [x] `T-025.1` Define payment domain contract types and provider interface (`PaymentService`, provider key/method enums, request/response payload types).
       Acceptance Criteria: Interface is provider-agnostic, strongly typed, and does not expose provider-specific implementation details to booking domain consumers.
-- [ ] `T-025.2` Implement provider registry/resolver in `lib/domain/payments/index.ts`.
+- [x] `T-025.2` Implement provider registry/resolver in `lib/domain/payments/index.ts`.
       Acceptance Criteria: Resolver maps payment method key to provider implementation deterministically; unknown method keys fail with typed domain error.
-- [ ] `T-025.3` Implement Pay-on-Arrival adapter in `lib/domain/payments/providers/payOnArrival.ts`.
-      Acceptance Criteria: Adapter returns payment decision/result with `paymentStatus=NOT_REQUIRED`, no external gateway call, and predictable metadata payload.
-- [ ] `T-025.4` Add domain error model for payment provider failures and unsupported methods.
+- [x] `T-025.3` Implement shared gateway client abstraction (auth/signature strategy, retries, timeout, correlation ids).
+      Acceptance Criteria: Gateway client is reusable by all providers; sensitive config comes from env; transient errors are typed and retry-safe.
+- [x] `T-025.4` Add domain error model for payment provider failures and unsupported methods.
       Acceptance Criteria: Errors include stable `code` + message shape usable by service/API layers; unsupported provider path is explicitly testable.
-- [ ] `T-025.5` Integrate payment interface usage in booking domain entry path (without coupling to concrete adapter import in core booking flow).
+- [x] `T-025.5` Integrate payment interface usage in booking domain entry path (without coupling to concrete adapter import in core booking flow).
       Acceptance Criteria: Booking flow depends on interface/registry contract only; direct references to Pay-on-Arrival implementation are isolated to composition/wiring layer.
-- [ ] `T-025.6` Add unit tests for resolver + Pay-on-Arrival provider contract behavior.
-      Acceptance Criteria: Tests cover provider resolution success/failure, `NOT_REQUIRED` result path, and ensure no external dependency/network call is required.
+- [x] `T-025.6` Add unit tests for resolver + provider contract behavior.
+      Acceptance Criteria: Tests cover provider resolution success/failure, canonical status mapping, and ensure no external dependency/network call is required.
+
+## T-025A — Integrate gateway-backed MTN MoMo and Orange Money providers
+
+<!-- issue: bookeasy:T-025A -->
+
+Status: SUPERSEDED
+
+- **Feature Area:** Payments
+- **Context:** Superseded by Notch Pay MVP adapter strategy and provider-specific webhook flow in `T-051` to align with `/docs/payment.md`.
+- **Scope Included:** Historical planning reference only.
+- **Scope Excluded:** Execution as a separate task.
+- **Acceptance Criteria:**
+- [ ] Superseded by `T-051`, `T-053`, and `T-054`
+- **Implementation Notes:** Keep for traceability; implement Notch Pay provider-first approach instead.
+- **Dependencies:** 051, 053, 054
+- **Estimate:** S
+
+## T-025B — Integrate Stripe provider through gateway (or direct adapter if gateway requires)
+
+<!-- issue: bookeasy:T-025B -->
+
+Status: SUPERSEDED
+
+- **Feature Area:** Payments
+- **Context:** Superseded by split provider tasks (`T-052` Notch Pay MVP, `T-066` Stripe adapter, and `T-059`/`T-060` CinetPay-ready path) to match `/docs/prd.md` and `/docs/system-architecture.md`.
+- **Scope Included:** Historical planning reference only.
+- **Scope Excluded:** Execution as a separate task.
+- **Acceptance Criteria:**
+- [ ] Superseded by `T-051`, `T-052`, `T-059`, `T-060`, and `T-066`
+- **Implementation Notes:** Keep for traceability; provider-specific work is handled in Milestone 3A by dedicated adapter tasks.
+- **Dependencies:** 051, 052, 059, 060, 066
+- **Estimate:** S
+
+## T-025C — Implement payment webhooks and reconciliation for gateway providers
+
+<!-- issue: bookeasy:T-025C -->
+
+Status: SUPERSEDED
+
+- **Feature Area:** Payments
+- **Context:** Superseded by split implementation tasks for Notch Pay webhook ingestion (`T-054`) and CinetPay future webhook route (`T-060`).
+- **Scope Included:** Historical planning reference only.
+- **Scope Excluded:** Execution as a separate task.
+- **Acceptance Criteria:**
+- [ ] Superseded by `T-054` and `T-060`
+- **Implementation Notes:** Keep for traceability; use provider-specific webhook routes and provider event ledger tasks below.
+- **Dependencies:** 054, 060
+- **Estimate:** S
+
+## T-025D — Add payment observability, audit, and failure recovery primitives
+
+<!-- issue: bookeasy:T-025D -->
+
+Status: TODO
+
+- **Feature Area:** Payments/Observability
+- **Context:** Payment failures need traceability and safe retries.
+- **Scope Included:** Structured logs, request correlation, Sentry context, retry-safe error surfaces, payment audit entries.
+- **Scope Excluded:** Revenue dashboards and finance analytics.
+- **Acceptance Criteria:**
+- [ ] Every payment attempt has request/payment correlation ids in logs
+- [ ] Provider/gateway errors are captured with redacted metadata
+- [ ] Recovery path supports safe retry without double-charging
+- **Implementation Notes:** Reuse `lib/observability/logger.ts`, `lib/http/errors.ts`, and audit patterns.
+- **Dependencies:** 006, 007, 051, 052, 053, 054
+- **Estimate:** S
 
 ## T-026 — Implement transactional BookingService reserve flow
 
@@ -637,9 +705,9 @@ Status: TODO
 - **Acceptance Criteria:**
 - [ ] Idempotency key returns same booking on retry
 - [ ] Overlap conflicts map to domain conflict response
-- [ ] Success persists booking, snapshot, and payment status atomically
-- **Implementation Notes:** Build in `lib/domain/booking.ts`; use DB transaction and DB exclusion constraint as final guard.
-- **Dependencies:** 011, 013, 024, 025
+- [ ] Success persists booking, snapshot, payment intent, and payment status atomically
+- **Implementation Notes:** Build in `lib/domain/booking.ts`; use DB transaction and DB exclusion constraint as final guard; do not finalize booking as confirmed before valid payment result.
+- **Dependencies:** 011, 013, 024, 025, 051, 052, 053, 054
 - **Estimate:** M
 
 ## T-027 — Implement `POST /bookings` endpoint with rate limiting
@@ -660,22 +728,23 @@ Status: TODO
 - **Dependencies:** 008, 024, 026
 - **Estimate:** S
 
-## T-028 — Build checkout/reservation UI for Pay on Arrival
+## T-028 — Build checkout UI for live payments (MTN, Orange, Stripe)
 
 <!-- issue: bookeasy:T-028 -->
 
 Status: TODO
 
 - **Feature Area:** Booking
-- **Context:** MVP checkout must reserve without online payment.
-- **Scope Included:** Guest details form, date/unit review, payment method selection fixed to pay-on-arrival.
-- **Scope Excluded:** Card/mobile-money payment form fields.
+- **Context:** Checkout must complete online payment before booking confirmation.
+- **Scope Included:** Guest details form, date/unit review, payment method selection for MTN/Orange/Stripe, provider handoff states.
+- **Scope Excluded:** Reserve-now/pay-later option.
 - **Acceptance Criteria:**
 - [ ] Checkout submits valid reservation payload
-- [ ] UI explicitly states payment happens on arrival
+- [ ] User can choose MTN MoMo, Orange Money, or Stripe
+- [ ] Booking confirmation appears only after successful payment status
 - [ ] Loading and error states are handled
 - **Implementation Notes:** Build under `app/(public)/checkout/page.tsx` or equivalent; prevent duplicate submit via idempotency key + disabled submit state.
-- **Dependencies:** 019, 020, 027
+- **Dependencies:** 019, 020, 027, 051, 052, 053, 054, 055
 - **Estimate:** M
 
 ## T-029 — Implement guest booking APIs (`/bookings/me`, `/bookings/:id`, cancel)
@@ -708,13 +777,13 @@ Status: TODO
 - **Scope Excluded:** Browser e2e tests.
 - **Acceptance Criteria:**
 - [ ] BookingService unit tests cover success/conflict/idempotency
-- [ ] Payment provider contract tests run against Pay-on-Arrival provider
+- [ ] Payment provider contract tests run against Notch Pay adapter and provider test doubles
 - [ ] Test suite has no external payment dependency
 - **Implementation Notes:** Add `tests/unit/booking-service.test.ts`, `tests/unit/payment-provider.test.ts`.
 - **Dependencies:** 025, 026
 - **Estimate:** M
 
-## T-031 — Add e2e tests for reserve-now and cancellation flow
+## T-031 — Add e2e tests for online payment checkout and cancellation flow
 
 <!-- issue: bookeasy:T-031 -->
 
@@ -722,15 +791,343 @@ Status: TODO
 
 - **Feature Area:** QA
 - **Context:** Primary conversion path must be tested end-to-end.
-- **Scope Included:** Room selection to reservation confirmation to cancellation.
-- **Scope Excluded:** Online payment scenarios.
+- **Scope Included:** Room selection -> payment method selection -> successful payment confirmation -> cancellation.
+- **Scope Excluded:** Chargeback/dispute scenarios.
 - **Acceptance Criteria:**
-- [ ] e2e confirms booking creation with pay-on-arrival method
+- [ ] e2e confirms booking creation with MTN/Orange and Stripe happy paths
 - [ ] e2e confirms cancellation frees availability
 - [ ] Tests run in CI
 - **Implementation Notes:** Add `tests/e2e/booking.spec.ts`.
 - **Dependencies:** 028, 029
 - **Estimate:** M
+
+## T-031A — Implement reserve-now / pay-later flow after payment-first stack is stable
+
+<!-- issue: bookeasy:T-031A -->
+
+Status: TODO
+
+- **Feature Area:** Booking/Payments
+- **Context:** Pay-later is explicitly deferred until MoMo and Stripe flows are production-ready.
+- **Scope Included:** Reserve-now option with deferred settlement and explicit policy constraints.
+- **Scope Excluded:** Replacing online payment options as the default checkout path.
+- **Acceptance Criteria:**
+- [ ] Reserve-now/pay-later option remains disabled until `T-051`, `T-052`, `T-053`, `T-054`, `T-055`, `T-066`, and `T-028` are DONE
+- [ ] Deferred-payment eligibility/expiry/cancellation rules are explicit and tested
+- [ ] Pay-later path does not regress online payment checkout flows
+- **Implementation Notes:** Implement only after payment-first tasks are complete.
+- **Dependencies:** 051, 052, 053, 054, 055, 066, 028
+- **Estimate:** S
+
+## Milestone 3A — Online Payments Delivery (Notch Pay MVP, CinetPay-Ready)
+
+## T-051 — Define canonical booking/payment transition policy and invariants
+
+<!-- issue: bookeasy:T-051 -->
+
+Status: TODO
+
+- **Feature Area:** Payments/Booking
+- **Context:** `/docs/prd.md` and `/docs/payment.md` require canonical transitions where booking confirmation is payment-driven.
+- **Scope Included:** Formalize and enforce `RESERVED -> CONFIRMED` only when payment reaches `SUCCEEDED`; handle failure/cancel/expire transitions.
+- **Scope Excluded:** Provider-specific API calls.
+- **Acceptance Criteria:**
+- [ ] Transition policy is documented in code and rejects illegal transitions with typed domain errors
+- [ ] Booking cannot reach `CONFIRMED` unless related payment status is `SUCCEEDED`
+- [ ] Expired/cancelled payments cannot confirm bookings
+- **Implementation Notes:** Extend domain transition guards in booking/payment services and update unit tests for transition matrix.
+- **Dependencies:** 012, 024, 025
+- **Estimate:** M
+
+## T-052 — Build Notch Pay adapter implementing provider contract
+
+<!-- issue: bookeasy:T-052 -->
+
+Status: TODO
+
+- **Feature Area:** Payments
+- **Context:** Notch Pay is the MVP gateway and must be integrated behind provider-agnostic contracts.
+- **Scope Included:** `initiatePayment`, `parseWebhook`, `verifyPayment` fallback, signature verification stub fallback when exact header/algorithm is pending.
+- **Scope Excluded:** CinetPay adapter implementation.
+- **Acceptance Criteria:**
+- [ ] Adapter compiles against shared provider interface with no provider leakage into domain types
+- [ ] `initiatePayment` returns normalized payment payload (`providerReference`, `checkoutUrl`, canonical status)
+- [ ] `parseWebhook` maps provider events to canonical internal event shape
+- [ ] Signature verification fails closed when required signature header is missing
+- **Implementation Notes:** Add `lib/payments/notchpay.ts` (or equivalent adapter location per project structure) and map statuses to canonical enum.
+- **Dependencies:** 025
+- **Estimate:** M
+
+## T-053 — Implement `POST /api/payments/start` idempotent payment initiation endpoint
+
+<!-- issue: bookeasy:T-053 -->
+
+Status: TODO
+
+- **Feature Area:** Payments/API
+- **Context:** API spec defines payment initiation as idempotent and provider-agnostic.
+- **Scope Included:** Endpoint contract, request validation, idempotency key handling, checkout URL return, safe conflict behavior.
+- **Scope Excluded:** Webhook processing.
+- **Acceptance Criteria:**
+- [ ] Endpoint accepts spec-compliant request and returns normalized `paymentId`, `status`, `checkoutUrl`, `provider`
+- [ ] Repeated calls with same idempotency key return the same successful result
+- [ ] Returns conflict when booking already confirmed with successful payment
+- **Implementation Notes:** Add `app/api/payments/start/route.ts`; reuse shared parser/error format and rate limiting guard.
+- **Dependencies:** 024, 025, 052
+- **Estimate:** M
+
+## T-054 — Implement Notch Pay webhook ingestion with ProviderEvent ledger dedupe and atomic updates
+
+<!-- issue: bookeasy:T-054 -->
+
+Status: TODO
+
+- **Feature Area:** Payments/Webhooks
+- **Context:** Payment confirmation must be webhook-driven, idempotent, and transaction-safe.
+- **Scope Included:** `POST /api/webhooks/payments/notchpay`, signature validation, event normalization, ProviderEvent upsert dedupe, atomic payment+booking update.
+- **Scope Excluded:** CinetPay webhook handler.
+- **Acceptance Criteria:**
+- [ ] Missing/invalid signature returns `WEBHOOK_SIGNATURE_INVALID`
+- [ ] Duplicate provider events are acknowledged without reapplying transitions
+- [ ] Payment + booking updates are committed in a single DB transaction
+- [ ] Unknown payment reference stores event for investigation and returns safe response
+- **Implementation Notes:** Add ledger and transaction logic in PaymentService; persist raw payload with redacted logs.
+- **Dependencies:** 051, 052
+- **Estimate:** M
+
+## T-055 — Add fallback payment verification endpoint and booking confirmation recovery flow
+
+<!-- issue: bookeasy:T-055 -->
+
+Status: TODO
+
+- **Feature Area:** Payments/API
+- **Context:** Users may return before webhook delivery; verification fallback is required by API spec.
+- **Scope Included:** `POST /api/payments/{paymentId}/verify` endpoint, provider verify call, canonical transition apply.
+- **Scope Excluded:** Manual admin overrides.
+- **Acceptance Criteria:**
+- [ ] Verify endpoint updates internal payment/booking state when provider reports successful payment
+- [ ] Provider downtime maps to `PAYMENT_PROVIDER_ERROR` with safe retry semantics
+- [ ] Endpoint is idempotent for already-terminal payment states
+- **Implementation Notes:** Reuse PaymentService reconciliation path to avoid divergent transition logic.
+- **Dependencies:** 052, 054
+- **Estimate:** S
+
+## T-056 — Enforce DB-backed idempotency for booking create and payment start flows
+
+<!-- issue: bookeasy:T-056 -->
+
+Status: TODO
+
+- **Feature Area:** Reliability
+- **Context:** API spec requires idempotent writes for booking creation and payment initiation.
+- **Scope Included:** Persistent idempotency keys, replay behavior, collision handling, deterministic response storage.
+- **Scope Excluded:** External distributed lock service.
+- **Acceptance Criteria:**
+- [ ] `POST /api/bookings` and `POST /api/payments/start` reject or replay duplicates deterministically
+- [ ] Idempotency scope includes endpoint + actor/session + key
+- [ ] Race conditions do not produce duplicate bookings/payments
+- **Implementation Notes:** DB table or existing payment fields are acceptable for MVP if semantics are test-covered.
+- **Dependencies:** 026, 053
+- **Estimate:** M
+
+## T-057 — Implement booking expiry window and scheduled cleanup job
+
+<!-- issue: bookeasy:T-057 -->
+
+Status: TODO
+
+- **Feature Area:** Booking/Reliability
+- **Context:** RESERVED bookings should expire when payment is not completed within configured TTL.
+- **Scope Included:** `expiresAt` semantics, background cleanup job/cron, safe status transitions to `EXPIRED`.
+- **Scope Excluded:** Customer reminder notification workflow.
+- **Acceptance Criteria:**
+- [ ] New RESERVED bookings include expiration timestamp where payment is pending
+- [ ] Cleanup job transitions expired pending bookings and related payments safely
+- [ ] Expired bookings no longer block inventory
+- **Implementation Notes:** Use Vercel/GitHub cron + admin fallback endpoint as noted in architecture docs.
+- **Dependencies:** 051, 026, 056
+- **Estimate:** M
+
+## T-058 — Implement booking receipt endpoint and success page data contract
+
+<!-- issue: bookeasy:T-058 -->
+
+Status: TODO
+
+- **Feature Area:** Booking/UX
+- **Context:** API spec defines receipt data for post-payment confirmation UX.
+- **Scope Included:** `GET /api/bookings/{bookingId}/receipt` contract and corresponding success-page data path.
+- **Scope Excluded:** PDF invoice generation.
+- **Acceptance Criteria:**
+- [ ] Receipt endpoint returns confirmed booking summary + payment reference + room snapshot
+- [ ] Access control prevents unrelated guests from reading receipt data
+- [ ] Success page can render solely from receipt contract
+- **Implementation Notes:** Align with booking access token/guest session model in API spec.
+- **Dependencies:** 029, 054, 055
+- **Estimate:** S
+
+## T-059 — Add CinetPay adapter (future-ready) behind the same provider interface
+
+<!-- issue: bookeasy:T-059 -->
+
+Status: TODO
+
+- **Feature Area:** Payments
+- **Context:** System design requires easy provider swap from Notch Pay to CinetPay with minimal domain impact.
+- **Scope Included:** Adapter skeleton with initiate/webhook/verify contract compatibility and status mapping.
+- **Scope Excluded:** Production activation of CinetPay in MVP.
+- **Acceptance Criteria:**
+- [ ] CinetPay adapter compiles and can be selected by provider registry without booking service changes
+- [ ] Adapter exposes same normalized outputs as Notch Pay adapter
+- [ ] Swap controlled by environment configuration only
+- **Implementation Notes:** Keep route + provider wiring ready; real secrets can remain staging-only until rollout.
+- **Dependencies:** 025, 052
+- **Estimate:** S
+
+## T-060 — Implement CinetPay webhook route skeleton with signature verification contract
+
+<!-- issue: bookeasy:T-060 -->
+
+Status: TODO
+
+- **Feature Area:** Payments/Webhooks
+- **Context:** API spec defines a future CinetPay webhook endpoint; route contract should exist early.
+- **Scope Included:** `POST /api/webhooks/payments/cinetpay` route, strict signature/header contract stubs, normalized event parsing interface.
+- **Scope Excluded:** Full production reconciliation rollout.
+- **Acceptance Criteria:**
+- [ ] Endpoint exists and validates required signature headers (fail closed when absent)
+- [ ] Parsed payload is normalized to internal provider-event shape
+- [ ] Route can be enabled without refactoring PaymentService
+- **Implementation Notes:** Keep logic parallel to Notch Pay webhook flow to reduce swap risk.
+- **Dependencies:** 059
+- **Estimate:** S
+
+## T-066 — Integrate Stripe payment provider behind the same payment adapter contract
+
+<!-- issue: bookeasy:T-066 -->
+
+Status: TODO
+
+- **Feature Area:** Payments
+- **Context:** Team decision requires full payment coverage from MoMo to Stripe before enabling pay-later.
+- **Scope Included:** Stripe provider adapter, initiation + verification mapping to canonical statuses, registry wiring via provider contract.
+- **Scope Excluded:** Subscription billing, disputes, payouts.
+- **Acceptance Criteria:**
+- [ ] Stripe adapter compiles and resolves through the same provider registry as Notch/CinetPay adapters
+- [ ] Stripe status mapping conforms to canonical internal payment statuses
+- [ ] Booking/payment domain services do not require provider-specific branching to support Stripe
+- **Implementation Notes:** Keep Stripe integration behind adapter boundary; no provider-specific payloads leak to API responses.
+- **Dependencies:** 025, 051, 053
+- **Estimate:** M
+
+## T-061 — Add admin payment visibility APIs and admin UI integration
+
+<!-- issue: bookeasy:T-061 -->
+
+Status: TODO
+
+- **Feature Area:** Admin/Payments
+- **Context:** Admin must inspect payment status and provider references to support operations.
+- **Scope Included:** `GET /api/admin/payments`, `GET /api/admin/payments/{paymentId}`, booking detail payment summary integration in admin views.
+- **Scope Excluded:** Financial reporting dashboards.
+- **Acceptance Criteria:**
+- [ ] Admin can list/filter payments by provider/status/date
+- [ ] Admin payment detail shows provider reference, canonical status, and event history summary
+- [ ] Admin booking detail exposes payment status/reference at a glance
+- **Implementation Notes:** Reuse admin auth guards and audit log patterns.
+- **Dependencies:** 032, 033, 054
+- **Estimate:** M
+
+## T-062 — Add payment-focused automated test suite (unit + integration + e2e skeleton)
+
+<!-- issue: bookeasy:T-062 -->
+
+Status: TODO
+
+- **Feature Area:** QA
+- **Context:** Payment correctness needs focused automated coverage before production rollout.
+- **Scope Included:** Unit tests for state transitions/idempotency/dedupe, integration tests for webhook atomicity, e2e skeleton for checkout + webhook simulation.
+- **Scope Excluded:** Live external gateway tests in CI.
+- **Acceptance Criteria:**
+- [ ] Unit tests cover idempotency replay, provider-event dedupe, and transition invariants
+- [ ] Integration tests verify atomic booking/payment update on webhook apply
+- [ ] E2E skeleton simulates webhook confirmation path and asserts booking confirmation behavior
+- **Implementation Notes:** Add contract tests around PaymentProvider and fake gateway fixtures.
+- **Dependencies:** 051, 053, 054, 055, 056
+- **Estimate:** M
+
+## T-063 — Add payment environment configuration validation and docs sync
+
+<!-- issue: bookeasy:T-063 -->
+
+Status: TODO
+
+- **Feature Area:** Ops/Payments
+- **Context:** Payment rollout requires strict env/secret validation to avoid runtime failures.
+- **Scope Included:** Validate required env vars (`PAYMENT_PROVIDER`, Notch Pay secrets, webhook secrets, future CinetPay keys), `.env.example` and deployment docs updates.
+- **Scope Excluded:** Secret rotation automation platform.
+- **Acceptance Criteria:**
+- [ ] App fails fast with clear startup error when required payment env vars are missing
+- [ ] `.env.example` and docs list all payment configuration keys with purpose
+- [ ] CI/deploy checks include payment env presence validation step
+- **Implementation Notes:** Add env parser/guard under `lib/env` and reference in app bootstrap paths.
+- **Dependencies:** 052, 059, 060, 066
+- **Estimate:** S
+
+## T-067 — Harden webhook perimeter with rate limiting and optional provider allowlist policy
+
+<!-- issue: bookeasy:T-067 -->
+
+Status: TODO
+
+- **Feature Area:** Security/Payments
+- **Context:** PRD and API spec require webhook hardening beyond signature checks.
+- **Scope Included:** Route-level rate limits for payment webhooks, allowlist strategy hooks for provider source validation, and operational fallbacks.
+- **Scope Excluded:** External WAF vendor setup.
+- **Acceptance Criteria:**
+- [ ] Payment webhook routes enforce dedicated rate limit buckets
+- [ ] Allowlist policy can be configured (enabled/disabled) per environment without code changes
+- [ ] Invalid/untrusted source handling is logged with correlation ids and safe response behavior
+- **Implementation Notes:** Reuse `lib/security/rate-limit.ts`; document recommended gateway IP allowlist strategy in docs.
+- **Dependencies:** 008, 054, 060
+- **Estimate:** S
+
+## T-064 — Implement public availability quote endpoint and validation contract
+
+<!-- issue: bookeasy:T-064 -->
+
+Status: TODO
+
+- **Feature Area:** Public API/Booking
+- **Context:** API spec recommends `/api/public/availability/quote` for price/availability confirmation before booking.
+- **Scope Included:** Endpoint contract, zod validation, availability + pricing response shape, conflict handling.
+- **Scope Excluded:** Checkout payment initiation.
+- **Acceptance Criteria:**
+- [ ] Endpoint returns nights/subtotal/total/currency for valid request payload
+- [ ] Invalid payloads return stable validation errors
+- [ ] Conflicting/unavailable inventory returns clear conflict response
+- **Implementation Notes:** Reuse existing availability + pricing domain logic to avoid duplicate calculations.
+- **Dependencies:** 014, 024
+- **Estimate:** S
+
+## T-065 — Align location/copy references from Bamenda to Buea across product content and docs
+
+<!-- issue: bookeasy:T-065 -->
+
+Status: TODO
+
+- **Feature Area:** Content/Chore
+- **Context:** `todo.md` and parts of code/docs still reference Bamenda while PRD/system architecture define Buea.
+- **Scope Included:** Identify and update user-facing copy/docs/config constants to canonical Buea references.
+- **Scope Excluded:** Geo-specific pricing or operations changes.
+- **Acceptance Criteria:**
+- [ ] Product-facing text is consistent with Buea in docs and public pages
+- [ ] No contradictory Bamenda/Buea references remain in active MVP docs
+- [ ] Changes are reviewed for SEO metadata consistency
+- **Implementation Notes:** Treat as content consistency pass; avoid changing unrelated technical logic.
+- **Dependencies:** 018, 021
+- **Estimate:** S
 
 ## Milestone 4 — Admin Portal
 
@@ -1014,36 +1411,32 @@ Status: TODO
 
 <!-- issue: bookeasy:T-047 -->
 
-Status: TODO
+Status: SUPERSEDED
 
 - **Feature Area:** Payments
-- **Context:** Future provider onboarding should not require booking refactors.
-- **Scope Included:** Typed, non-live adapter stubs and registry wiring.
-- **Scope Excluded:** Live payment API calls.
+- **Context:** Replaced by live payment integration tasks in Milestone 3A (`T-051`, `T-052`, `T-059`, `T-066`).
+- **Scope Included:** Historical planning reference only.
+- **Scope Excluded:** Execution as a separate task.
 - **Acceptance Criteria:**
-- [ ] Stub providers compile and register successfully
-- [ ] Switching provider key does not require BookingService code changes
-- [ ] Provider-specific details do not leak into booking domain logic
-- **Implementation Notes:** Add `lib/domain/payments/providers/stripe.ts`, `lib/domain/payments/providers/momo.ts`.
-- **Dependencies:** 025
+- [ ] Superseded by `T-051`, `T-052`, `T-059`, and `T-066`
+- **Implementation Notes:** Archived; implementation covered by Milestone 3 payment-first tasks.
+- **Dependencies:** 051, 052, 059, 066
 - **Estimate:** S
 
 ## T-048 — Create webhook endpoint skeletons for Stripe and Mobile Money
 
 <!-- issue: bookeasy:T-048 -->
 
-Status: TODO
+Status: SUPERSEDED
 
 - **Feature Area:** Payments
-- **Context:** API surface should be reserved for future payment rollout.
-- **Scope Included:** Route stubs, placeholder signature validation contracts, structured logs.
-- **Scope Excluded:** Actual booking/payment mutation logic from webhook events.
+- **Context:** Replaced by `T-054` and `T-060` with live webhook and reconciliation implementation.
+- **Scope Included:** Historical planning reference only.
+- **Scope Excluded:** Execution as a separate task.
 - **Acceptance Criteria:**
-- [ ] `/api/webhooks/stripe` and `/api/webhooks/momo` routes exist
-- [ ] Endpoints return safe not-implemented responses with logs
-- [ ] Signature validation placeholders are documented in code
-- **Implementation Notes:** Add `app/api/webhooks/stripe/route.ts` and `app/api/webhooks/momo/route.ts`.
-- **Dependencies:** 007, 047
+- [ ] Superseded by `T-054` and `T-060`
+- **Implementation Notes:** Archived; implementation covered by Milestone 3 payment-first tasks.
+- **Dependencies:** 054, 060
 - **Estimate:** S
 
 ## T-049 — Harden currency invariants without enabling FX conversion
@@ -1077,9 +1470,9 @@ Status: TODO
 - **Acceptance Criteria:**
 - [ ] Any provider implementation must pass the shared contract suite
 - [ ] Currency and integer amount invariants are validated in tests
-- [ ] MVP default path (pay-on-arrival) remains green
+- [ ] Notch Pay and Stripe provider paths remain green under shared contract tests
 - **Implementation Notes:** Add `tests/contract/payment-provider.contract.test.ts`, `tests/unit/currency.test.ts`.
-- **Dependencies:** 047, 049
+- **Dependencies:** 049, 051, 052, 059, 066
 - **Estimate:** M
 
 ## Immediate Next Actions (Start Milestone 0)

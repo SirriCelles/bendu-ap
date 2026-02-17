@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import type { PaymentService } from "@/lib/domain/payments";
 import type { BookingReservationDbClient } from "@/lib/domain/booking";
-import { reserveBookingWithSnapshot } from "@/lib/domain/booking";
+import { reserveBookingWithPayment, reserveBookingWithSnapshot } from "@/lib/domain/booking";
 import type { MinorUnitAmount } from "@/lib/domain/pricing";
 import {
   PricingCalculationError,
@@ -316,5 +317,110 @@ describe("integration: booking-time snapshot persistence", () => {
       feesMinor: 500,
       totalAmountMinor: 74500,
     });
+  });
+});
+
+describe("reserveBookingWithPayment", () => {
+  it("uses PaymentService interface without concrete provider coupling in booking flow", async () => {
+    const db: BookingReservationDbClient<{
+      id: string;
+      currency: "XAF";
+      totalAmountMinor: number;
+    }> = {
+      async $transaction(callback) {
+        return callback({
+          booking: {
+            async create(args) {
+              return {
+                id: "booking-pay-1",
+                currency: "XAF",
+                totalAmountMinor: args.data.totalAmountMinor,
+              };
+            },
+          },
+        });
+      },
+    };
+
+    const paymentService: PaymentService = {
+      async startPayment(input) {
+        return {
+          paymentId: input.paymentId,
+          bookingId: input.bookingId,
+          provider: input.provider,
+          method: input.method,
+          status: "PENDING",
+          providerReference: "provider-ref-1",
+          checkoutUrl: "https://gateway.example/checkout",
+          amountMinor: input.amountMinor,
+          currency: input.currency,
+        };
+      },
+      async getPaymentStatus() {
+        throw new Error("Not used in this test");
+      },
+      async applyWebhookEvent() {
+        throw new Error("Not used in this test");
+      },
+      async verifyPayment() {
+        throw new Error("Not used in this test");
+      },
+    };
+
+    const result = await reserveBookingWithPayment(
+      {
+        db,
+        paymentService,
+      },
+      {
+        booking: {
+          propertyId: "property-1",
+          unitId: "unit-1",
+          checkInDate: new Date("2026-06-01T12:00:00.000Z"),
+          checkOutDate: new Date("2026-06-03T09:00:00.000Z"),
+          guestFullName: "Test Guest",
+          guestEmail: "guest@example.com",
+          guestPhone: "+237600000002",
+          adultsCount: 2,
+          pricing: {
+            checkInDate: new Date("2026-06-01T12:00:00.000Z"),
+            checkOutDate: new Date("2026-06-03T09:00:00.000Z"),
+            currency: "XAF",
+            selectedUnit: {
+              unitId: "unit-1",
+              code: "A-301",
+              nightlyRateMinor: minor(22000),
+            },
+            selectedUnitType: {
+              unitTypeId: "type-1",
+              slug: "standard",
+              basePriceMinor: minor(22000),
+            },
+          },
+        },
+        payment: {
+          paymentId: "pay-1",
+          provider: "NOTCHPAY",
+          method: "MOMO",
+          customer: {
+            fullName: "Test Guest",
+            email: "guest@example.com",
+            phone: "+237600000002",
+          },
+          redirectUrls: {
+            returnUrl: "https://bookeasy.cm/booking/booking-pay-1/success",
+            cancelUrl: "https://bookeasy.cm/booking/booking-pay-1",
+          },
+          idempotencyKey: "idem-payment-1",
+        },
+      }
+    );
+
+    expect(result.booking.id).toBe("booking-pay-1");
+    expect(result.payment.bookingId).toBe("booking-pay-1");
+    expect(result.payment.amountMinor).toBe(44000);
+    expect(result.payment.currency).toBe("XAF");
+    expect(result.payment.provider).toBe("NOTCHPAY");
+    expect(result.payment.method).toBe("MOMO");
   });
 });
