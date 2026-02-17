@@ -858,7 +858,7 @@ Verification: 2026-02-17 (`pnpm exec vitest run tests/unit/domain/booking-paymen
 Status: TODO
 
 - **Feature Area:** Payments
-- **Context:** Notch Pay is the MVP gateway and must be integrated behind provider-agnostic contracts.
+- **Context:** Notch Pay is the MVP gateway and must be integrated behind provider-agnostic contracts.(https://developer.notchpay.co/get-started/quickstart)
 - **Scope Included:** `initiatePayment`, `parseWebhook`, `verifyPayment` fallback, signature verification stub fallback when exact header/algorithm is pending.
 - **Scope Excluded:** CinetPay adapter implementation.
 - **Acceptance Criteria:**
