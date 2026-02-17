@@ -8,65 +8,130 @@ import type {
   ProviderWebhookEvent,
   ProviderWebhookParseInput,
 } from "@/lib/domain/payments";
-import { PaymentDomainError } from "@/lib/domain/payments";
+import type { Currency } from "@/generated/prisma";
+import { PaymentDomainError, mapProviderFailureToPaymentDomainError } from "@/lib/domain/payments";
 import {
   NotchPayApiClient,
   createNotchPayApiClientFromEnv,
   type NotchPayCreatePaymentInput,
 } from "@/lib/payments/notchpay-client";
+import { verifyNotchWebhookSignatureFromEnv } from "@/lib/payments/notchpay-signature";
+import { mapNotchStatusToCanonical } from "@/lib/payments/notchpay-status";
 
 const SUPPORTED_METHODS: readonly PaymentMethodKey[] = ["MOMO"];
 
-function normalizeProviderStatus(rawStatus: string | null): string | null {
-  if (!rawStatus) {
-    return null;
-  }
-
-  return rawStatus.trim().toLowerCase();
-}
-
-export function mapNotchStatusToCanonical(
-  status: string | null
-): "INITIATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELLED" | "EXPIRED" {
-  const normalized = normalizeProviderStatus(status);
-
-  if (normalized == null) {
-    return "INITIATED";
-  }
-
-  if (normalized === "complete" || normalized === "completed" || normalized === "success") {
-    return "SUCCEEDED";
-  }
-
-  if (normalized === "failed" || normalized === "error") {
-    return "FAILED";
-  }
-
-  if (normalized === "expired") {
-    return "EXPIRED";
-  }
-
-  if (normalized === "canceled" || normalized === "cancelled") {
-    return "CANCELLED";
-  }
-
-  if (normalized === "pending" || normalized === "processing" || normalized === "created") {
-    return "PENDING";
-  }
-
-  throw new PaymentDomainError({
-    code: "PAYMENT_PROVIDER_RESPONSE_INVALID",
-    message: `Unsupported Notch Pay status: ${status}.`,
-    details: {
-      provider: "NOTCHPAY",
-      status: String(status),
-    },
-  });
-}
+export type NotchPayCallbackVerificationInput = {
+  paymentId: string;
+  reference: string;
+  amountMinor: number;
+  currency: Currency;
+  requestId?: string;
+};
 
 type NotchPayProviderDeps = {
   apiClient: Pick<NotchPayApiClient, "createPayment" | "verifyPayment">;
 };
+
+type ParsedWebhookPayload = {
+  id?: string;
+  event?: string;
+  type?: string;
+  createdAt?: string;
+  occurredAt?: string;
+  timestamp?: string;
+  data?: {
+    id?: string;
+    reference?: string;
+    status?: string;
+    payment?: {
+      reference?: string;
+      status?: string;
+    };
+    transaction?: {
+      status?: string;
+    };
+  };
+  reference?: string;
+  status?: string;
+  transaction?: {
+    status?: string;
+  };
+};
+
+function parseOccurredAt(payload: ParsedWebhookPayload): Date {
+  const rawTimestamp = payload.occurredAt ?? payload.createdAt ?? payload.timestamp;
+  if (!rawTimestamp) {
+    return new Date();
+  }
+
+  const occurredAt = new Date(rawTimestamp);
+  if (Number.isNaN(occurredAt.getTime())) {
+    throw new PaymentDomainError({
+      code: "PAYMENT_PROVIDER_RESPONSE_INVALID",
+      message: "Notch Pay webhook payload has invalid occurredAt timestamp.",
+      details: {
+        provider: "NOTCHPAY",
+      },
+    });
+  }
+
+  return occurredAt;
+}
+
+function parseWebhookPayload(rawBody: string): ParsedWebhookPayload {
+  try {
+    return JSON.parse(rawBody) as ParsedWebhookPayload;
+  } catch {
+    throw new PaymentDomainError({
+      code: "PAYMENT_PROVIDER_RESPONSE_INVALID",
+      message: "Notch Pay webhook payload is not valid JSON.",
+      details: {
+        provider: "NOTCHPAY",
+      },
+    });
+  }
+}
+
+function extractEventId(payload: ParsedWebhookPayload): string {
+  const eventId = payload.id ?? payload.data?.id;
+  if (!eventId || eventId.trim().length === 0) {
+    throw new PaymentDomainError({
+      code: "PAYMENT_PROVIDER_RESPONSE_INVALID",
+      message: "Notch Pay webhook payload is missing event id.",
+      details: {
+        provider: "NOTCHPAY",
+      },
+    });
+  }
+
+  return eventId.trim();
+}
+
+function extractProviderReference(payload: ParsedWebhookPayload): string | null {
+  return payload.data?.reference ?? payload.data?.payment?.reference ?? payload.reference ?? null;
+}
+
+function extractProviderStatus(payload: ParsedWebhookPayload): string {
+  const status =
+    payload.data?.status ??
+    payload.data?.payment?.status ??
+    payload.data?.transaction?.status ??
+    payload.status ??
+    payload.transaction?.status ??
+    null;
+
+  if (!status || status.trim().length === 0) {
+    throw new PaymentDomainError({
+      code: "PAYMENT_PROVIDER_RESPONSE_INVALID",
+      message: "Notch Pay webhook payload is missing payment status.",
+      details: {
+        provider: "NOTCHPAY",
+      },
+    });
+  }
+
+  return status.trim();
+}
 
 export class NotchPayProvider implements PaymentProvider {
   readonly provider = "NOTCHPAY" as const;
@@ -127,9 +192,7 @@ export class NotchPayProvider implements PaymentProvider {
       });
     }
 
-    const canonicalStatus = mapNotchStatusToCanonical(response.statusRaw);
-    const status =
-      response.authorizationUrl && canonicalStatus === "INITIATED" ? "PENDING" : canonicalStatus;
+    const status = mapNotchStatusToCanonical(response.statusRaw ?? "pending");
 
     return {
       provider: "NOTCHPAY",
@@ -141,13 +204,36 @@ export class NotchPayProvider implements PaymentProvider {
   }
 
   async parseWebhook(_input: ProviderWebhookParseInput): Promise<ProviderWebhookEvent> {
-    throw new PaymentDomainError({
-      code: "PAYMENT_PROVIDER_ERROR",
-      message: "Notch Pay webhook parsing is not implemented yet.",
-      details: {
-        provider: "NOTCHPAY",
-      },
+    const signatureValid = verifyNotchWebhookSignatureFromEnv({
+      headers: _input.headers,
+      rawBody: _input.rawBody,
     });
+
+    if (!signatureValid) {
+      throw new PaymentDomainError({
+        code: "PAYMENT_PROVIDER_ERROR",
+        message: "Notch Pay webhook signature validation failed.",
+        details: {
+          provider: "NOTCHPAY",
+        },
+      });
+    }
+
+    const payload = parseWebhookPayload(_input.rawBody);
+    const eventId = extractEventId(payload);
+    const providerReference = extractProviderReference(payload);
+    const providerStatus = extractProviderStatus(payload);
+    const occurredAt = parseOccurredAt(payload);
+
+    return {
+      provider: "NOTCHPAY",
+      eventId,
+      providerReference,
+      status: mapNotchStatusToCanonical(providerStatus),
+      occurredAt,
+      signatureValid,
+      raw: payload,
+    };
   }
 
   async verifyPayment(input: ProviderVerifyPaymentInput): Promise<ProviderVerifyPaymentResult> {
@@ -162,18 +248,39 @@ export class NotchPayProvider implements PaymentProvider {
       });
     }
 
-    const result = await this.apiClient.verifyPayment({
-      reference: input.providerReference,
+    try {
+      const result = await this.apiClient.verifyPayment({
+        reference: input.providerReference,
+        requestId: input.requestId,
+      });
+
+      return {
+        provider: "NOTCHPAY",
+        status: mapNotchStatusToCanonical(result.statusRaw ?? ""),
+        providerReference: result.reference,
+        verifiedAt: new Date(),
+        raw: result.raw,
+      };
+    } catch (error) {
+      throw mapProviderFailureToPaymentDomainError(error, {
+        provider: "NOTCHPAY",
+        paymentId: input.paymentId,
+        requestId: input.requestId ?? null,
+      });
+    }
+  }
+
+  // Callback/redirect hook: never trust redirect alone; always verify against provider API.
+  async verifyCallbackReference(
+    input: NotchPayCallbackVerificationInput
+  ): Promise<ProviderVerifyPaymentResult> {
+    return this.verifyPayment({
+      paymentId: input.paymentId,
+      providerReference: input.reference,
+      amountMinor: input.amountMinor,
+      currency: input.currency,
       requestId: input.requestId,
     });
-
-    return {
-      provider: "NOTCHPAY",
-      status: mapNotchStatusToCanonical(result.statusRaw),
-      providerReference: result.reference,
-      verifiedAt: new Date(),
-      raw: result.raw,
-    };
   }
 }
 
