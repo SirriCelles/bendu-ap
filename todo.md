@@ -855,18 +855,18 @@ Verification: 2026-02-17 (`pnpm exec vitest run tests/unit/domain/booking-paymen
 
 <!-- issue: bookeasy:T-052 -->
 
-Status: TODO
-Verification (partial): 2026-02-17 (`pnpm exec vitest run tests/unit/payments/notchpay-config.test.ts tests/unit/payments/notchpay-client.test.ts tests/unit/payments/notchpay-provider.test.ts tests/unit/payments/notchpay-signature.test.ts tests/unit/payments/notchpay-registry-contract.test.ts` ✅, `pnpm typecheck` ✅)
+Status: DONE
+Verification: 2026-02-17 (`pnpm exec vitest run tests/unit/payments/notchpay-config.test.ts tests/unit/payments/notchpay-client.test.ts tests/unit/payments/notchpay-provider.test.ts tests/unit/payments/notchpay-signature.test.ts tests/unit/payments/notchpay-registry-contract.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments
 - **Context:** Notch Pay is the MVP gateway and must be integrated behind provider-agnostic contracts.(https://developer.notchpay.co/get-started/quickstart)
 - **Scope Included:** `initiatePayment`, `parseWebhook`, `verifyPayment` fallback, signature verification stub fallback when exact header/algorithm is pending.
 - **Scope Excluded:** CinetPay adapter implementation.
 - **Acceptance Criteria:**
-- [ ] Adapter compiles against shared provider interface with no provider leakage into domain types
-- [ ] `initiatePayment` returns normalized payment payload (`providerReference`, `checkoutUrl`, canonical status)
-- [ ] `parseWebhook` maps provider events to canonical internal event shape
-- [ ] Signature verification fails closed when required signature header is missing
+- [x] Adapter compiles against shared provider interface with no provider leakage into domain types
+- [x] `initiatePayment` returns normalized payment payload (`providerReference`, `checkoutUrl`, canonical status)
+- [x] `parseWebhook` maps provider events to canonical internal event shape
+- [x] Signature verification fails closed when required signature header is missing
 - **Implementation Notes:** Add `lib/payments/notchpay.ts` (or equivalent adapter location per project structure) and map statuses to canonical enum.
 - **Dependencies:** 025
 - **Estimate:** M
