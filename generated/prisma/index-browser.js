@@ -243,6 +243,21 @@ exports.Prisma.PaymentTransactionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ProviderEventScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  eventId: 'eventId',
+  providerReference: 'providerReference',
+  paymentIntentId: 'paymentIntentId',
+  status: 'status',
+  signatureValid: 'signatureValid',
+  rawPayload: 'rawPayload',
+  occurredAt: 'occurredAt',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.MessageThreadScalarFieldEnum = {
   id: 'id',
   propertyId: 'propertyId',
@@ -293,6 +308,10 @@ exports.Prisma.SortOrder = {
 
 exports.Prisma.NullableJsonNullValueInput = {
   DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -379,6 +398,7 @@ exports.Prisma.ModelName = {
   PriceSnapshot: 'PriceSnapshot',
   PaymentIntent: 'PaymentIntent',
   PaymentTransaction: 'PaymentTransaction',
+  ProviderEvent: 'ProviderEvent',
   MessageThread: 'MessageThread',
   Message: 'Message',
   AuditLog: 'AuditLog'

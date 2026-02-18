@@ -220,9 +220,10 @@ model PaymentIntent {
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
 
-  property     Property             @relation(fields: [propertyId], references: [id], onDelete: Restrict)
-  booking      Booking              @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  transactions PaymentTransaction[]
+  property       Property             @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  booking        Booking              @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  transactions   PaymentTransaction[]
+  providerEvents ProviderEvent[]
 
   @@unique([provider, providerIntentRef])
   @@unique([idempotencyKey])
@@ -253,6 +254,28 @@ model PaymentTransaction {
   @@index([paymentIntentId, occurredAt])
   @@index([status, occurredAt])
   @@index([externalReference, occurredAt])
+}
+
+model ProviderEvent {
+  id                String    @id @default(cuid())
+  provider          String
+  eventId           String
+  providerReference String?
+  paymentIntentId   String?
+  status            String?
+  signatureValid    Boolean
+  rawPayload        Json
+  occurredAt        DateTime?
+  processedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  paymentIntent PaymentIntent? @relation(fields: [paymentIntentId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, eventId])
+  @@index([provider, providerReference])
+  @@index([paymentIntentId, createdAt])
+  @@index([processedAt])
 }
 
 model MessageThread {

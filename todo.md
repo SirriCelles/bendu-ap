@@ -944,6 +944,26 @@ Verification: 2026-02-18 (`pnpm exec vitest run tests/unit/api/notchpay-webhook-
 - [x] `T-054.6` Add webhook write rate limiting and correlation logging.
 - [x] `T-054.7` Add route-level unit tests for happy path, duplicate dedupe, invalid signature, unknown reference, and 429 behavior.
 
+## T-054A — Consolidate webhook ledger on dedicated `ProviderEvent` table
+
+<!-- issue: bookeasy:T-054A -->
+
+Status: DONE
+Verification: 2026-02-18 (`pnpm exec vitest run tests/unit/api/notchpay-webhook-route.test.ts` ✅, `pnpm typecheck` ✅)
+
+- **Feature Area:** Payments/Webhooks
+- **Context:** Architecture requires first-class provider event dedupe persistence; `AuditLog` fallback must be replaced by canonical `ProviderEvent`.
+- **Scope Included:** Prisma model + migration, webhook route refactor to `ProviderEvent` upsert/dedupe path, route tests updated to assert provider-event ledger behavior.
+- **Scope Excluded:** Backfill migration for historical `AuditLog`-based dedupe records.
+- **Acceptance Criteria:**
+- [x] `ProviderEvent` table exists with unique `(provider,eventId)` constraint and processing timestamps
+- [x] Webhook dedupe is driven by `ProviderEvent`, not `AuditLog`
+- [x] Unknown references are still persisted in ledger and acknowledged safely
+- [x] Route tests validate duplicate suppression and processed-at behavior via `ProviderEvent`
+- **Implementation Notes:** Added `ProviderEvent` in Prisma schema + SQL migration; refactored `app/api/webhooks/payments/notchpay/route.ts` to create/update provider events inside transaction.
+- **Dependencies:** 054
+- **Estimate:** S
+
 ## T-055 — Add fallback payment verification endpoint and booking confirmation recovery flow
 
 <!-- issue: bookeasy:T-055 -->

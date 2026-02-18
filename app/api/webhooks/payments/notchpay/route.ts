@@ -1,16 +1,9 @@
-import {
-  type Booking,
-  type BookingStatus,
-  type PaymentIntent,
-  type PaymentStatus,
-  type Prisma,
-} from "@/generated/prisma";
+import { type BookingStatus, type PaymentStatus, type Prisma } from "@/generated/prisma";
 import { createBookingStatusUpdate, createPaymentStatusUpdate } from "@/lib/domain/booking";
 import {
   PaymentDomainError,
   type PaymentLifecycleStatus,
   type PaymentProvider,
-  type ProviderWebhookEvent,
 } from "@/lib/domain/payments";
 import { prisma } from "@/lib/db/prisma";
 import { HttpError, toErrorResponse } from "@/lib/http/errors";
@@ -28,25 +21,6 @@ type WebhookRouteDeps = {
   limitRequest: typeof limitRequest;
   getRequestIdentifier: typeof getRequestIdentifier;
 };
-
-type EventLedgerRecord = {
-  id: string;
-  action: string;
-  entityType: string;
-  entityId: string | null;
-  metadata: unknown;
-};
-
-type MatchedPayment = Pick<
-  PaymentIntent,
-  "id" | "propertyId" | "bookingId" | "status" | "providerIntentRef" | "amountMinor" | "currency"
-> & {
-  booking: Pick<Booking, "id" | "status" | "paymentStatus">;
-};
-
-const LEDGER_ENTITY_TYPE = "PAYMENT_PROVIDER_EVENT";
-const LEDGER_ACTION_PROCESSED = "PAYMENT_WEBHOOK_EVENT_PROCESSED";
-const LEDGER_ACTION_UNMATCHED = "PAYMENT_WEBHOOK_EVENT_UNMATCHED_REFERENCE";
 
 function toJsonSafeValue(value: unknown): Prisma.InputJsonValue {
   if (value === undefined) {
@@ -74,10 +48,6 @@ function appendHeaders(response: Response, headers: HeadersInit): Response {
 
 function getRequestId(request: Request): string {
   return request.headers.get("x-request-id")?.trim() || crypto.randomUUID();
-}
-
-function ledgerEntityId(event: ProviderWebhookEvent): string {
-  return `${event.provider}:${event.eventId}`;
 }
 
 function mapCanonicalToDbPaymentStatus(
@@ -132,57 +102,30 @@ function mapWebhookError(error: unknown): HttpError {
   return new HttpError(500, "INTERNAL_SERVER_ERROR", "Unexpected server error.");
 }
 
-async function ensurePropertyIdForUnmatched(db: typeof prisma): Promise<string> {
-  const property = await db.property.findFirst({
-    select: {
-      id: true,
-    },
-  });
-
-  if (!property) {
-    throw new HttpError(
-      500,
-      "INTERNAL_SERVER_ERROR",
-      "Cannot persist unmatched provider event without a property context."
-    );
+function isProviderEventDuplicate(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
   }
 
-  return property.id;
-}
+  const candidate = error as {
+    code?: string;
+    meta?: { target?: unknown };
+    constraint?: string;
+    message?: string;
+  };
 
-async function findLedgerEntry(
-  tx: {
-    auditLog: {
-      findFirst: (args: {
-        where: {
-          entityType: string;
-          entityId: string;
-        };
-        select: {
-          id: true;
-          action: true;
-          entityType: true;
-          entityId: true;
-          metadata: true;
-        };
-      }) => Promise<EventLedgerRecord | null>;
-    };
-  },
-  entityId: string
-): Promise<EventLedgerRecord | null> {
-  return tx.auditLog.findFirst({
-    where: {
-      entityType: LEDGER_ENTITY_TYPE,
-      entityId,
-    },
-    select: {
-      id: true,
-      action: true,
-      entityType: true,
-      entityId: true,
-      metadata: true,
-    },
-  });
+  if (candidate.code === "P2002") {
+    if (Array.isArray(candidate.meta?.target)) {
+      return candidate.meta.target.some((item) => String(item).includes("provider"));
+    }
+
+    return String(candidate.meta?.target ?? "").includes("provider");
+  }
+
+  return (
+    String(candidate.constraint ?? "").includes("ProviderEvent_provider_eventId_key") ||
+    String(candidate.message ?? "").includes("ProviderEvent_provider_eventId_key")
+  );
 }
 
 function canApplyPaymentTransition(from: PaymentStatus, to: PaymentStatus): boolean {
@@ -229,17 +172,29 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
         rawBody,
       });
 
-      const entityId = ledgerEntityId(event);
-      const unmatchedPropertyId = await ensurePropertyIdForUnmatched(deps.db);
+      const eventKey = {
+        provider: event.provider,
+        eventId: event.eventId,
+      };
 
       const result = await deps.db.$transaction(async (tx) => {
-        const existingLedger = await findLedgerEntry(tx, entityId);
-        if (existingLedger) {
+        const duplicateEvent = await tx.providerEvent.findUnique({
+          where: {
+            provider_eventId: eventKey,
+          },
+          select: {
+            id: true,
+            paymentIntentId: true,
+            status: true,
+          },
+        });
+
+        if (duplicateEvent) {
           return {
             duplicate: true,
-            paymentId: null as string | null,
+            paymentId: duplicateEvent.paymentIntentId,
             bookingId: null as string | null,
-            status: event.status,
+            status: (duplicateEvent.status as PaymentLifecycleStatus | null) ?? event.status,
           };
         }
 
@@ -250,10 +205,7 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
               },
               select: {
                 id: true,
-                propertyId: true,
-                bookingId: true,
                 status: true,
-                providerIntentRef: true,
                 amountMinor: true,
                 currency: true,
                 booking: {
@@ -267,24 +219,45 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
             })
           : null;
 
-        if (!payment) {
-          await tx.auditLog.create({
+        let providerEventId: string;
+        try {
+          const createdProviderEvent = await tx.providerEvent.create({
             data: {
-              propertyId: unmatchedPropertyId,
-              actorRole: "ADMIN",
-              action: LEDGER_ACTION_UNMATCHED,
-              entityType: LEDGER_ENTITY_TYPE,
-              entityId,
-              requestId,
-              metadata: {
-                provider: event.provider,
-                eventId: event.eventId,
-                providerReference: event.providerReference,
-                status: event.status,
-                signatureValid: event.signatureValid,
-                occurredAt: event.occurredAt.toISOString(),
-                raw: toJsonSafeValue(event.raw),
-              },
+              provider: event.provider,
+              eventId: event.eventId,
+              providerReference: event.providerReference,
+              paymentIntentId: payment?.id,
+              status: event.status,
+              signatureValid: event.signatureValid,
+              rawPayload: toJsonSafeValue(event.raw),
+              occurredAt: event.occurredAt,
+            },
+            select: {
+              id: true,
+            },
+          });
+
+          providerEventId = createdProviderEvent.id;
+        } catch (error) {
+          if (isProviderEventDuplicate(error)) {
+            return {
+              duplicate: true,
+              paymentId: payment?.id ?? null,
+              bookingId: payment?.booking.id ?? null,
+              status: event.status,
+            };
+          }
+
+          throw error;
+        }
+
+        if (!payment) {
+          await tx.providerEvent.update({
+            where: {
+              id: providerEventId,
+            },
+            data: {
+              processedAt: new Date(),
             },
           });
 
@@ -346,7 +319,7 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
             amountMinor: payment.amountMinor,
             currency: payment.currency,
             providerTxnRef: null,
-            externalReference: entityId,
+            externalReference: `${event.provider}:${event.eventId}`,
             message: `Webhook event ${event.eventId} processed`,
             rawPayload: {
               provider: event.provider,
@@ -366,23 +339,12 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
           },
         });
 
-        await tx.auditLog.create({
+        await tx.providerEvent.update({
+          where: {
+            id: providerEventId,
+          },
           data: {
-            propertyId: payment.propertyId,
-            bookingId: payment.booking.id,
-            actorRole: "ADMIN",
-            action: LEDGER_ACTION_PROCESSED,
-            entityType: LEDGER_ENTITY_TYPE,
-            entityId,
-            requestId,
-            metadata: {
-              provider: event.provider,
-              eventId: event.eventId,
-              providerReference: event.providerReference,
-              status: event.status,
-              signatureValid: event.signatureValid,
-              occurredAt: event.occurredAt.toISOString(),
-            },
+            processedAt: new Date(),
           },
         });
 

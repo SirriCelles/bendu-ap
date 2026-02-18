@@ -17,7 +17,6 @@ import {
 
 type PaymentIntentRecord = {
   id: string;
-  propertyId: string;
   bookingId: string;
   status: "NOT_REQUIRED" | "PENDING" | "PAID" | "FAILED" | "REFUNDED";
   providerIntentRef: string | null;
@@ -31,14 +30,14 @@ type BookingRecord = {
   paymentStatus: "NOT_REQUIRED" | "PENDING" | "PAID" | "FAILED" | "REFUNDED";
 };
 
-type AuditRecord = {
+type ProviderEventRecord = {
   id: string;
-  entityType: string;
-  entityId: string | null;
-  action: string;
-  propertyId: string;
-  bookingId?: string;
-  metadata?: unknown;
+  provider: string;
+  eventId: string;
+  providerReference: string | null;
+  paymentIntentId: string | null;
+  status: string | null;
+  processedAt: Date | null;
 };
 
 type TransactionRecord = {
@@ -78,7 +77,7 @@ function buildHarness(options?: {
   parseError?: Error;
   limitSuccess?: boolean;
   includePayment?: boolean;
-  existingLedger?: boolean;
+  existingProviderEvent?: boolean;
 }) {
   const bookings = new Map<string, BookingRecord>([
     [
@@ -96,7 +95,6 @@ function buildHarness(options?: {
       "pay_1",
       {
         id: "pay_1",
-        propertyId: "prop_1",
         bookingId: "bk_1",
         status: "PENDING",
         providerIntentRef: "np_ref_123",
@@ -110,14 +108,16 @@ function buildHarness(options?: {
     payments.clear();
   }
 
-  const auditLogs: AuditRecord[] = options?.existingLedger
+  const providerEvents: ProviderEventRecord[] = options?.existingProviderEvent
     ? [
         {
-          id: "audit_1",
-          entityType: "PAYMENT_PROVIDER_EVENT",
-          entityId: "NOTCHPAY:evt_1",
-          action: "PAYMENT_WEBHOOK_EVENT_PROCESSED",
-          propertyId: "prop_1",
+          id: "evt_row_1",
+          provider: "NOTCHPAY",
+          eventId: "evt_1",
+          providerReference: "np_ref_123",
+          paymentIntentId: "pay_1",
+          status: "SUCCEEDED",
+          processedAt: new Date(),
         },
       ]
     : [];
@@ -145,17 +145,66 @@ function buildHarness(options?: {
   };
 
   const tx = {
-    auditLog: {
-      findFirst: vi.fn(async ({ where }: { where: { entityType: string; entityId: string } }) => {
-        return (
-          auditLogs.find(
-            (log) => log.entityType === where.entityType && log.entityId === where.entityId
-          ) ?? null
-        );
-      }),
-      create: vi.fn(async ({ data }: { data: Omit<AuditRecord, "id"> }) => {
-        auditLogs.push({ id: `audit_${auditLogs.length + 1}`, ...data });
-      }),
+    providerEvent: {
+      findUnique: vi.fn(
+        async ({
+          where,
+        }: {
+          where: { provider_eventId: { provider: string; eventId: string } };
+        }) => {
+          const key = where.provider_eventId;
+          return (
+            providerEvents.find(
+              (entry) => entry.provider === key.provider && entry.eventId === key.eventId
+            ) ?? null
+          );
+        }
+      ),
+      create: vi.fn(
+        async ({
+          data,
+        }: {
+          data: Omit<ProviderEventRecord, "id" | "processedAt"> & { processedAt?: Date };
+        }) => {
+          const duplicate = providerEvents.find(
+            (entry) => entry.provider === data.provider && entry.eventId === data.eventId
+          );
+          if (duplicate) {
+            const error = new Error("duplicate provider event") as Error & {
+              code?: string;
+              meta?: { target?: string[] };
+            };
+            error.code = "P2002";
+            error.meta = { target: ["provider", "eventId"] };
+            throw error;
+          }
+
+          const next: ProviderEventRecord = {
+            id: `evt_row_${providerEvents.length + 1}`,
+            provider: data.provider,
+            eventId: data.eventId,
+            providerReference: data.providerReference,
+            paymentIntentId: data.paymentIntentId ?? null,
+            status: data.status,
+            processedAt: data.processedAt ?? null,
+          };
+
+          providerEvents.push(next);
+          return { id: next.id };
+        }
+      ),
+      update: vi.fn(
+        async ({ where, data }: { where: { id: string }; data: { processedAt?: Date } }) => {
+          const event = providerEvents.find((entry) => entry.id === where.id);
+          if (!event) {
+            throw new Error("provider event not found");
+          }
+
+          if (data.processedAt) {
+            event.processedAt = data.processedAt;
+          }
+        }
+      ),
     },
     paymentIntent: {
       findFirst: vi.fn(async ({ where }: { where: { providerIntentRef: string | null } }) => {
@@ -215,9 +264,6 @@ function buildHarness(options?: {
 
   const handler = createNotchPayWebhookPostHandler({
     db: {
-      property: {
-        findFirst: vi.fn(async () => ({ id: "prop_1" })),
-      },
       $transaction: vi.fn(async (callback: (trx: typeof tx) => Promise<unknown>) => callback(tx)),
     } as never,
     createProvider: vi.fn(() => provider),
@@ -235,9 +281,8 @@ function buildHarness(options?: {
     handler,
     bookings,
     payments,
-    auditLogs,
+    providerEvents,
     transactions,
-    tx,
   };
 }
 
@@ -257,11 +302,12 @@ describe("POST /api/webhooks/payments/notchpay", () => {
     expect(harness.bookings.get("bk_1")?.status).toBe("CONFIRMED");
     expect(harness.bookings.get("bk_1")?.paymentStatus).toBe("PAID");
     expect(harness.transactions).toHaveLength(1);
-    expect(harness.auditLogs.some((log) => log.entityId === "NOTCHPAY:evt_1")).toBe(true);
+    expect(harness.providerEvents).toHaveLength(1);
+    expect(harness.providerEvents[0].processedAt).toBeTruthy();
   });
 
   it("acknowledges duplicate events without reapplying transitions", async () => {
-    const harness = buildHarness({ existingLedger: true });
+    const harness = buildHarness({ existingProviderEvent: true });
 
     const response = await harness.handler(createRequest('{"ok":true}'));
     const body = await response.json();
@@ -286,7 +332,7 @@ describe("POST /api/webhooks/payments/notchpay", () => {
     expect(body.error.code).toBe("WEBHOOK_SIGNATURE_INVALID");
   });
 
-  it("stores unmatched provider reference in event ledger and returns safe success", async () => {
+  it("stores unmatched provider reference in provider event ledger and returns safe success", async () => {
     const harness = buildHarness({ includePayment: false });
 
     const response = await harness.handler(createRequest('{"ok":true}'));
@@ -296,9 +342,9 @@ describe("POST /api/webhooks/payments/notchpay", () => {
     expect(body.data.duplicate).toBe(false);
     expect(body.data.paymentId).toBeNull();
     expect(body.data.bookingId).toBeNull();
-    expect(
-      harness.auditLogs.some((log) => log.action === "PAYMENT_WEBHOOK_EVENT_UNMATCHED_REFERENCE")
-    ).toBe(true);
+    expect(harness.providerEvents).toHaveLength(1);
+    expect(harness.providerEvents[0].paymentIntentId).toBeNull();
+    expect(harness.providerEvents[0].processedAt).toBeTruthy();
   });
 
   it("returns 429 when webhook rate limit is exceeded", async () => {

@@ -49,6 +49,11 @@ export type PaymentIntent = $Result.DefaultSelection<Prisma.$PaymentIntentPayloa
  */
 export type PaymentTransaction = $Result.DefaultSelection<Prisma.$PaymentTransactionPayload>
 /**
+ * Model ProviderEvent
+ * 
+ */
+export type ProviderEvent = $Result.DefaultSelection<Prisma.$ProviderEventPayload>
+/**
  * Model MessageThread
  * 
  */
@@ -378,6 +383,16 @@ export class PrismaClient<
     * ```
     */
   get paymentTransaction(): Prisma.PaymentTransactionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.providerEvent`: Exposes CRUD operations for the **ProviderEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProviderEvents
+    * const providerEvents = await prisma.providerEvent.findMany()
+    * ```
+    */
+  get providerEvent(): Prisma.ProviderEventDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.messageThread`: Exposes CRUD operations for the **MessageThread** model.
@@ -849,6 +864,7 @@ export namespace Prisma {
     PriceSnapshot: 'PriceSnapshot',
     PaymentIntent: 'PaymentIntent',
     PaymentTransaction: 'PaymentTransaction',
+    ProviderEvent: 'ProviderEvent',
     MessageThread: 'MessageThread',
     Message: 'Message',
     AuditLog: 'AuditLog'
@@ -867,7 +883,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "property" | "unitType" | "unit" | "booking" | "priceSnapshot" | "paymentIntent" | "paymentTransaction" | "messageThread" | "message" | "auditLog"
+      modelProps: "property" | "unitType" | "unit" | "booking" | "priceSnapshot" | "paymentIntent" | "paymentTransaction" | "providerEvent" | "messageThread" | "message" | "auditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1389,6 +1405,80 @@ export namespace Prisma {
           }
         }
       }
+      ProviderEvent: {
+        payload: Prisma.$ProviderEventPayload<ExtArgs>
+        fields: Prisma.ProviderEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProviderEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProviderEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>
+          }
+          findFirst: {
+            args: Prisma.ProviderEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProviderEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>
+          }
+          findMany: {
+            args: Prisma.ProviderEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>[]
+          }
+          create: {
+            args: Prisma.ProviderEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>
+          }
+          createMany: {
+            args: Prisma.ProviderEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProviderEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>[]
+          }
+          delete: {
+            args: Prisma.ProviderEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>
+          }
+          update: {
+            args: Prisma.ProviderEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProviderEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProviderEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ProviderEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.ProviderEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProviderEventPayload>
+          }
+          aggregate: {
+            args: Prisma.ProviderEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProviderEvent>
+          }
+          groupBy: {
+            args: Prisma.ProviderEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProviderEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProviderEventCountArgs<ExtArgs>
+            result: $Utils.Optional<ProviderEventCountAggregateOutputType> | number
+          }
+        }
+      }
       MessageThread: {
         payload: Prisma.$MessageThreadPayload<ExtArgs>
         fields: Prisma.MessageThreadFieldRefs
@@ -1726,6 +1816,7 @@ export namespace Prisma {
     priceSnapshot?: PriceSnapshotOmit
     paymentIntent?: PaymentIntentOmit
     paymentTransaction?: PaymentTransactionOmit
+    providerEvent?: ProviderEventOmit
     messageThread?: MessageThreadOmit
     message?: MessageOmit
     auditLog?: AuditLogOmit
@@ -2006,10 +2097,12 @@ export namespace Prisma {
 
   export type PaymentIntentCountOutputType = {
     transactions: number
+    providerEvents: number
   }
 
   export type PaymentIntentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     transactions?: boolean | PaymentIntentCountOutputTypeCountTransactionsArgs
+    providerEvents?: boolean | PaymentIntentCountOutputTypeCountProviderEventsArgs
   }
 
   // Custom InputTypes
@@ -2028,6 +2121,13 @@ export namespace Prisma {
    */
   export type PaymentIntentCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PaymentTransactionWhereInput
+  }
+
+  /**
+   * PaymentIntentCountOutputType without action
+   */
+  export type PaymentIntentCountOutputTypeCountProviderEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProviderEventWhereInput
   }
 
 
@@ -8803,6 +8903,7 @@ export namespace Prisma {
     property?: boolean | PropertyDefaultArgs<ExtArgs>
     booking?: boolean | BookingDefaultArgs<ExtArgs>
     transactions?: boolean | PaymentIntent$transactionsArgs<ExtArgs>
+    providerEvents?: boolean | PaymentIntent$providerEventsArgs<ExtArgs>
     _count?: boolean | PaymentIntentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["paymentIntent"]>
 
@@ -8866,6 +8967,7 @@ export namespace Prisma {
     property?: boolean | PropertyDefaultArgs<ExtArgs>
     booking?: boolean | BookingDefaultArgs<ExtArgs>
     transactions?: boolean | PaymentIntent$transactionsArgs<ExtArgs>
+    providerEvents?: boolean | PaymentIntent$providerEventsArgs<ExtArgs>
     _count?: boolean | PaymentIntentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PaymentIntentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8883,6 +8985,7 @@ export namespace Prisma {
       property: Prisma.$PropertyPayload<ExtArgs>
       booking: Prisma.$BookingPayload<ExtArgs>
       transactions: Prisma.$PaymentTransactionPayload<ExtArgs>[]
+      providerEvents: Prisma.$ProviderEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9296,6 +9399,7 @@ export namespace Prisma {
     property<T extends PropertyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PropertyDefaultArgs<ExtArgs>>): Prisma__PropertyClient<$Result.GetResult<Prisma.$PropertyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     booking<T extends BookingDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BookingDefaultArgs<ExtArgs>>): Prisma__BookingClient<$Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     transactions<T extends PaymentIntent$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, PaymentIntent$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    providerEvents<T extends PaymentIntent$providerEventsArgs<ExtArgs> = {}>(args?: Subset<T, PaymentIntent$providerEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9756,6 +9860,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PaymentTransactionScalarFieldEnum | PaymentTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * PaymentIntent.providerEvents
+   */
+  export type PaymentIntent$providerEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    where?: ProviderEventWhereInput
+    orderBy?: ProviderEventOrderByWithRelationInput | ProviderEventOrderByWithRelationInput[]
+    cursor?: ProviderEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProviderEventScalarFieldEnum | ProviderEventScalarFieldEnum[]
   }
 
   /**
@@ -10970,6 +11098,1170 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PaymentTransactionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProviderEvent
+   */
+
+  export type AggregateProviderEvent = {
+    _count: ProviderEventCountAggregateOutputType | null
+    _min: ProviderEventMinAggregateOutputType | null
+    _max: ProviderEventMaxAggregateOutputType | null
+  }
+
+  export type ProviderEventMinAggregateOutputType = {
+    id: string | null
+    provider: string | null
+    eventId: string | null
+    providerReference: string | null
+    paymentIntentId: string | null
+    status: string | null
+    signatureValid: boolean | null
+    occurredAt: Date | null
+    processedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProviderEventMaxAggregateOutputType = {
+    id: string | null
+    provider: string | null
+    eventId: string | null
+    providerReference: string | null
+    paymentIntentId: string | null
+    status: string | null
+    signatureValid: boolean | null
+    occurredAt: Date | null
+    processedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProviderEventCountAggregateOutputType = {
+    id: number
+    provider: number
+    eventId: number
+    providerReference: number
+    paymentIntentId: number
+    status: number
+    signatureValid: number
+    rawPayload: number
+    occurredAt: number
+    processedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProviderEventMinAggregateInputType = {
+    id?: true
+    provider?: true
+    eventId?: true
+    providerReference?: true
+    paymentIntentId?: true
+    status?: true
+    signatureValid?: true
+    occurredAt?: true
+    processedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProviderEventMaxAggregateInputType = {
+    id?: true
+    provider?: true
+    eventId?: true
+    providerReference?: true
+    paymentIntentId?: true
+    status?: true
+    signatureValid?: true
+    occurredAt?: true
+    processedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProviderEventCountAggregateInputType = {
+    id?: true
+    provider?: true
+    eventId?: true
+    providerReference?: true
+    paymentIntentId?: true
+    status?: true
+    signatureValid?: true
+    rawPayload?: true
+    occurredAt?: true
+    processedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProviderEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProviderEvent to aggregate.
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProviderEvents to fetch.
+     */
+    orderBy?: ProviderEventOrderByWithRelationInput | ProviderEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProviderEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProviderEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProviderEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProviderEvents
+    **/
+    _count?: true | ProviderEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProviderEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProviderEventMaxAggregateInputType
+  }
+
+  export type GetProviderEventAggregateType<T extends ProviderEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateProviderEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProviderEvent[P]>
+      : GetScalarType<T[P], AggregateProviderEvent[P]>
+  }
+
+
+
+
+  export type ProviderEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProviderEventWhereInput
+    orderBy?: ProviderEventOrderByWithAggregationInput | ProviderEventOrderByWithAggregationInput[]
+    by: ProviderEventScalarFieldEnum[] | ProviderEventScalarFieldEnum
+    having?: ProviderEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProviderEventCountAggregateInputType | true
+    _min?: ProviderEventMinAggregateInputType
+    _max?: ProviderEventMaxAggregateInputType
+  }
+
+  export type ProviderEventGroupByOutputType = {
+    id: string
+    provider: string
+    eventId: string
+    providerReference: string | null
+    paymentIntentId: string | null
+    status: string | null
+    signatureValid: boolean
+    rawPayload: JsonValue
+    occurredAt: Date | null
+    processedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ProviderEventCountAggregateOutputType | null
+    _min: ProviderEventMinAggregateOutputType | null
+    _max: ProviderEventMaxAggregateOutputType | null
+  }
+
+  type GetProviderEventGroupByPayload<T extends ProviderEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProviderEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProviderEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProviderEventGroupByOutputType[P]>
+            : GetScalarType<T[P], ProviderEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProviderEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    provider?: boolean
+    eventId?: boolean
+    providerReference?: boolean
+    paymentIntentId?: boolean
+    status?: boolean
+    signatureValid?: boolean
+    rawPayload?: boolean
+    occurredAt?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    paymentIntent?: boolean | ProviderEvent$paymentIntentArgs<ExtArgs>
+  }, ExtArgs["result"]["providerEvent"]>
+
+  export type ProviderEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    provider?: boolean
+    eventId?: boolean
+    providerReference?: boolean
+    paymentIntentId?: boolean
+    status?: boolean
+    signatureValid?: boolean
+    rawPayload?: boolean
+    occurredAt?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    paymentIntent?: boolean | ProviderEvent$paymentIntentArgs<ExtArgs>
+  }, ExtArgs["result"]["providerEvent"]>
+
+  export type ProviderEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    provider?: boolean
+    eventId?: boolean
+    providerReference?: boolean
+    paymentIntentId?: boolean
+    status?: boolean
+    signatureValid?: boolean
+    rawPayload?: boolean
+    occurredAt?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    paymentIntent?: boolean | ProviderEvent$paymentIntentArgs<ExtArgs>
+  }, ExtArgs["result"]["providerEvent"]>
+
+  export type ProviderEventSelectScalar = {
+    id?: boolean
+    provider?: boolean
+    eventId?: boolean
+    providerReference?: boolean
+    paymentIntentId?: boolean
+    status?: boolean
+    signatureValid?: boolean
+    rawPayload?: boolean
+    occurredAt?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ProviderEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "provider" | "eventId" | "providerReference" | "paymentIntentId" | "status" | "signatureValid" | "rawPayload" | "occurredAt" | "processedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["providerEvent"]>
+  export type ProviderEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    paymentIntent?: boolean | ProviderEvent$paymentIntentArgs<ExtArgs>
+  }
+  export type ProviderEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    paymentIntent?: boolean | ProviderEvent$paymentIntentArgs<ExtArgs>
+  }
+  export type ProviderEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    paymentIntent?: boolean | ProviderEvent$paymentIntentArgs<ExtArgs>
+  }
+
+  export type $ProviderEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProviderEvent"
+    objects: {
+      paymentIntent: Prisma.$PaymentIntentPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      provider: string
+      eventId: string
+      providerReference: string | null
+      paymentIntentId: string | null
+      status: string | null
+      signatureValid: boolean
+      rawPayload: Prisma.JsonValue
+      occurredAt: Date | null
+      processedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["providerEvent"]>
+    composites: {}
+  }
+
+  type ProviderEventGetPayload<S extends boolean | null | undefined | ProviderEventDefaultArgs> = $Result.GetResult<Prisma.$ProviderEventPayload, S>
+
+  type ProviderEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProviderEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProviderEventCountAggregateInputType | true
+    }
+
+  export interface ProviderEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProviderEvent'], meta: { name: 'ProviderEvent' } }
+    /**
+     * Find zero or one ProviderEvent that matches the filter.
+     * @param {ProviderEventFindUniqueArgs} args - Arguments to find a ProviderEvent
+     * @example
+     * // Get one ProviderEvent
+     * const providerEvent = await prisma.providerEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProviderEventFindUniqueArgs>(args: SelectSubset<T, ProviderEventFindUniqueArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProviderEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProviderEventFindUniqueOrThrowArgs} args - Arguments to find a ProviderEvent
+     * @example
+     * // Get one ProviderEvent
+     * const providerEvent = await prisma.providerEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProviderEventFindUniqueOrThrowArgs>(args: SelectSubset<T, ProviderEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProviderEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventFindFirstArgs} args - Arguments to find a ProviderEvent
+     * @example
+     * // Get one ProviderEvent
+     * const providerEvent = await prisma.providerEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProviderEventFindFirstArgs>(args?: SelectSubset<T, ProviderEventFindFirstArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProviderEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventFindFirstOrThrowArgs} args - Arguments to find a ProviderEvent
+     * @example
+     * // Get one ProviderEvent
+     * const providerEvent = await prisma.providerEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProviderEventFindFirstOrThrowArgs>(args?: SelectSubset<T, ProviderEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProviderEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProviderEvents
+     * const providerEvents = await prisma.providerEvent.findMany()
+     * 
+     * // Get first 10 ProviderEvents
+     * const providerEvents = await prisma.providerEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const providerEventWithIdOnly = await prisma.providerEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProviderEventFindManyArgs>(args?: SelectSubset<T, ProviderEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProviderEvent.
+     * @param {ProviderEventCreateArgs} args - Arguments to create a ProviderEvent.
+     * @example
+     * // Create one ProviderEvent
+     * const ProviderEvent = await prisma.providerEvent.create({
+     *   data: {
+     *     // ... data to create a ProviderEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProviderEventCreateArgs>(args: SelectSubset<T, ProviderEventCreateArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProviderEvents.
+     * @param {ProviderEventCreateManyArgs} args - Arguments to create many ProviderEvents.
+     * @example
+     * // Create many ProviderEvents
+     * const providerEvent = await prisma.providerEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProviderEventCreateManyArgs>(args?: SelectSubset<T, ProviderEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProviderEvents and returns the data saved in the database.
+     * @param {ProviderEventCreateManyAndReturnArgs} args - Arguments to create many ProviderEvents.
+     * @example
+     * // Create many ProviderEvents
+     * const providerEvent = await prisma.providerEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProviderEvents and only return the `id`
+     * const providerEventWithIdOnly = await prisma.providerEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProviderEventCreateManyAndReturnArgs>(args?: SelectSubset<T, ProviderEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ProviderEvent.
+     * @param {ProviderEventDeleteArgs} args - Arguments to delete one ProviderEvent.
+     * @example
+     * // Delete one ProviderEvent
+     * const ProviderEvent = await prisma.providerEvent.delete({
+     *   where: {
+     *     // ... filter to delete one ProviderEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProviderEventDeleteArgs>(args: SelectSubset<T, ProviderEventDeleteArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProviderEvent.
+     * @param {ProviderEventUpdateArgs} args - Arguments to update one ProviderEvent.
+     * @example
+     * // Update one ProviderEvent
+     * const providerEvent = await prisma.providerEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProviderEventUpdateArgs>(args: SelectSubset<T, ProviderEventUpdateArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProviderEvents.
+     * @param {ProviderEventDeleteManyArgs} args - Arguments to filter ProviderEvents to delete.
+     * @example
+     * // Delete a few ProviderEvents
+     * const { count } = await prisma.providerEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProviderEventDeleteManyArgs>(args?: SelectSubset<T, ProviderEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProviderEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProviderEvents
+     * const providerEvent = await prisma.providerEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProviderEventUpdateManyArgs>(args: SelectSubset<T, ProviderEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProviderEvents and returns the data updated in the database.
+     * @param {ProviderEventUpdateManyAndReturnArgs} args - Arguments to update many ProviderEvents.
+     * @example
+     * // Update many ProviderEvents
+     * const providerEvent = await prisma.providerEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ProviderEvents and only return the `id`
+     * const providerEventWithIdOnly = await prisma.providerEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ProviderEventUpdateManyAndReturnArgs>(args: SelectSubset<T, ProviderEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ProviderEvent.
+     * @param {ProviderEventUpsertArgs} args - Arguments to update or create a ProviderEvent.
+     * @example
+     * // Update or create a ProviderEvent
+     * const providerEvent = await prisma.providerEvent.upsert({
+     *   create: {
+     *     // ... data to create a ProviderEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProviderEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProviderEventUpsertArgs>(args: SelectSubset<T, ProviderEventUpsertArgs<ExtArgs>>): Prisma__ProviderEventClient<$Result.GetResult<Prisma.$ProviderEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProviderEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventCountArgs} args - Arguments to filter ProviderEvents to count.
+     * @example
+     * // Count the number of ProviderEvents
+     * const count = await prisma.providerEvent.count({
+     *   where: {
+     *     // ... the filter for the ProviderEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProviderEventCountArgs>(
+      args?: Subset<T, ProviderEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProviderEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProviderEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProviderEventAggregateArgs>(args: Subset<T, ProviderEventAggregateArgs>): Prisma.PrismaPromise<GetProviderEventAggregateType<T>>
+
+    /**
+     * Group by ProviderEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProviderEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProviderEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProviderEventGroupByArgs['orderBy'] }
+        : { orderBy?: ProviderEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProviderEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProviderEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProviderEvent model
+   */
+  readonly fields: ProviderEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProviderEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProviderEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    paymentIntent<T extends ProviderEvent$paymentIntentArgs<ExtArgs> = {}>(args?: Subset<T, ProviderEvent$paymentIntentArgs<ExtArgs>>): Prisma__PaymentIntentClient<$Result.GetResult<Prisma.$PaymentIntentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProviderEvent model
+   */
+  interface ProviderEventFieldRefs {
+    readonly id: FieldRef<"ProviderEvent", 'String'>
+    readonly provider: FieldRef<"ProviderEvent", 'String'>
+    readonly eventId: FieldRef<"ProviderEvent", 'String'>
+    readonly providerReference: FieldRef<"ProviderEvent", 'String'>
+    readonly paymentIntentId: FieldRef<"ProviderEvent", 'String'>
+    readonly status: FieldRef<"ProviderEvent", 'String'>
+    readonly signatureValid: FieldRef<"ProviderEvent", 'Boolean'>
+    readonly rawPayload: FieldRef<"ProviderEvent", 'Json'>
+    readonly occurredAt: FieldRef<"ProviderEvent", 'DateTime'>
+    readonly processedAt: FieldRef<"ProviderEvent", 'DateTime'>
+    readonly createdAt: FieldRef<"ProviderEvent", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProviderEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProviderEvent findUnique
+   */
+  export type ProviderEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ProviderEvent to fetch.
+     */
+    where: ProviderEventWhereUniqueInput
+  }
+
+  /**
+   * ProviderEvent findUniqueOrThrow
+   */
+  export type ProviderEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ProviderEvent to fetch.
+     */
+    where: ProviderEventWhereUniqueInput
+  }
+
+  /**
+   * ProviderEvent findFirst
+   */
+  export type ProviderEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ProviderEvent to fetch.
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProviderEvents to fetch.
+     */
+    orderBy?: ProviderEventOrderByWithRelationInput | ProviderEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProviderEvents.
+     */
+    cursor?: ProviderEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProviderEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProviderEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProviderEvents.
+     */
+    distinct?: ProviderEventScalarFieldEnum | ProviderEventScalarFieldEnum[]
+  }
+
+  /**
+   * ProviderEvent findFirstOrThrow
+   */
+  export type ProviderEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ProviderEvent to fetch.
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProviderEvents to fetch.
+     */
+    orderBy?: ProviderEventOrderByWithRelationInput | ProviderEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProviderEvents.
+     */
+    cursor?: ProviderEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProviderEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProviderEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProviderEvents.
+     */
+    distinct?: ProviderEventScalarFieldEnum | ProviderEventScalarFieldEnum[]
+  }
+
+  /**
+   * ProviderEvent findMany
+   */
+  export type ProviderEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ProviderEvents to fetch.
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProviderEvents to fetch.
+     */
+    orderBy?: ProviderEventOrderByWithRelationInput | ProviderEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProviderEvents.
+     */
+    cursor?: ProviderEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProviderEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProviderEvents.
+     */
+    skip?: number
+    distinct?: ProviderEventScalarFieldEnum | ProviderEventScalarFieldEnum[]
+  }
+
+  /**
+   * ProviderEvent create
+   */
+  export type ProviderEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ProviderEvent.
+     */
+    data: XOR<ProviderEventCreateInput, ProviderEventUncheckedCreateInput>
+  }
+
+  /**
+   * ProviderEvent createMany
+   */
+  export type ProviderEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProviderEvents.
+     */
+    data: ProviderEventCreateManyInput | ProviderEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProviderEvent createManyAndReturn
+   */
+  export type ProviderEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many ProviderEvents.
+     */
+    data: ProviderEventCreateManyInput | ProviderEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProviderEvent update
+   */
+  export type ProviderEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ProviderEvent.
+     */
+    data: XOR<ProviderEventUpdateInput, ProviderEventUncheckedUpdateInput>
+    /**
+     * Choose, which ProviderEvent to update.
+     */
+    where: ProviderEventWhereUniqueInput
+  }
+
+  /**
+   * ProviderEvent updateMany
+   */
+  export type ProviderEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProviderEvents.
+     */
+    data: XOR<ProviderEventUpdateManyMutationInput, ProviderEventUncheckedUpdateManyInput>
+    /**
+     * Filter which ProviderEvents to update
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * Limit how many ProviderEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProviderEvent updateManyAndReturn
+   */
+  export type ProviderEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * The data used to update ProviderEvents.
+     */
+    data: XOR<ProviderEventUpdateManyMutationInput, ProviderEventUncheckedUpdateManyInput>
+    /**
+     * Filter which ProviderEvents to update
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * Limit how many ProviderEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProviderEvent upsert
+   */
+  export type ProviderEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ProviderEvent to update in case it exists.
+     */
+    where: ProviderEventWhereUniqueInput
+    /**
+     * In case the ProviderEvent found by the `where` argument doesn't exist, create a new ProviderEvent with this data.
+     */
+    create: XOR<ProviderEventCreateInput, ProviderEventUncheckedCreateInput>
+    /**
+     * In case the ProviderEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProviderEventUpdateInput, ProviderEventUncheckedUpdateInput>
+  }
+
+  /**
+   * ProviderEvent delete
+   */
+  export type ProviderEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
+    /**
+     * Filter which ProviderEvent to delete.
+     */
+    where: ProviderEventWhereUniqueInput
+  }
+
+  /**
+   * ProviderEvent deleteMany
+   */
+  export type ProviderEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProviderEvents to delete
+     */
+    where?: ProviderEventWhereInput
+    /**
+     * Limit how many ProviderEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProviderEvent.paymentIntent
+   */
+  export type ProviderEvent$paymentIntentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PaymentIntent
+     */
+    select?: PaymentIntentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PaymentIntent
+     */
+    omit?: PaymentIntentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentIntentInclude<ExtArgs> | null
+    where?: PaymentIntentWhereInput
+  }
+
+  /**
+   * ProviderEvent without action
+   */
+  export type ProviderEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProviderEvent
+     */
+    select?: ProviderEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProviderEvent
+     */
+    omit?: ProviderEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProviderEventInclude<ExtArgs> | null
   }
 
 
@@ -14687,6 +15979,24 @@ export namespace Prisma {
   export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum]
 
 
+  export const ProviderEventScalarFieldEnum: {
+    id: 'id',
+    provider: 'provider',
+    eventId: 'eventId',
+    providerReference: 'providerReference',
+    paymentIntentId: 'paymentIntentId',
+    status: 'status',
+    signatureValid: 'signatureValid',
+    rawPayload: 'rawPayload',
+    occurredAt: 'occurredAt',
+    processedAt: 'processedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProviderEventScalarFieldEnum = (typeof ProviderEventScalarFieldEnum)[keyof typeof ProviderEventScalarFieldEnum]
+
+
   export const MessageThreadScalarFieldEnum: {
     id: 'id',
     propertyId: 'propertyId',
@@ -14753,6 +16063,13 @@ export namespace Prisma {
   };
 
   export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -15590,6 +16907,7 @@ export namespace Prisma {
     property?: XOR<PropertyScalarRelationFilter, PropertyWhereInput>
     booking?: XOR<BookingScalarRelationFilter, BookingWhereInput>
     transactions?: PaymentTransactionListRelationFilter
+    providerEvents?: ProviderEventListRelationFilter
   }
 
   export type PaymentIntentOrderByWithRelationInput = {
@@ -15610,6 +16928,7 @@ export namespace Prisma {
     property?: PropertyOrderByWithRelationInput
     booking?: BookingOrderByWithRelationInput
     transactions?: PaymentTransactionOrderByRelationAggregateInput
+    providerEvents?: ProviderEventOrderByRelationAggregateInput
   }
 
   export type PaymentIntentWhereUniqueInput = Prisma.AtLeast<{
@@ -15634,6 +16953,7 @@ export namespace Prisma {
     property?: XOR<PropertyScalarRelationFilter, PropertyWhereInput>
     booking?: XOR<BookingScalarRelationFilter, BookingWhereInput>
     transactions?: PaymentTransactionListRelationFilter
+    providerEvents?: ProviderEventListRelationFilter
   }, "id" | "provider_providerIntentRef" | "idempotencyKey">
 
   export type PaymentIntentOrderByWithAggregationInput = {
@@ -15774,6 +17094,97 @@ export namespace Prisma {
     occurredAt?: DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
+  }
+
+  export type ProviderEventWhereInput = {
+    AND?: ProviderEventWhereInput | ProviderEventWhereInput[]
+    OR?: ProviderEventWhereInput[]
+    NOT?: ProviderEventWhereInput | ProviderEventWhereInput[]
+    id?: StringFilter<"ProviderEvent"> | string
+    provider?: StringFilter<"ProviderEvent"> | string
+    eventId?: StringFilter<"ProviderEvent"> | string
+    providerReference?: StringNullableFilter<"ProviderEvent"> | string | null
+    paymentIntentId?: StringNullableFilter<"ProviderEvent"> | string | null
+    status?: StringNullableFilter<"ProviderEvent"> | string | null
+    signatureValid?: BoolFilter<"ProviderEvent"> | boolean
+    rawPayload?: JsonFilter<"ProviderEvent">
+    occurredAt?: DateTimeNullableFilter<"ProviderEvent"> | Date | string | null
+    processedAt?: DateTimeNullableFilter<"ProviderEvent"> | Date | string | null
+    createdAt?: DateTimeFilter<"ProviderEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"ProviderEvent"> | Date | string
+    paymentIntent?: XOR<PaymentIntentNullableScalarRelationFilter, PaymentIntentWhereInput> | null
+  }
+
+  export type ProviderEventOrderByWithRelationInput = {
+    id?: SortOrder
+    provider?: SortOrder
+    eventId?: SortOrder
+    providerReference?: SortOrderInput | SortOrder
+    paymentIntentId?: SortOrderInput | SortOrder
+    status?: SortOrderInput | SortOrder
+    signatureValid?: SortOrder
+    rawPayload?: SortOrder
+    occurredAt?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    paymentIntent?: PaymentIntentOrderByWithRelationInput
+  }
+
+  export type ProviderEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    provider_eventId?: ProviderEventProviderEventIdCompoundUniqueInput
+    AND?: ProviderEventWhereInput | ProviderEventWhereInput[]
+    OR?: ProviderEventWhereInput[]
+    NOT?: ProviderEventWhereInput | ProviderEventWhereInput[]
+    provider?: StringFilter<"ProviderEvent"> | string
+    eventId?: StringFilter<"ProviderEvent"> | string
+    providerReference?: StringNullableFilter<"ProviderEvent"> | string | null
+    paymentIntentId?: StringNullableFilter<"ProviderEvent"> | string | null
+    status?: StringNullableFilter<"ProviderEvent"> | string | null
+    signatureValid?: BoolFilter<"ProviderEvent"> | boolean
+    rawPayload?: JsonFilter<"ProviderEvent">
+    occurredAt?: DateTimeNullableFilter<"ProviderEvent"> | Date | string | null
+    processedAt?: DateTimeNullableFilter<"ProviderEvent"> | Date | string | null
+    createdAt?: DateTimeFilter<"ProviderEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"ProviderEvent"> | Date | string
+    paymentIntent?: XOR<PaymentIntentNullableScalarRelationFilter, PaymentIntentWhereInput> | null
+  }, "id" | "provider_eventId">
+
+  export type ProviderEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    provider?: SortOrder
+    eventId?: SortOrder
+    providerReference?: SortOrderInput | SortOrder
+    paymentIntentId?: SortOrderInput | SortOrder
+    status?: SortOrderInput | SortOrder
+    signatureValid?: SortOrder
+    rawPayload?: SortOrder
+    occurredAt?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ProviderEventCountOrderByAggregateInput
+    _max?: ProviderEventMaxOrderByAggregateInput
+    _min?: ProviderEventMinOrderByAggregateInput
+  }
+
+  export type ProviderEventScalarWhereWithAggregatesInput = {
+    AND?: ProviderEventScalarWhereWithAggregatesInput | ProviderEventScalarWhereWithAggregatesInput[]
+    OR?: ProviderEventScalarWhereWithAggregatesInput[]
+    NOT?: ProviderEventScalarWhereWithAggregatesInput | ProviderEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProviderEvent"> | string
+    provider?: StringWithAggregatesFilter<"ProviderEvent"> | string
+    eventId?: StringWithAggregatesFilter<"ProviderEvent"> | string
+    providerReference?: StringNullableWithAggregatesFilter<"ProviderEvent"> | string | null
+    paymentIntentId?: StringNullableWithAggregatesFilter<"ProviderEvent"> | string | null
+    status?: StringNullableWithAggregatesFilter<"ProviderEvent"> | string | null
+    signatureValid?: BoolWithAggregatesFilter<"ProviderEvent"> | boolean
+    rawPayload?: JsonWithAggregatesFilter<"ProviderEvent">
+    occurredAt?: DateTimeNullableWithAggregatesFilter<"ProviderEvent"> | Date | string | null
+    processedAt?: DateTimeNullableWithAggregatesFilter<"ProviderEvent"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ProviderEvent"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ProviderEvent"> | Date | string
   }
 
   export type MessageThreadWhereInput = {
@@ -16742,6 +18153,7 @@ export namespace Prisma {
     property: PropertyCreateNestedOneWithoutPaymentIntentsInput
     booking: BookingCreateNestedOneWithoutPaymentIntentsInput
     transactions?: PaymentTransactionCreateNestedManyWithoutPaymentIntentInput
+    providerEvents?: ProviderEventCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentUncheckedCreateInput = {
@@ -16760,6 +18172,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     transactions?: PaymentTransactionUncheckedCreateNestedManyWithoutPaymentIntentInput
+    providerEvents?: ProviderEventUncheckedCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentUpdateInput = {
@@ -16778,6 +18191,7 @@ export namespace Prisma {
     property?: PropertyUpdateOneRequiredWithoutPaymentIntentsNestedInput
     booking?: BookingUpdateOneRequiredWithoutPaymentIntentsNestedInput
     transactions?: PaymentTransactionUpdateManyWithoutPaymentIntentNestedInput
+    providerEvents?: ProviderEventUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentUncheckedUpdateInput = {
@@ -16796,6 +18210,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transactions?: PaymentTransactionUncheckedUpdateManyWithoutPaymentIntentNestedInput
+    providerEvents?: ProviderEventUncheckedUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentCreateManyInput = {
@@ -16954,6 +18369,110 @@ export namespace Prisma {
     rawPayload?: NullableJsonNullValueInput | InputJsonValue
     sequence?: IntFieldUpdateOperationsInput | number
     occurredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProviderEventCreateInput = {
+    id?: string
+    provider: string
+    eventId: string
+    providerReference?: string | null
+    status?: string | null
+    signatureValid: boolean
+    rawPayload: JsonNullValueInput | InputJsonValue
+    occurredAt?: Date | string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    paymentIntent?: PaymentIntentCreateNestedOneWithoutProviderEventsInput
+  }
+
+  export type ProviderEventUncheckedCreateInput = {
+    id?: string
+    provider: string
+    eventId: string
+    providerReference?: string | null
+    paymentIntentId?: string | null
+    status?: string | null
+    signatureValid: boolean
+    rawPayload: JsonNullValueInput | InputJsonValue
+    occurredAt?: Date | string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProviderEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paymentIntent?: PaymentIntentUpdateOneWithoutProviderEventsNestedInput
+  }
+
+  export type ProviderEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentIntentId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProviderEventCreateManyInput = {
+    id?: string
+    provider: string
+    eventId: string
+    providerReference?: string | null
+    paymentIntentId?: string | null
+    status?: string | null
+    signatureValid: boolean
+    rawPayload: JsonNullValueInput | InputJsonValue
+    occurredAt?: Date | string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProviderEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProviderEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentIntentId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18006,7 +19525,17 @@ export namespace Prisma {
     none?: PaymentTransactionWhereInput
   }
 
+  export type ProviderEventListRelationFilter = {
+    every?: ProviderEventWhereInput
+    some?: ProviderEventWhereInput
+    none?: ProviderEventWhereInput
+  }
+
   export type PaymentTransactionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProviderEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -18182,6 +19711,108 @@ export namespace Prisma {
   export type PaymentTransactionSumOrderByAggregateInput = {
     amountMinor?: SortOrder
     sequence?: SortOrder
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type PaymentIntentNullableScalarRelationFilter = {
+    is?: PaymentIntentWhereInput | null
+    isNot?: PaymentIntentWhereInput | null
+  }
+
+  export type ProviderEventProviderEventIdCompoundUniqueInput = {
+    provider: string
+    eventId: string
+  }
+
+  export type ProviderEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    provider?: SortOrder
+    eventId?: SortOrder
+    providerReference?: SortOrder
+    paymentIntentId?: SortOrder
+    status?: SortOrder
+    signatureValid?: SortOrder
+    rawPayload?: SortOrder
+    occurredAt?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProviderEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    provider?: SortOrder
+    eventId?: SortOrder
+    providerReference?: SortOrder
+    paymentIntentId?: SortOrder
+    status?: SortOrder
+    signatureValid?: SortOrder
+    occurredAt?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProviderEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    provider?: SortOrder
+    eventId?: SortOrder
+    providerReference?: SortOrder
+    paymentIntentId?: SortOrder
+    status?: SortOrder
+    signatureValid?: SortOrder
+    occurredAt?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumMessageThreadStatusFilter<$PrismaModel = never> = {
@@ -19088,11 +20719,25 @@ export namespace Prisma {
     connect?: PaymentTransactionWhereUniqueInput | PaymentTransactionWhereUniqueInput[]
   }
 
+  export type ProviderEventCreateNestedManyWithoutPaymentIntentInput = {
+    create?: XOR<ProviderEventCreateWithoutPaymentIntentInput, ProviderEventUncheckedCreateWithoutPaymentIntentInput> | ProviderEventCreateWithoutPaymentIntentInput[] | ProviderEventUncheckedCreateWithoutPaymentIntentInput[]
+    connectOrCreate?: ProviderEventCreateOrConnectWithoutPaymentIntentInput | ProviderEventCreateOrConnectWithoutPaymentIntentInput[]
+    createMany?: ProviderEventCreateManyPaymentIntentInputEnvelope
+    connect?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+  }
+
   export type PaymentTransactionUncheckedCreateNestedManyWithoutPaymentIntentInput = {
     create?: XOR<PaymentTransactionCreateWithoutPaymentIntentInput, PaymentTransactionUncheckedCreateWithoutPaymentIntentInput> | PaymentTransactionCreateWithoutPaymentIntentInput[] | PaymentTransactionUncheckedCreateWithoutPaymentIntentInput[]
     connectOrCreate?: PaymentTransactionCreateOrConnectWithoutPaymentIntentInput | PaymentTransactionCreateOrConnectWithoutPaymentIntentInput[]
     createMany?: PaymentTransactionCreateManyPaymentIntentInputEnvelope
     connect?: PaymentTransactionWhereUniqueInput | PaymentTransactionWhereUniqueInput[]
+  }
+
+  export type ProviderEventUncheckedCreateNestedManyWithoutPaymentIntentInput = {
+    create?: XOR<ProviderEventCreateWithoutPaymentIntentInput, ProviderEventUncheckedCreateWithoutPaymentIntentInput> | ProviderEventCreateWithoutPaymentIntentInput[] | ProviderEventUncheckedCreateWithoutPaymentIntentInput[]
+    connectOrCreate?: ProviderEventCreateOrConnectWithoutPaymentIntentInput | ProviderEventCreateOrConnectWithoutPaymentIntentInput[]
+    createMany?: ProviderEventCreateManyPaymentIntentInputEnvelope
+    connect?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
   }
 
   export type EnumPaymentMethodFieldUpdateOperationsInput = {
@@ -19133,6 +20778,20 @@ export namespace Prisma {
     deleteMany?: PaymentTransactionScalarWhereInput | PaymentTransactionScalarWhereInput[]
   }
 
+  export type ProviderEventUpdateManyWithoutPaymentIntentNestedInput = {
+    create?: XOR<ProviderEventCreateWithoutPaymentIntentInput, ProviderEventUncheckedCreateWithoutPaymentIntentInput> | ProviderEventCreateWithoutPaymentIntentInput[] | ProviderEventUncheckedCreateWithoutPaymentIntentInput[]
+    connectOrCreate?: ProviderEventCreateOrConnectWithoutPaymentIntentInput | ProviderEventCreateOrConnectWithoutPaymentIntentInput[]
+    upsert?: ProviderEventUpsertWithWhereUniqueWithoutPaymentIntentInput | ProviderEventUpsertWithWhereUniqueWithoutPaymentIntentInput[]
+    createMany?: ProviderEventCreateManyPaymentIntentInputEnvelope
+    set?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    disconnect?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    delete?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    connect?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    update?: ProviderEventUpdateWithWhereUniqueWithoutPaymentIntentInput | ProviderEventUpdateWithWhereUniqueWithoutPaymentIntentInput[]
+    updateMany?: ProviderEventUpdateManyWithWhereWithoutPaymentIntentInput | ProviderEventUpdateManyWithWhereWithoutPaymentIntentInput[]
+    deleteMany?: ProviderEventScalarWhereInput | ProviderEventScalarWhereInput[]
+  }
+
   export type PaymentTransactionUncheckedUpdateManyWithoutPaymentIntentNestedInput = {
     create?: XOR<PaymentTransactionCreateWithoutPaymentIntentInput, PaymentTransactionUncheckedCreateWithoutPaymentIntentInput> | PaymentTransactionCreateWithoutPaymentIntentInput[] | PaymentTransactionUncheckedCreateWithoutPaymentIntentInput[]
     connectOrCreate?: PaymentTransactionCreateOrConnectWithoutPaymentIntentInput | PaymentTransactionCreateOrConnectWithoutPaymentIntentInput[]
@@ -19147,6 +20806,20 @@ export namespace Prisma {
     deleteMany?: PaymentTransactionScalarWhereInput | PaymentTransactionScalarWhereInput[]
   }
 
+  export type ProviderEventUncheckedUpdateManyWithoutPaymentIntentNestedInput = {
+    create?: XOR<ProviderEventCreateWithoutPaymentIntentInput, ProviderEventUncheckedCreateWithoutPaymentIntentInput> | ProviderEventCreateWithoutPaymentIntentInput[] | ProviderEventUncheckedCreateWithoutPaymentIntentInput[]
+    connectOrCreate?: ProviderEventCreateOrConnectWithoutPaymentIntentInput | ProviderEventCreateOrConnectWithoutPaymentIntentInput[]
+    upsert?: ProviderEventUpsertWithWhereUniqueWithoutPaymentIntentInput | ProviderEventUpsertWithWhereUniqueWithoutPaymentIntentInput[]
+    createMany?: ProviderEventCreateManyPaymentIntentInputEnvelope
+    set?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    disconnect?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    delete?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    connect?: ProviderEventWhereUniqueInput | ProviderEventWhereUniqueInput[]
+    update?: ProviderEventUpdateWithWhereUniqueWithoutPaymentIntentInput | ProviderEventUpdateWithWhereUniqueWithoutPaymentIntentInput[]
+    updateMany?: ProviderEventUpdateManyWithWhereWithoutPaymentIntentInput | ProviderEventUpdateManyWithWhereWithoutPaymentIntentInput[]
+    deleteMany?: ProviderEventScalarWhereInput | ProviderEventScalarWhereInput[]
+  }
+
   export type PaymentIntentCreateNestedOneWithoutTransactionsInput = {
     create?: XOR<PaymentIntentCreateWithoutTransactionsInput, PaymentIntentUncheckedCreateWithoutTransactionsInput>
     connectOrCreate?: PaymentIntentCreateOrConnectWithoutTransactionsInput
@@ -19159,6 +20832,22 @@ export namespace Prisma {
     upsert?: PaymentIntentUpsertWithoutTransactionsInput
     connect?: PaymentIntentWhereUniqueInput
     update?: XOR<XOR<PaymentIntentUpdateToOneWithWhereWithoutTransactionsInput, PaymentIntentUpdateWithoutTransactionsInput>, PaymentIntentUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type PaymentIntentCreateNestedOneWithoutProviderEventsInput = {
+    create?: XOR<PaymentIntentCreateWithoutProviderEventsInput, PaymentIntentUncheckedCreateWithoutProviderEventsInput>
+    connectOrCreate?: PaymentIntentCreateOrConnectWithoutProviderEventsInput
+    connect?: PaymentIntentWhereUniqueInput
+  }
+
+  export type PaymentIntentUpdateOneWithoutProviderEventsNestedInput = {
+    create?: XOR<PaymentIntentCreateWithoutProviderEventsInput, PaymentIntentUncheckedCreateWithoutProviderEventsInput>
+    connectOrCreate?: PaymentIntentCreateOrConnectWithoutProviderEventsInput
+    upsert?: PaymentIntentUpsertWithoutProviderEventsInput
+    disconnect?: PaymentIntentWhereInput | boolean
+    delete?: PaymentIntentWhereInput | boolean
+    connect?: PaymentIntentWhereUniqueInput
+    update?: XOR<XOR<PaymentIntentUpdateToOneWithWhereWithoutProviderEventsInput, PaymentIntentUpdateWithoutProviderEventsInput>, PaymentIntentUncheckedUpdateWithoutProviderEventsInput>
   }
 
   export type PropertyCreateNestedOneWithoutMessageThreadsInput = {
@@ -19674,6 +21363,29 @@ export namespace Prisma {
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedEnumMessageThreadStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MessageThreadStatus | EnumMessageThreadStatusFieldRefInput<$PrismaModel>
@@ -19914,6 +21626,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     booking: BookingCreateNestedOneWithoutPaymentIntentsInput
     transactions?: PaymentTransactionCreateNestedManyWithoutPaymentIntentInput
+    providerEvents?: ProviderEventCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentUncheckedCreateWithoutPropertyInput = {
@@ -19931,6 +21644,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     transactions?: PaymentTransactionUncheckedCreateNestedManyWithoutPaymentIntentInput
+    providerEvents?: ProviderEventUncheckedCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentCreateOrConnectWithoutPropertyInput = {
@@ -20769,6 +22483,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     property: PropertyCreateNestedOneWithoutPaymentIntentsInput
     transactions?: PaymentTransactionCreateNestedManyWithoutPaymentIntentInput
+    providerEvents?: ProviderEventCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentUncheckedCreateWithoutBookingInput = {
@@ -20786,6 +22501,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     transactions?: PaymentTransactionUncheckedCreateNestedManyWithoutPaymentIntentInput
+    providerEvents?: ProviderEventUncheckedCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentCreateOrConnectWithoutBookingInput = {
@@ -21525,6 +23241,44 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ProviderEventCreateWithoutPaymentIntentInput = {
+    id?: string
+    provider: string
+    eventId: string
+    providerReference?: string | null
+    status?: string | null
+    signatureValid: boolean
+    rawPayload: JsonNullValueInput | InputJsonValue
+    occurredAt?: Date | string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProviderEventUncheckedCreateWithoutPaymentIntentInput = {
+    id?: string
+    provider: string
+    eventId: string
+    providerReference?: string | null
+    status?: string | null
+    signatureValid: boolean
+    rawPayload: JsonNullValueInput | InputJsonValue
+    occurredAt?: Date | string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProviderEventCreateOrConnectWithoutPaymentIntentInput = {
+    where: ProviderEventWhereUniqueInput
+    create: XOR<ProviderEventCreateWithoutPaymentIntentInput, ProviderEventUncheckedCreateWithoutPaymentIntentInput>
+  }
+
+  export type ProviderEventCreateManyPaymentIntentInputEnvelope = {
+    data: ProviderEventCreateManyPaymentIntentInput | ProviderEventCreateManyPaymentIntentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type PropertyUpsertWithoutPaymentIntentsInput = {
     update: XOR<PropertyUpdateWithoutPaymentIntentsInput, PropertyUncheckedUpdateWithoutPaymentIntentsInput>
     create: XOR<PropertyCreateWithoutPaymentIntentsInput, PropertyUncheckedCreateWithoutPaymentIntentsInput>
@@ -21678,6 +23432,40 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"PaymentTransaction"> | Date | string
   }
 
+  export type ProviderEventUpsertWithWhereUniqueWithoutPaymentIntentInput = {
+    where: ProviderEventWhereUniqueInput
+    update: XOR<ProviderEventUpdateWithoutPaymentIntentInput, ProviderEventUncheckedUpdateWithoutPaymentIntentInput>
+    create: XOR<ProviderEventCreateWithoutPaymentIntentInput, ProviderEventUncheckedCreateWithoutPaymentIntentInput>
+  }
+
+  export type ProviderEventUpdateWithWhereUniqueWithoutPaymentIntentInput = {
+    where: ProviderEventWhereUniqueInput
+    data: XOR<ProviderEventUpdateWithoutPaymentIntentInput, ProviderEventUncheckedUpdateWithoutPaymentIntentInput>
+  }
+
+  export type ProviderEventUpdateManyWithWhereWithoutPaymentIntentInput = {
+    where: ProviderEventScalarWhereInput
+    data: XOR<ProviderEventUpdateManyMutationInput, ProviderEventUncheckedUpdateManyWithoutPaymentIntentInput>
+  }
+
+  export type ProviderEventScalarWhereInput = {
+    AND?: ProviderEventScalarWhereInput | ProviderEventScalarWhereInput[]
+    OR?: ProviderEventScalarWhereInput[]
+    NOT?: ProviderEventScalarWhereInput | ProviderEventScalarWhereInput[]
+    id?: StringFilter<"ProviderEvent"> | string
+    provider?: StringFilter<"ProviderEvent"> | string
+    eventId?: StringFilter<"ProviderEvent"> | string
+    providerReference?: StringNullableFilter<"ProviderEvent"> | string | null
+    paymentIntentId?: StringNullableFilter<"ProviderEvent"> | string | null
+    status?: StringNullableFilter<"ProviderEvent"> | string | null
+    signatureValid?: BoolFilter<"ProviderEvent"> | boolean
+    rawPayload?: JsonFilter<"ProviderEvent">
+    occurredAt?: DateTimeNullableFilter<"ProviderEvent"> | Date | string | null
+    processedAt?: DateTimeNullableFilter<"ProviderEvent"> | Date | string | null
+    createdAt?: DateTimeFilter<"ProviderEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"ProviderEvent"> | Date | string
+  }
+
   export type PaymentIntentCreateWithoutTransactionsInput = {
     id?: string
     amountMinor: number
@@ -21693,6 +23481,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     property: PropertyCreateNestedOneWithoutPaymentIntentsInput
     booking: BookingCreateNestedOneWithoutPaymentIntentsInput
+    providerEvents?: ProviderEventCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentUncheckedCreateWithoutTransactionsInput = {
@@ -21710,6 +23499,7 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    providerEvents?: ProviderEventUncheckedCreateNestedManyWithoutPaymentIntentInput
   }
 
   export type PaymentIntentCreateOrConnectWithoutTransactionsInput = {
@@ -21743,6 +23533,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     property?: PropertyUpdateOneRequiredWithoutPaymentIntentsNestedInput
     booking?: BookingUpdateOneRequiredWithoutPaymentIntentsNestedInput
+    providerEvents?: ProviderEventUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentUncheckedUpdateWithoutTransactionsInput = {
@@ -21760,6 +23551,95 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    providerEvents?: ProviderEventUncheckedUpdateManyWithoutPaymentIntentNestedInput
+  }
+
+  export type PaymentIntentCreateWithoutProviderEventsInput = {
+    id?: string
+    amountMinor: number
+    currency: $Enums.Currency
+    method: $Enums.PaymentMethod
+    provider?: $Enums.PaymentProvider
+    status?: $Enums.PaymentStatus
+    providerIntentRef?: string | null
+    providerCustomerRef?: string | null
+    idempotencyKey?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    property: PropertyCreateNestedOneWithoutPaymentIntentsInput
+    booking: BookingCreateNestedOneWithoutPaymentIntentsInput
+    transactions?: PaymentTransactionCreateNestedManyWithoutPaymentIntentInput
+  }
+
+  export type PaymentIntentUncheckedCreateWithoutProviderEventsInput = {
+    id?: string
+    propertyId: string
+    bookingId: string
+    amountMinor: number
+    currency: $Enums.Currency
+    method: $Enums.PaymentMethod
+    provider?: $Enums.PaymentProvider
+    status?: $Enums.PaymentStatus
+    providerIntentRef?: string | null
+    providerCustomerRef?: string | null
+    idempotencyKey?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transactions?: PaymentTransactionUncheckedCreateNestedManyWithoutPaymentIntentInput
+  }
+
+  export type PaymentIntentCreateOrConnectWithoutProviderEventsInput = {
+    where: PaymentIntentWhereUniqueInput
+    create: XOR<PaymentIntentCreateWithoutProviderEventsInput, PaymentIntentUncheckedCreateWithoutProviderEventsInput>
+  }
+
+  export type PaymentIntentUpsertWithoutProviderEventsInput = {
+    update: XOR<PaymentIntentUpdateWithoutProviderEventsInput, PaymentIntentUncheckedUpdateWithoutProviderEventsInput>
+    create: XOR<PaymentIntentCreateWithoutProviderEventsInput, PaymentIntentUncheckedCreateWithoutProviderEventsInput>
+    where?: PaymentIntentWhereInput
+  }
+
+  export type PaymentIntentUpdateToOneWithWhereWithoutProviderEventsInput = {
+    where?: PaymentIntentWhereInput
+    data: XOR<PaymentIntentUpdateWithoutProviderEventsInput, PaymentIntentUncheckedUpdateWithoutProviderEventsInput>
+  }
+
+  export type PaymentIntentUpdateWithoutProviderEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountMinor?: IntFieldUpdateOperationsInput | number
+    currency?: EnumCurrencyFieldUpdateOperationsInput | $Enums.Currency
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    provider?: EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    providerIntentRef?: NullableStringFieldUpdateOperationsInput | string | null
+    providerCustomerRef?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    property?: PropertyUpdateOneRequiredWithoutPaymentIntentsNestedInput
+    booking?: BookingUpdateOneRequiredWithoutPaymentIntentsNestedInput
+    transactions?: PaymentTransactionUpdateManyWithoutPaymentIntentNestedInput
+  }
+
+  export type PaymentIntentUncheckedUpdateWithoutProviderEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    propertyId?: StringFieldUpdateOperationsInput | string
+    bookingId?: StringFieldUpdateOperationsInput | string
+    amountMinor?: IntFieldUpdateOperationsInput | number
+    currency?: EnumCurrencyFieldUpdateOperationsInput | $Enums.Currency
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    provider?: EnumPaymentProviderFieldUpdateOperationsInput | $Enums.PaymentProvider
+    status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    providerIntentRef?: NullableStringFieldUpdateOperationsInput | string | null
+    providerCustomerRef?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: PaymentTransactionUncheckedUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PropertyCreateWithoutMessageThreadsInput = {
@@ -22825,6 +24705,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     booking?: BookingUpdateOneRequiredWithoutPaymentIntentsNestedInput
     transactions?: PaymentTransactionUpdateManyWithoutPaymentIntentNestedInput
+    providerEvents?: ProviderEventUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentUncheckedUpdateWithoutPropertyInput = {
@@ -22842,6 +24723,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transactions?: PaymentTransactionUncheckedUpdateManyWithoutPaymentIntentNestedInput
+    providerEvents?: ProviderEventUncheckedUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentUncheckedUpdateManyWithoutPropertyInput = {
@@ -23157,6 +25039,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     property?: PropertyUpdateOneRequiredWithoutPaymentIntentsNestedInput
     transactions?: PaymentTransactionUpdateManyWithoutPaymentIntentNestedInput
+    providerEvents?: ProviderEventUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentUncheckedUpdateWithoutBookingInput = {
@@ -23174,6 +25057,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transactions?: PaymentTransactionUncheckedUpdateManyWithoutPaymentIntentNestedInput
+    providerEvents?: ProviderEventUncheckedUpdateManyWithoutPaymentIntentNestedInput
   }
 
   export type PaymentIntentUncheckedUpdateManyWithoutBookingInput = {
@@ -23298,6 +25182,20 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ProviderEventCreateManyPaymentIntentInput = {
+    id?: string
+    provider: string
+    eventId: string
+    providerReference?: string | null
+    status?: string | null
+    signatureValid: boolean
+    rawPayload: JsonNullValueInput | InputJsonValue
+    occurredAt?: Date | string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type PaymentTransactionUpdateWithoutPaymentIntentInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
@@ -23339,6 +25237,48 @@ export namespace Prisma {
     rawPayload?: NullableJsonNullValueInput | InputJsonValue
     sequence?: IntFieldUpdateOperationsInput | number
     occurredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProviderEventUpdateWithoutPaymentIntentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProviderEventUncheckedUpdateWithoutPaymentIntentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProviderEventUncheckedUpdateManyWithoutPaymentIntentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: StringFieldUpdateOperationsInput | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    providerReference?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureValid?: BoolFieldUpdateOperationsInput | boolean
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    occurredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
