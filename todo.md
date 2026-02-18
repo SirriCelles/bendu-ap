@@ -920,20 +920,29 @@ Verification: 2026-02-18 (`pnpm exec vitest run tests/unit/validation/payments-s
 
 <!-- issue: bookeasy:T-054 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-18 (`pnpm exec vitest run tests/unit/api/notchpay-webhook-route.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments/Webhooks
 - **Context:** Payment confirmation must be webhook-driven, idempotent, and transaction-safe.
 - **Scope Included:** `POST /api/webhooks/payments/notchpay`, signature validation, event normalization, ProviderEvent upsert dedupe, atomic payment+booking update.
 - **Scope Excluded:** CinetPay webhook handler.
 - **Acceptance Criteria:**
-- [ ] Missing/invalid signature returns `WEBHOOK_SIGNATURE_INVALID`
-- [ ] Duplicate provider events are acknowledged without reapplying transitions
-- [ ] Payment + booking updates are committed in a single DB transaction
-- [ ] Unknown payment reference stores event for investigation and returns safe response
+- [x] Missing/invalid signature returns `WEBHOOK_SIGNATURE_INVALID`
+- [x] Duplicate provider events are acknowledged without reapplying transitions
+- [x] Payment + booking updates are committed in a single DB transaction
+- [x] Unknown payment reference stores event for investigation and returns safe response
 - **Implementation Notes:** Add ledger and transaction logic in PaymentService; persist raw payload with redacted logs.
 - **Dependencies:** 051, 052
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-054.1` Add `POST /api/webhooks/payments/notchpay` route scaffold and raw-body parsing.
+- [x] `T-054.2` Normalize typed webhook errors with signature-invalid fail-closed behavior.
+- [x] `T-054.3` Add provider-event ledger dedupe key (`provider:eventId`) before state application.
+- [x] `T-054.4` Apply payment + booking status updates inside one DB transaction.
+- [x] `T-054.5` Persist unmatched-reference events for investigation with safe `200` response.
+- [x] `T-054.6` Add webhook write rate limiting and correlation logging.
+- [x] `T-054.7` Add route-level unit tests for happy path, duplicate dedupe, invalid signature, unknown reference, and 429 behavior.
 
 ## T-055 — Add fallback payment verification endpoint and booking confirmation recovery flow
 

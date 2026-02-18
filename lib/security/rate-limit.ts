@@ -4,7 +4,12 @@ import { Redis } from "@upstash/redis";
 import { HttpError } from "@/lib/http/errors";
 
 // Named limiter profiles for different write surfaces.
-type BucketName = "bookings_write" | "payments_write" | "messages_write" | "sample_write";
+type BucketName =
+  | "bookings_write"
+  | "payments_write"
+  | "payments_webhook_write"
+  | "messages_write"
+  | "sample_write";
 
 type BucketConfig = {
   limit: number;
@@ -31,6 +36,11 @@ const BUCKETS: Record<BucketName, BucketConfig> = {
     limit: 15,
     window: "1 m",
     prefix: "payments",
+  },
+  payments_webhook_write: {
+    limit: 60,
+    window: "1 m",
+    prefix: "payments-webhook",
   },
   messages_write: {
     limit: 20,
