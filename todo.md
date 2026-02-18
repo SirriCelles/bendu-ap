@@ -856,6 +856,7 @@ Verification: 2026-02-17 (`pnpm exec vitest run tests/unit/domain/booking-paymen
 <!-- issue: bookeasy:T-052 -->
 
 Status: TODO
+Verification (partial): 2026-02-17 (`pnpm exec vitest run tests/unit/payments/notchpay-config.test.ts tests/unit/payments/notchpay-client.test.ts tests/unit/payments/notchpay-provider.test.ts tests/unit/payments/notchpay-signature.test.ts tests/unit/payments/notchpay-registry-contract.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments
 - **Context:** Notch Pay is the MVP gateway and must be integrated behind provider-agnostic contracts.(https://developer.notchpay.co/get-started/quickstart)
@@ -869,6 +870,19 @@ Status: TODO
 - **Implementation Notes:** Add `lib/payments/notchpay.ts` (or equivalent adapter location per project structure) and map statuses to canonical enum.
 - **Dependencies:** 025
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-052.1` Define Notch adapter config contract (`NOTCHPAY_PUBLIC_KEY`, `NOTCHPAY_WEBHOOK_SECRET`, `APP_BASE_URL`, optional private key) with fail-fast typed config errors and secret-safe error messages.
+- [x] `T-052.2` Build Notch API client wrapper on shared `GatewayHttpClient` for `POST /payments` and `GET /payments/{reference}` with auth headers, retries/timeouts, and correlation IDs.
+- [x] `T-052.3` Implement `initiatePayment` mapping from internal request to Notch payload and canonical `ProviderInitiatePaymentResult`.
+- [x] `T-052.4` Centralize provider status mapper (`complete->SUCCEEDED`, `failed->FAILED`, `expired->EXPIRED`, `canceled->CANCELLED`, `pending/processing->PENDING`) with typed unknown-status errors.
+- [x] `T-052.5` Implement `verifyPayment` against Notch `GET /payments/{reference}` and map provider/network failures to typed domain errors.
+- [x] `T-052.6` Implement webhook signature verification helper (`x-notch-signature`, HMAC SHA-256, timing-safe compare) with fail-closed behavior.
+- [x] `T-052.7` Implement `parseWebhook` canonical normalization (`eventId`, `providerReference`, canonical `status`, `occurredAt`) with typed parse errors.
+- [x] `T-052.8` Add callback/redirect verification support hook that verifies callback `reference` server-side via provider verify path.
+- [x] `T-052.9` Add unit tests for adapter happy paths (`initiatePayment`, `verifyPayment`, `parseWebhook`) using fixtures and canonical field assertions.
+- [x] `T-052.10` Add failure/idempotency-safe unit tests (invalid signature, unknown status, malformed payload, timeout/network/provider errors) with no external network calls.
+- [x] `T-052.11` Add contract compliance test with provider registry for deterministic `MOMO` resolution and typed unsupported provider/method paths.
+- [x] `T-052.12` Update `todo.md` traceability with subtask checklist and verification evidence.
 
 ## T-053 — Implement `POST /api/payments/start` idempotent payment initiation endpoint
 
