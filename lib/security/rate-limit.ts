@@ -1,10 +1,10 @@
 import { Ratelimit, type Duration } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-import { HttpError } from "@/http/errors";
+import { HttpError } from "@/lib/http/errors";
 
 // Named limiter profiles for different write surfaces.
-type BucketName = "bookings_write" | "messages_write" | "sample_write";
+type BucketName = "bookings_write" | "payments_write" | "messages_write" | "sample_write";
 
 type BucketConfig = {
   limit: number;
@@ -26,6 +26,11 @@ const BUCKETS: Record<BucketName, BucketConfig> = {
     limit: 10,
     window: "1 m",
     prefix: "bookings",
+  },
+  payments_write: {
+    limit: 15,
+    window: "1 m",
+    prefix: "payments",
   },
   messages_write: {
     limit: 20,

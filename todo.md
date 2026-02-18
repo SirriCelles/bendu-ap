@@ -888,19 +888,33 @@ Verification (partial): 2026-02-17 (`pnpm exec vitest run tests/unit/payments/no
 
 <!-- issue: bookeasy:T-053 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-18 (`pnpm exec vitest run tests/unit/validation/payments-start.test.ts tests/unit/api/payments-start-route.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments/API
 - **Context:** API spec defines payment initiation as idempotent and provider-agnostic.
 - **Scope Included:** Endpoint contract, request validation, idempotency key handling, checkout URL return, safe conflict behavior.
 - **Scope Excluded:** Webhook processing.
 - **Acceptance Criteria:**
-- [ ] Endpoint accepts spec-compliant request and returns normalized `paymentId`, `status`, `checkoutUrl`, `provider`
-- [ ] Repeated calls with same idempotency key return the same successful result
-- [ ] Returns conflict when booking already confirmed with successful payment
+- [x] Endpoint accepts spec-compliant request and returns normalized `paymentId`, `status`, `checkoutUrl`, `provider`
+- [x] Repeated calls with same idempotency key return the same successful result
+- [x] Returns conflict when booking already confirmed with successful payment
 - **Implementation Notes:** Add `app/api/payments/start/route.ts`; reuse shared parser/error format and rate limiting guard.
 - **Dependencies:** 024, 025, 052
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-053.1` Define `/api/payments/start` request/response schemas and header parsing in `lib/validation/payments-start.ts`.
+- [x] `T-053.2` Add route scaffold in `app/api/payments/start/route.ts` with safe JSON parse, actor/session context extraction, and request ID handling.
+- [x] `T-053.3` Add booking eligibility checks (`NOT_FOUND`, `FORBIDDEN`, `CONFLICT`) before payment initiation.
+- [x] `T-053.4` Resolve provider via registry and enforce method support with typed domain errors.
+- [x] `T-053.5` Implement idempotency replay for `bookingId + Idempotency-Key` with deterministic response reuse.
+- [x] `T-053.6` Implement provider initiation call path and persist payment intent fields (`providerReference`, metadata checkout URL, idempotency key).
+- [x] `T-053.7` Return `409 CONFLICT` when booking is already `CONFIRMED` with successful payment.
+- [x] `T-053.8` Apply route rate limiting and structured logging (`requestId`, `bookingId`, `paymentId`, `provider`, `actorId`) without secrets.
+- [x] `T-053.9` Add unit tests for schema + happy path response contract.
+- [x] `T-053.10` Add unit tests for replay, conflicts, unsupported provider/method, and provider failure mapping.
+- [x] `T-053.11` Verify route tests perform no direct network calls (`fetch` not called).
+- [x] `T-053.12` Update todo traceability with subtask completion and verification commands.
 
 ## T-054 — Implement Notch Pay webhook ingestion with ProviderEvent ledger dedupe and atomic updates
 

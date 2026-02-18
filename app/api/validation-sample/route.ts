@@ -1,10 +1,10 @@
-import { HttpError, toErrorResponse } from "@/http/errors";
+import { HttpError, toErrorResponse } from "@/lib/http/errors";
 import {
   createRateLimitError,
   getRequestIdentifier,
   limitRequest,
   rateLimitHeaders,
-} from "@/security/rate-limit";
+} from "@/lib/security/rate-limit";
 import { bookingReservationRequestSchema } from "@/lib/validation/booking";
 import { parseJsonBody } from "@/lib/validation/parser";
 

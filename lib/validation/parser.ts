@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { HttpError, validationErrorFromZod } from "@/http/errors";
+import { HttpError, validationErrorFromZod } from "@/lib/http/errors";
 
 export async function parseJsonBody<TSchema extends z.ZodTypeAny>(
   request: Request,
