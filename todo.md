@@ -784,7 +784,8 @@ Status: DONE
 
 <!-- issue: bookeasy:T-030 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/validation/booking-receipt.test.ts tests/unit/domain/booking-receipt.test.ts tests/unit/api/booking-receipt-route.test.ts tests/unit/public/booking-success-page-ssr.test.tsx tests/unit/public/booking-success-loading-and-error.test.tsx` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** QA
 - **Context:** Booking correctness and separation-of-concerns require direct unit coverage.
@@ -1052,12 +1053,24 @@ Status: TODO
 - **Scope Included:** `GET /api/bookings/{bookingId}/receipt` contract and corresponding success-page data path.
 - **Scope Excluded:** PDF invoice generation.
 - **Acceptance Criteria:**
-- [ ] Receipt endpoint returns confirmed booking summary + payment reference + room snapshot
-- [ ] Access control prevents unrelated guests from reading receipt data
-- [ ] Success page can render solely from receipt contract
+- [x] Receipt endpoint returns confirmed booking summary + payment reference + room snapshot
+- [x] Access control prevents unrelated guests from reading receipt data
+- [x] Success page can render solely from receipt contract
 - **Implementation Notes:** Align with booking access token/guest session model in API spec.
 - **Dependencies:** 029, 054, 055
 - **Estimate:** S
+- **Subtasks:**
+- [x] `T-058.1` Define receipt response contract + validation schema.
+- [x] `T-058.2` Implement receipt domain query service with typed not-found/invalid-state errors.
+- [x] `T-058.3` Add `GET /api/bookings/[bookingId]/receipt` route with stable error mapping.
+- [x] `T-058.4` Enforce ownership checks for guest/session and admin access.
+- [x] `T-058.5` Add confirmed-and-paid receipt eligibility guard.
+- [x] `T-058.6` Build success page loader using receipt API contract only.
+- [x] `T-058.7` Implement loading/error/empty success-page UX states and retry path.
+- [x] `T-058.8` Add unit tests for schema + domain query paths.
+- [x] `T-058.9` Add route tests for auth + error mapping.
+- [x] `T-058.10` Add SSR/UI tests for success-page integration and fallback states.
+- [x] `T-058.11` Update todo traceability + verification commands.
 
 ## T-059 — Add CinetPay adapter (future-ready) behind the same provider interface
 

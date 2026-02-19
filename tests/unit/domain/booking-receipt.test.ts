@@ -132,4 +132,19 @@ describe("createBookingReceiptService", () => {
       }),
     });
   });
+
+  it("rejects receipt when payment is missing", async () => {
+    const service = createHarness({
+      bookingStatus: "CONFIRMED",
+      paymentStatus: "PAID",
+      missingPayment: true,
+    });
+
+    await expect(service.getReceipt("bk_123")).rejects.toMatchObject({
+      code: "BOOKING_RECEIPT_INVALID_STATE",
+      details: expect.objectContaining({
+        reason: "PAYMENT_MISSING",
+      }),
+    });
+  });
 });

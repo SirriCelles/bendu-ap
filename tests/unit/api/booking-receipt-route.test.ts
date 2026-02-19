@@ -203,4 +203,47 @@ describe("GET /api/bookings/[bookingId]/receipt", () => {
     expect(conflictResponse.status).toBe(409);
     expect(conflictBody.error.code).toBe("CONFLICT");
   });
+
+  it("returns unauthorized when no authenticated user or guest session is present", async () => {
+    const harness = buildHarness({
+      actor: null,
+      guestSession: undefined,
+    });
+
+    const response = await harness.handler(harness.request, {
+      params: { bookingId: "bk_123" },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.error.code).toBe("UNAUTHORIZED");
+  });
+
+  it("maps unexpected route failures to 500 with stable shape", async () => {
+    const handler = createBookingReceiptGetHandler({
+      auth: vi.fn(async () => ({
+        user: {
+          id: "user_1",
+          email: "guest@example.com",
+          role: "GUEST",
+        },
+      })) as never,
+      receiptService: {
+        getReceipt: vi.fn(async () => {
+          throw new Error("db unavailable");
+        }),
+      } as never,
+    });
+
+    const response = await handler(
+      new Request("http://localhost:3000/api/bookings/bk_123/receipt", { method: "GET" }),
+      {
+        params: { bookingId: "bk_123" },
+      }
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error.code).toBe("INTERNAL_SERVER_ERROR");
+  });
 });

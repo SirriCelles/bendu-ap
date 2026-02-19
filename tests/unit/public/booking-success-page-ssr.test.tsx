@@ -106,6 +106,32 @@ describe("BookingSuccessPage SSR", () => {
 
     render(page);
     expect(screen.getByRole("heading", { name: "Receipt Unavailable" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Try Again" })).toHaveAttribute(
+      "href",
+      "/booking/bk_123/success?retry=1"
+    );
+    expect(screen.getByRole("link", { name: "Back To Rooms" })).toHaveAttribute("href", "/rooms");
+  });
+
+  it("renders empty state when receipt endpoint returns not found", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          error: {
+            code: "NOT_FOUND",
+            message: "missing",
+          },
+        }),
+        { status: 404 }
+      )
+    );
+
+    const page = await BookingSuccessPage({
+      params: Promise.resolve({ bookingId: "bk_123" }),
+    });
+
+    render(page);
+    expect(screen.getByRole("heading", { name: "No Receipt Yet" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back To Rooms" })).toHaveAttribute("href", "/rooms");
   });
 });

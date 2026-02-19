@@ -11,6 +11,7 @@ import {
 
 type BookingSuccessPageProps = {
   params: Promise<{ bookingId: string }> | { bookingId: string };
+  searchParams?: Promise<{ retry?: string }> | { retry?: string };
 };
 
 export const metadata: Metadata = {
@@ -28,9 +29,19 @@ function resolveBaseUrl(requestHeaders: Headers): string {
   return process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
 }
 
-async function loadBookingReceipt(
-  bookingId: string
-): Promise<BookingReceiptResponse["data"] | null> {
+type BookingReceiptLoadResult =
+  | {
+      kind: "ready";
+      data: BookingReceiptResponse["data"];
+    }
+  | {
+      kind: "empty";
+    }
+  | {
+      kind: "error";
+    };
+
+async function loadBookingReceipt(bookingId: string): Promise<BookingReceiptLoadResult> {
   const incoming = await headers();
   const baseUrl = resolveBaseUrl(incoming);
 
@@ -52,41 +63,58 @@ async function loadBookingReceipt(
     cache: "no-store",
   });
   if (!response.ok) {
-    return null;
+    if (response.status === 404) {
+      return { kind: "empty" };
+    }
+    return { kind: "error" };
   }
 
   let payload: unknown;
   try {
     payload = await response.json();
   } catch {
-    return null;
+    return { kind: "error" };
   }
 
   try {
     const parsed = parseBookingReceiptResponse(payload);
-    return parsed.data;
+    return {
+      kind: "ready",
+      data: parsed.data,
+    };
   } catch (error) {
     if (error instanceof BookingReceiptValidationError) {
-      return null;
+      return { kind: "error" };
     }
     throw error;
   }
 }
 
-export default async function BookingSuccessPage({ params }: BookingSuccessPageProps) {
+export default async function BookingSuccessPage({
+  params,
+  searchParams,
+}: BookingSuccessPageProps) {
   const resolvedParams = "then" in params ? await params : params;
-  const receipt = await loadBookingReceipt(resolvedParams.bookingId);
+  const resolvedSearchParams = searchParams
+    ? "then" in searchParams
+      ? await searchParams
+      : searchParams
+    : {};
+  const receiptState = await loadBookingReceipt(resolvedParams.bookingId);
+  const retryHref = `/booking/${encodeURIComponent(resolvedParams.bookingId)}/success?retry=${
+    resolvedSearchParams.retry === "1" ? "2" : "1"
+  }`;
 
-  if (!receipt) {
+  if (receiptState.kind === "empty") {
     return (
       <main className="min-h-[70svh] bg-background px-4 py-12 md:px-8 md:py-16">
         <section className="mx-auto w-full max-w-3xl rounded-2xl border border-input bg-card p-6 text-center shadow-sm md:p-10">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">BookEasy</p>
           <h1 className="mt-3 text-3xl font-semibold text-foreground md:text-4xl">
-            Receipt Unavailable
+            No Receipt Yet
           </h1>
           <p className="mt-4 text-sm text-muted-foreground md:text-base">
-            We could not load your booking receipt right now.
+            We could not find a confirmed receipt for this booking yet.
           </p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Button asChild>
@@ -100,6 +128,32 @@ export default async function BookingSuccessPage({ params }: BookingSuccessPageP
       </main>
     );
   }
+
+  if (receiptState.kind === "error") {
+    return (
+      <main className="min-h-[70svh] bg-background px-4 py-12 md:px-8 md:py-16">
+        <section className="mx-auto w-full max-w-3xl rounded-2xl border border-input bg-card p-6 text-center shadow-sm md:p-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">BookEasy</p>
+          <h1 className="mt-3 text-3xl font-semibold text-foreground md:text-4xl">
+            Receipt Unavailable
+          </h1>
+          <p className="mt-4 text-sm text-muted-foreground md:text-base">
+            We could not load your booking receipt right now.
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button asChild>
+              <Link href={retryHref}>Try Again</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/rooms">Back To Rooms</Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const receipt = receiptState.data;
 
   return (
     <main className="min-h-[70svh] bg-background px-4 py-12 md:px-8 md:py-16">
