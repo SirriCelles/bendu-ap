@@ -228,6 +228,38 @@ describe("POST /api/payments/start", () => {
     expect(harness.paymentIntents[0].providerIntentRef).toContain("np_");
   });
 
+  it("uses canonical booking success/cancel redirect URLs when starting payment", async () => {
+    const harness = buildHarness();
+
+    await harness.handler(
+      new Request("http://localhost:3000/api/payments/start", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "idempotency-key": "idem_key_12345",
+          host: "localhost:3000",
+        },
+        body: JSON.stringify(
+          baseBody({
+            returnUrl: "https://external.example/should-not-be-used",
+            cancelUrl: "https://external.example/should-not-be-used",
+          })
+        ),
+      })
+    );
+
+    expect(harness.initiatePayment).toHaveBeenCalledTimes(1);
+    const firstCall = harness.initiatePayment.mock.calls[0]?.[0] as {
+      redirectUrls?: { returnUrl: string; cancelUrl: string };
+      bookingId?: string;
+    };
+    expect(firstCall.bookingId).toBe("bk_123");
+    expect(firstCall.redirectUrls).toEqual({
+      returnUrl: "http://localhost:3000/booking/bk_123/success",
+      cancelUrl: "http://localhost:3000/booking/bk_123",
+    });
+  });
+
   it("replays existing successful/pending response for the same booking + idempotency key", async () => {
     const harness = buildHarness();
     const request = makeRequest(baseBody(), { "idempotency-key": "idem_replay_1" });

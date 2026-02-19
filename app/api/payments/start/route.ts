@@ -211,6 +211,33 @@ function getRequestId(request: Request): string {
   return request.headers.get(DEFAULT_REQUEST_ID_HEADER)?.trim() || crypto.randomUUID();
 }
 
+function resolveBaseUrl(request: Request): string {
+  const forwardedHost = request.headers.get("x-forwarded-host")?.trim();
+  const host = forwardedHost || request.headers.get("host")?.trim();
+  const proto = request.headers.get("x-forwarded-proto")?.trim() || "http";
+
+  if (host) {
+    return `${proto}://${host}`;
+  }
+
+  return process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+}
+
+function buildBookingRedirectUrls(
+  request: Request,
+  bookingId: string
+): {
+  returnUrl: string;
+  cancelUrl: string;
+} {
+  const baseUrl = resolveBaseUrl(request).replace(/\/+$/, "");
+  const encodedBookingId = encodeURIComponent(bookingId);
+  return {
+    returnUrl: `${baseUrl}/booking/${encodedBookingId}/success`,
+    cancelUrl: `${baseUrl}/booking/${encodedBookingId}`,
+  };
+}
+
 async function resolveActorContext(request: Request, authFn: typeof auth): Promise<ActorContext> {
   const session = await authFn();
   const user = session?.user;
@@ -414,6 +441,7 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
       });
 
       const paymentId = `pay_${crypto.randomUUID().replace(/-/g, "")}`;
+      const redirectUrls = buildBookingRedirectUrls(request, booking.id);
 
       const providerResult = await provider.initiatePayment({
         paymentId,
@@ -426,10 +454,7 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
           email: booking.guestEmail,
           phone: body.customerPhone ?? booking.guestPhone,
         },
-        redirectUrls: {
-          returnUrl: body.returnUrl,
-          cancelUrl: body.cancelUrl,
-        },
+        redirectUrls,
         idempotencyKey: parsedHeaders.idempotencyKey,
         metadata: {
           idempotencyScope: `payments:start:${actor.actorId}`,

@@ -803,7 +803,7 @@ Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/validation/booking-re
 
 <!-- issue: bookeasy:T-031 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** QA
 - **Context:** Primary conversion path must be tested end-to-end.
