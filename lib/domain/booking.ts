@@ -36,6 +36,21 @@ export class BookingConflictError extends Error {
   }
 }
 
+export type BookingServiceErrorCode =
+  | "BOOKING_IDEMPOTENCY_REPLAY_MISMATCH"
+  | "BOOKING_IDEMPOTENCY_REPLAY_UNAVAILABLE"
+  | "BOOKING_RESERVE_PERSISTENCE_ERROR";
+
+export class BookingServiceError extends Error {
+  readonly code: BookingServiceErrorCode;
+
+  constructor(code: BookingServiceErrorCode, message: string) {
+    super(message);
+    this.code = code;
+    this.name = "BookingServiceError";
+  }
+}
+
 export type BookingStatusUpdate = {
   status: BookingStatus;
   cancelledAt: Date | null;
@@ -103,6 +118,7 @@ type BookingCreateData = {
 };
 
 type PaymentIntentCreateData = {
+  id?: string;
   propertyId: string;
   bookingId: string;
   amountMinor: number;
@@ -171,6 +187,14 @@ export type BookingServiceTransactionClient<TBookingRecord, TPaymentIntentRecord
 };
 
 export type BookingServiceDbClient<TBookingRecord, TPaymentIntentRecord> = {
+  booking?: {
+    findUnique?: (args: { where: { idempotencyKey: string } }) => Promise<TBookingRecord | null>;
+  };
+  paymentIntent?: {
+    findFirst?: (args: {
+      where: { bookingId: string; idempotencyKey: string };
+    }) => Promise<TPaymentIntentRecord | null>;
+  };
   $transaction<TResult>(
     callback: (
       tx: BookingServiceTransactionClient<TBookingRecord, TPaymentIntentRecord>
@@ -281,6 +305,78 @@ function mapProviderToPrismaPaymentProvider(provider: PaymentProviderKey): "CUST
 
   // MVP maps gateway-backed providers to CUSTOM and stores canonical provider in metadata.
   return "CUSTOM";
+}
+
+type IdempotencyComparableBooking = {
+  id: string;
+  propertyId: string;
+  unitId: string;
+  checkInDate: Date;
+  checkOutDate: Date;
+  guestEmail: string;
+};
+
+function isReplayCompatible(
+  existing: IdempotencyComparableBooking,
+  input: BookingReserveInput
+): boolean {
+  return (
+    existing.propertyId === input.propertyId &&
+    existing.unitId === input.unitId &&
+    existing.checkInDate.getTime() === input.checkInDate.getTime() &&
+    existing.checkOutDate.getTime() === input.checkOutDate.getTime() &&
+    existing.guestEmail.trim().toLowerCase() === input.guestEmail.trim().toLowerCase()
+  );
+}
+
+async function attemptIdempotencyReplay<TBookingRecord, TPaymentIntentRecord>(
+  db: BookingServiceDbClient<TBookingRecord, TPaymentIntentRecord>,
+  idempotencyKey: string,
+  expectedInput: BookingReserveInput
+): Promise<BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord> | null> {
+  const findBooking = db.booking?.findUnique;
+  const findPaymentIntent = db.paymentIntent?.findFirst;
+
+  if (!findBooking || !findPaymentIntent) {
+    return null;
+  }
+
+  const existingBooking = await findBooking({
+    where: {
+      idempotencyKey,
+    },
+  });
+
+  if (!existingBooking) {
+    return null;
+  }
+
+  const comparable = existingBooking as unknown as IdempotencyComparableBooking;
+  if (!isReplayCompatible(comparable, expectedInput)) {
+    throw new BookingServiceError(
+      "BOOKING_IDEMPOTENCY_REPLAY_MISMATCH",
+      "Idempotency key is already used by a different booking payload."
+    );
+  }
+
+  const existingPaymentIntent = await findPaymentIntent({
+    where: {
+      bookingId: comparable.id,
+      idempotencyKey,
+    },
+  });
+
+  if (!existingPaymentIntent) {
+    throw new BookingServiceError(
+      "BOOKING_IDEMPOTENCY_REPLAY_UNAVAILABLE",
+      "Idempotency booking replay found, but associated payment intent could not be resolved."
+    );
+  }
+
+  return {
+    booking: existingBooking,
+    paymentIntent: existingPaymentIntent,
+  };
 }
 
 // Centralized booking status mutation path backed by transition guards.
@@ -422,11 +518,18 @@ export function createBookingService<
       input: BookingServiceReserveInput
     ): Promise<BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord>> {
       const validatedInput = parseBookingReserveInput(input.booking);
+      const idempotencyKey = validatedInput.idempotencyKey?.trim() ?? null;
       const snapshot = buildPriceSnapshot(validatedInput.pricing);
       const paymentId =
         input.payment.paymentId?.trim() || `pay_${crypto.randomUUID().replace(/-/g, "")}`;
-      const paymentIdempotencyKey =
-        input.payment.idempotencyKey ?? validatedInput.idempotencyKey ?? null;
+      const paymentIdempotencyKey = input.payment.idempotencyKey ?? idempotencyKey ?? null;
+
+      if (idempotencyKey) {
+        const replayResult = await attemptIdempotencyReplay(db, idempotencyKey, validatedInput);
+        if (replayResult) {
+          return replayResult;
+        }
+      }
 
       try {
         return await db.$transaction(async (tx) => {
@@ -472,6 +575,7 @@ export function createBookingService<
               bookingId: booking.id,
               amountMinor: snapshot.totalAmountMinor,
               currency: snapshot.currency,
+              id: paymentId,
               method: mapMethodToPrismaPaymentMethod(input.payment.method),
               provider: mapProviderToPrismaPaymentProvider(input.payment.provider),
               status: "PENDING",
@@ -494,9 +598,23 @@ export function createBookingService<
       } catch (error) {
         const domainConflict = mapBookingPersistenceConflict(error);
         if (domainConflict) {
+          if (domainConflict.reason === "IDEMPOTENCY_KEY_REUSED" && idempotencyKey) {
+            const replayResult = await attemptIdempotencyReplay(db, idempotencyKey, validatedInput);
+            if (replayResult) {
+              return replayResult;
+            }
+
+            throw new BookingServiceError(
+              "BOOKING_IDEMPOTENCY_REPLAY_UNAVAILABLE",
+              "Idempotency conflict occurred but replay data could not be loaded."
+            );
+          }
           throw domainConflict;
         }
-        throw error;
+        throw new BookingServiceError(
+          "BOOKING_RESERVE_PERSISTENCE_ERROR",
+          "Failed to persist booking reserve transaction."
+        );
       }
     },
   };
@@ -505,22 +623,36 @@ export function createBookingService<
 // Payment-aware booking entry point that keeps provider implementation details outside the core domain flow.
 export async function reserveBookingWithPayment<TBookingRecord extends PaymentBackedBookingRecord>(
   deps: {
-    db: BookingReservationDbClient<TBookingRecord>;
+    db: BookingServiceDbClient<
+      TBookingRecord,
+      { id: string; idempotencyKey: string | null; providerIntentRef: string | null }
+    >;
     paymentService: PaymentService;
   },
   input: ReserveBookingWithPaymentInput
 ): Promise<ReserveBookingWithPaymentResult<TBookingRecord>> {
-  const booking = await reserveBookingWithSnapshot(deps.db, input.booking);
+  const bookingService = createBookingService(deps.db);
+  const reserved = await bookingService.reserve({
+    booking: input.booking,
+    payment: {
+      paymentId: input.payment.paymentId,
+      provider: input.payment.provider,
+      method: input.payment.method,
+      idempotencyKey: input.payment.idempotencyKey,
+      metadata: input.payment.metadata,
+    },
+  });
 
   const payment = await deps.paymentService.startPayment({
     ...input.payment,
-    bookingId: booking.id,
-    amountMinor: booking.totalAmountMinor,
-    currency: booking.currency,
+    paymentId: reserved.paymentIntent.id,
+    bookingId: reserved.booking.id,
+    amountMinor: reserved.booking.totalAmountMinor,
+    currency: reserved.booking.currency,
   });
 
   return {
-    booking,
+    booking: reserved.booking,
     payment,
   };
 }

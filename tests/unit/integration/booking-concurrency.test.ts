@@ -222,11 +222,11 @@ describe("integration: booking concurrency protection", () => {
     const db = new ConcurrencyBookingDb();
 
     const [first, second] = await Promise.allSettled([
-      reserveBookingWithSnapshot(db, makeReserveInput({ idempotencyKey: "req-a" })),
+      reserveBookingWithSnapshot(db, makeReserveInput({ idempotencyKey: "req-a-1234" })),
       reserveBookingWithSnapshot(
         db,
         makeReserveInput({
-          idempotencyKey: "req-b",
+          idempotencyKey: "req-b-1234",
           checkInDate: new Date("2026-09-11T00:00:00.000Z"),
           checkOutDate: new Date("2026-09-13T00:00:00.000Z"),
         })
@@ -249,7 +249,7 @@ describe("integration: booking concurrency protection", () => {
       reserveBookingWithSnapshot(
         db,
         makeReserveInput({
-          idempotencyKey: "req-c",
+          idempotencyKey: "req-c-1234",
           checkInDate: new Date("2026-10-10T00:00:00.000Z"),
           checkOutDate: new Date("2026-10-12T00:00:00.000Z"),
         })
@@ -257,7 +257,7 @@ describe("integration: booking concurrency protection", () => {
       reserveBookingWithSnapshot(
         db,
         makeReserveInput({
-          idempotencyKey: "req-d",
+          idempotencyKey: "req-d-1234",
           checkInDate: new Date("2026-10-12T00:00:00.000Z"),
           checkOutDate: new Date("2026-10-14T00:00:00.000Z"),
         })
@@ -277,7 +277,7 @@ describe("integration: booking concurrency protection", () => {
       reserveBookingWithSnapshot(
         db,
         makeReserveInput({
-          idempotencyKey: "same-key",
+          idempotencyKey: "same-key-1234",
           checkInDate: new Date("2026-11-01T00:00:00.000Z"),
           checkOutDate: new Date("2026-11-03T00:00:00.000Z"),
         })
@@ -285,7 +285,7 @@ describe("integration: booking concurrency protection", () => {
       reserveBookingWithSnapshot(
         db,
         makeReserveInput({
-          idempotencyKey: "same-key",
+          idempotencyKey: "same-key-1234",
           checkInDate: new Date("2026-11-01T00:00:00.000Z"),
           checkOutDate: new Date("2026-11-03T00:00:00.000Z"),
         })
@@ -306,14 +306,14 @@ describe("integration: booking concurrency protection", () => {
     db.seedBooking({
       unitId: "unit-1",
       status: "RESERVED",
-      idempotencyKey: "old-reserved",
+      idempotencyKey: "old-reserved-1234",
       checkInDate: new Date("2026-12-01T00:00:00.000Z"),
       checkOutDate: new Date("2026-12-03T00:00:00.000Z"),
     });
     db.seedBooking({
       unitId: "unit-1",
       status: "RESERVED",
-      idempotencyKey: "old-completed",
+      idempotencyKey: "old-completed-1234",
       checkInDate: new Date("2026-12-05T00:00:00.000Z"),
       checkOutDate: new Date("2026-12-07T00:00:00.000Z"),
     });
@@ -326,7 +326,7 @@ describe("integration: booking concurrency protection", () => {
     const result = await reserveBookingWithSnapshot(
       db,
       makeReserveInput({
-        idempotencyKey: "new-reservation",
+        idempotencyKey: "new-reservation-1234",
         checkInDate: new Date("2026-12-01T00:00:00.000Z"),
         checkOutDate: new Date("2026-12-03T00:00:00.000Z"),
       })

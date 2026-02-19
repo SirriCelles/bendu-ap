@@ -696,19 +696,31 @@ Status: TODO
 
 <!-- issue: bookeasy:T-026 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/domain/pricing-and-reserve-flow.test.ts tests/unit/integration/booking-concurrency.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Booking
 - **Context:** Core booking workflow must enforce invariants consistently.
 - **Scope Included:** Availability check, snapshot creation, booking insert, payment hook, idempotency.
 - **Scope Excluded:** Admin-side lifecycle updates.
 - **Acceptance Criteria:**
-- [ ] Idempotency key returns same booking on retry
-- [ ] Overlap conflicts map to domain conflict response
-- [ ] Success persists booking, snapshot, payment intent, and payment status atomically
+- [x] Idempotency key returns same booking on retry
+- [x] Overlap conflicts map to domain conflict response
+- [x] Success persists booking, snapshot, payment intent, and payment status atomically
 - **Implementation Notes:** Build in `lib/domain/booking.ts`; use DB transaction and DB exclusion constraint as final guard; do not finalize booking as confirmed before valid payment result.
 - **Dependencies:** 011, 013, 024, 025, 051, 052, 053, 054
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-026.1` Define booking service contract and transactional reserve boundary types.
+- [x] `T-026.2` Implement transactional reserve orchestration (booking + immutable snapshot + payment intent seed).
+- [x] `T-026.3` Preserve overlap conflict mapping from DB constraints to typed domain conflict.
+- [x] `T-026.4` Add payment-intent initialization hook with provider-agnostic canonical metadata (no provider API call).
+- [x] `T-026.5` Add idempotency replay behavior (same key returns deterministic booking/payment-intent pair).
+- [x] `T-026.6` Add typed BookingService error model for replay mismatch/unavailable and persistence wrapper failures.
+- [x] `T-026.7` Add unit coverage for transactional happy path.
+- [x] `T-026.8` Add unit coverage for idempotency replay and typed mismatch/persistence failures.
+- [x] `T-026.9` Verify compatibility with existing booking concurrency integration coverage.
+- [x] `T-026.10` Wire reserve entry path (`reserveBookingWithPayment`) to shared BookingService transactional reserve flow.
 
 ## T-027 — Implement `POST /bookings` endpoint with rate limiting
 

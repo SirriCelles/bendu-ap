@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PaymentService } from "@/lib/domain/payments";
 import type { BookingReservationDbClient, BookingServiceDbClient } from "@/lib/domain/booking";
 import {
+  BookingServiceError,
   createBookingService,
   reserveBookingWithPayment,
   reserveBookingWithSnapshot,
@@ -330,10 +331,58 @@ describe("createBookingService.reserve", () => {
     let bookingCreateData: unknown;
     let paymentIntentCreateData: unknown;
 
+    const replayStore = new Map<
+      string,
+      {
+        booking: {
+          id: string;
+          propertyId: string;
+          unitId: string;
+          checkInDate: Date;
+          checkOutDate: Date;
+          guestEmail: string;
+          currency: "XAF";
+          totalAmountMinor: number;
+        };
+        paymentIntent: {
+          id: string;
+          status: "PENDING";
+          idempotencyKey: string | null;
+          providerIntentRef: string | null;
+        };
+      }
+    >();
+
     const db: BookingServiceDbClient<
-      { id: string; currency: "XAF"; totalAmountMinor: number },
-      { id: string; status: "PENDING" }
+      {
+        id: string;
+        propertyId: string;
+        unitId: string;
+        checkInDate: Date;
+        checkOutDate: Date;
+        guestEmail: string;
+        currency: "XAF";
+        totalAmountMinor: number;
+      },
+      {
+        id: string;
+        status: "PENDING";
+        idempotencyKey: string | null;
+        providerIntentRef: string | null;
+      }
     > = {
+      booking: {
+        async findUnique(args) {
+          const replay = replayStore.get(args.where.idempotencyKey);
+          return replay?.booking ?? null;
+        },
+      },
+      paymentIntent: {
+        async findFirst(args) {
+          const replay = replayStore.get(args.where.idempotencyKey);
+          return replay?.paymentIntent ?? null;
+        },
+      },
       async $transaction(callback) {
         inTransaction = true;
         try {
@@ -344,6 +393,11 @@ describe("createBookingService.reserve", () => {
                 bookingCreateData = args.data;
                 return {
                   id: "booking-service-1",
+                  propertyId: args.data.propertyId,
+                  unitId: args.data.unitId,
+                  checkInDate: args.data.checkInDate,
+                  checkOutDate: args.data.checkOutDate,
+                  guestEmail: args.data.guestEmail,
                   currency: "XAF",
                   totalAmountMinor: args.data.totalAmountMinor,
                 };
@@ -353,9 +407,30 @@ describe("createBookingService.reserve", () => {
               async create(args) {
                 expect(inTransaction).toBe(true);
                 paymentIntentCreateData = args.data;
+                const idempotencyKey = args.data.idempotencyKey ?? "booking-key-1";
+                replayStore.set(idempotencyKey, {
+                  booking: {
+                    id: "booking-service-1",
+                    propertyId: "property-1",
+                    unitId: "unit-1",
+                    checkInDate: new Date("2026-08-01T12:00:00.000Z"),
+                    checkOutDate: new Date("2026-08-03T09:00:00.000Z"),
+                    guestEmail: "guest@example.com",
+                    currency: "XAF",
+                    totalAmountMinor: 46000,
+                  },
+                  paymentIntent: {
+                    id: "payment-intent-1",
+                    status: "PENDING",
+                    idempotencyKey,
+                    providerIntentRef: "pay-seed-1",
+                  },
+                });
                 return {
                   id: "payment-intent-1",
                   status: "PENDING",
+                  idempotencyKey: args.data.idempotencyKey,
+                  providerIntentRef: args.data.providerIntentRef,
                 };
               },
             },
@@ -422,6 +497,7 @@ describe("createBookingService.reserve", () => {
       provider: "CUSTOM",
       method: "MOBILE_MONEY",
       providerIntentRef: "pay-seed-1",
+      id: "pay-seed-1",
       idempotencyKey: "pay-seed-key-1",
       metadata: {
         canonicalProvider: "NOTCHPAY",
@@ -429,6 +505,205 @@ describe("createBookingService.reserve", () => {
         canonicalStatus: "INITIATED",
       },
     });
+  });
+
+  it("replays the same booking/payment intent deterministically on idempotency retry", async () => {
+    const replayBooking = {
+      id: "booking-replay-1",
+      propertyId: "property-1",
+      unitId: "unit-1",
+      checkInDate: new Date("2026-09-01T12:00:00.000Z"),
+      checkOutDate: new Date("2026-09-03T09:00:00.000Z"),
+      guestEmail: "guest@example.com",
+      currency: "XAF" as const,
+      totalAmountMinor: 44000,
+    };
+    const replayPaymentIntent = {
+      id: "pay-replay-1",
+      status: "PENDING" as const,
+      idempotencyKey: "idem-replay-1",
+      providerIntentRef: "pay-replay-1",
+    };
+    let transactionCalls = 0;
+
+    const db: BookingServiceDbClient<typeof replayBooking, typeof replayPaymentIntent> = {
+      booking: {
+        async findUnique() {
+          return replayBooking;
+        },
+      },
+      paymentIntent: {
+        async findFirst() {
+          return replayPaymentIntent;
+        },
+      },
+      async $transaction() {
+        transactionCalls += 1;
+        throw new Error("transaction should not execute for replay");
+      },
+    };
+
+    const service = createBookingService(db);
+    const result = await service.reserve({
+      booking: {
+        propertyId: "property-1",
+        unitId: "unit-1",
+        idempotencyKey: "idem-replay-1",
+        checkInDate: new Date("2026-09-01T12:00:00.000Z"),
+        checkOutDate: new Date("2026-09-03T09:00:00.000Z"),
+        guestFullName: "Guest",
+        guestEmail: "guest@example.com",
+        guestPhone: "+237600000003",
+        adultsCount: 2,
+        pricing: {
+          checkInDate: new Date("2026-09-01T12:00:00.000Z"),
+          checkOutDate: new Date("2026-09-03T09:00:00.000Z"),
+          currency: "XAF",
+          selectedUnit: {
+            unitId: "unit-1",
+            code: "A-402",
+            nightlyRateMinor: minor(22000),
+          },
+          selectedUnitType: {
+            unitTypeId: "type-1",
+            slug: "standard",
+            basePriceMinor: minor(22000),
+          },
+        },
+      },
+      payment: {
+        provider: "NOTCHPAY",
+        method: "MOMO",
+      },
+    });
+
+    expect(result.booking.id).toBe("booking-replay-1");
+    expect(result.paymentIntent.id).toBe("pay-replay-1");
+    expect(transactionCalls).toBe(0);
+  });
+
+  it("throws typed booking service error when replay key maps to a different payload", async () => {
+    const db: BookingServiceDbClient<
+      {
+        id: string;
+        propertyId: string;
+        unitId: string;
+        checkInDate: Date;
+        checkOutDate: Date;
+        guestEmail: string;
+        currency: "XAF";
+        totalAmountMinor: number;
+      },
+      { id: string; status: "PENDING" }
+    > = {
+      booking: {
+        async findUnique() {
+          return {
+            id: "booking-existing",
+            propertyId: "property-1",
+            unitId: "unit-other",
+            checkInDate: new Date("2026-10-01T12:00:00.000Z"),
+            checkOutDate: new Date("2026-10-03T09:00:00.000Z"),
+            guestEmail: "guest@example.com",
+            currency: "XAF",
+            totalAmountMinor: 44000,
+          };
+        },
+      },
+      paymentIntent: {
+        async findFirst() {
+          return { id: "pay-existing", status: "PENDING" };
+        },
+      },
+      async $transaction() {
+        throw new Error("transaction should not execute");
+      },
+    };
+
+    const service = createBookingService(db);
+
+    await expect(
+      service.reserve({
+        booking: {
+          propertyId: "property-1",
+          unitId: "unit-1",
+          idempotencyKey: "idem-mismatch",
+          checkInDate: new Date("2026-10-01T12:00:00.000Z"),
+          checkOutDate: new Date("2026-10-03T09:00:00.000Z"),
+          guestFullName: "Guest",
+          guestEmail: "guest@example.com",
+          guestPhone: "+237600000003",
+          adultsCount: 2,
+          pricing: {
+            checkInDate: new Date("2026-10-01T12:00:00.000Z"),
+            checkOutDate: new Date("2026-10-03T09:00:00.000Z"),
+            currency: "XAF",
+            selectedUnit: {
+              unitId: "unit-1",
+              code: "A-501",
+              nightlyRateMinor: minor(22000),
+            },
+            selectedUnitType: {
+              unitTypeId: "type-1",
+              slug: "standard",
+              basePriceMinor: minor(22000),
+            },
+          },
+        },
+        payment: {
+          provider: "NOTCHPAY",
+          method: "MOMO",
+        },
+      })
+    ).rejects.toMatchObject({
+      code: "BOOKING_IDEMPOTENCY_REPLAY_MISMATCH",
+    });
+  });
+
+  it("wraps unexpected persistence failures with typed booking service error", async () => {
+    const db: BookingServiceDbClient<
+      { id: string; currency: "XAF"; totalAmountMinor: number },
+      { id: string; status: "PENDING" }
+    > = {
+      async $transaction() {
+        throw new Error("db unavailable");
+      },
+    };
+
+    const service = createBookingService(db);
+    await expect(
+      service.reserve({
+        booking: {
+          propertyId: "property-1",
+          unitId: "unit-1",
+          checkInDate: new Date("2026-11-01T12:00:00.000Z"),
+          checkOutDate: new Date("2026-11-03T09:00:00.000Z"),
+          guestFullName: "Guest",
+          guestEmail: "guest@example.com",
+          guestPhone: "+237600000003",
+          adultsCount: 2,
+          pricing: {
+            checkInDate: new Date("2026-11-01T12:00:00.000Z"),
+            checkOutDate: new Date("2026-11-03T09:00:00.000Z"),
+            currency: "XAF",
+            selectedUnit: {
+              unitId: "unit-1",
+              code: "A-601",
+              nightlyRateMinor: minor(22000),
+            },
+            selectedUnitType: {
+              unitTypeId: "type-1",
+              slug: "standard",
+              basePriceMinor: minor(22000),
+            },
+          },
+        },
+        payment: {
+          provider: "NOTCHPAY",
+          method: "MOMO",
+        },
+      })
+    ).rejects.toBeInstanceOf(BookingServiceError);
   });
 
   it("maps overlap conflicts from the transactional reserve path to typed domain conflict", async () => {
@@ -487,19 +762,64 @@ describe("createBookingService.reserve", () => {
 
 describe("reserveBookingWithPayment", () => {
   it("uses PaymentService interface without concrete provider coupling in booking flow", async () => {
-    const db: BookingReservationDbClient<{
-      id: string;
-      currency: "XAF";
-      totalAmountMinor: number;
-    }> = {
+    const replayStore = new Map<
+      string,
+      {
+        booking: { id: string; currency: "XAF"; totalAmountMinor: number };
+        paymentIntent: {
+          id: string;
+          idempotencyKey: string | null;
+          providerIntentRef: string | null;
+        };
+      }
+    >();
+
+    const db: BookingServiceDbClient<
+      {
+        id: string;
+        currency: "XAF";
+        totalAmountMinor: number;
+      },
+      { id: string; idempotencyKey: string | null; providerIntentRef: string | null }
+    > = {
+      booking: {
+        async findUnique(args) {
+          const replay = replayStore.get(args.where.idempotencyKey);
+          return replay?.booking ?? null;
+        },
+      },
+      paymentIntent: {
+        async findFirst(args) {
+          const replay = replayStore.get(args.where.idempotencyKey);
+          return replay?.paymentIntent ?? null;
+        },
+      },
       async $transaction(callback) {
         return callback({
           booking: {
             async create(args) {
-              return {
+              const booking = {
                 id: "booking-pay-1",
-                currency: "XAF",
-                totalAmountMinor: args.data.totalAmountMinor,
+                currency: "XAF" as const,
+                totalAmountMinor: Number(args.data.totalAmountMinor),
+              };
+              replayStore.set(args.data.idempotencyKey ?? "idem-payment-1", {
+                booking,
+                paymentIntent: {
+                  id: "pay-1",
+                  idempotencyKey: args.data.idempotencyKey,
+                  providerIntentRef: "pay-1",
+                },
+              });
+              return booking;
+            },
+          },
+          paymentIntent: {
+            async create(args) {
+              return {
+                id: args.data.id ?? "pay-1",
+                idempotencyKey: args.data.idempotencyKey,
+                providerIntentRef: args.data.providerIntentRef,
               };
             },
           },
