@@ -500,7 +500,8 @@ Verification: 2026-02-15 (`pnpm typecheck` ✅)
 
 <!-- issue: bookeasy:T-022 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/api/payments-start-route.test.ts tests/unit/domain/pricing-and-reserve-flow.test.ts tests/unit/integration/booking-concurrency.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Performance
 - **Context:** Listing pages should meet target load performance.
@@ -1013,9 +1014,9 @@ Status: TODO
 - **Scope Included:** Persistent idempotency keys, replay behavior, collision handling, deterministic response storage.
 - **Scope Excluded:** External distributed lock service.
 - **Acceptance Criteria:**
-- [ ] `POST /api/bookings` and `POST /api/payments/start` reject or replay duplicates deterministically
-- [ ] Idempotency scope includes endpoint + actor/session + key
-- [ ] Race conditions do not produce duplicate bookings/payments
+- [x] `POST /api/bookings` and `POST /api/payments/start` reject or replay duplicates deterministically
+- [x] Idempotency scope includes endpoint + actor/session + key
+- [x] Race conditions do not produce duplicate bookings/payments
 - **Implementation Notes:** DB table or existing payment fields are acceptable for MVP if semantics are test-covered.
 - **Dependencies:** 026, 053
 - **Estimate:** M

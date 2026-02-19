@@ -483,7 +483,7 @@ describe("createBookingService.reserve", () => {
     expect(bookingCreateData).toMatchObject({
       status: "RESERVED",
       paymentStatus: "PENDING",
-      idempotencyKey: "booking-key-1",
+      idempotencyKey: "bookings:anonymous:booking-key-1",
       priceSnapshot: {
         create: {
           currency: "XAF",
@@ -505,6 +505,97 @@ describe("createBookingService.reserve", () => {
         canonicalStatus: "INITIATED",
       },
     });
+  });
+
+  it("scopes booking idempotency keys by provided idempotency scope", async () => {
+    const bookingIdempotencyKeys: string[] = [];
+    const paymentIdempotencyKeys: string[] = [];
+
+    const db: BookingServiceDbClient<
+      {
+        id: string;
+        currency: "XAF";
+        totalAmountMinor: number;
+      },
+      { id: string; idempotencyKey: string | null; providerIntentRef: string | null }
+    > = {
+      async $transaction(callback) {
+        return callback({
+          booking: {
+            async create(args) {
+              bookingIdempotencyKeys.push(args.data.idempotencyKey ?? "");
+              return {
+                id: `booking-${bookingIdempotencyKeys.length}`,
+                currency: "XAF",
+                totalAmountMinor: Number(args.data.totalAmountMinor),
+              };
+            },
+          },
+          paymentIntent: {
+            async create(args) {
+              paymentIdempotencyKeys.push(args.data.idempotencyKey ?? "");
+              return {
+                id: args.data.id ?? `payment-${paymentIdempotencyKeys.length}`,
+                idempotencyKey: args.data.idempotencyKey,
+                providerIntentRef: args.data.providerIntentRef,
+              };
+            },
+          },
+        });
+      },
+    };
+
+    const service = createBookingService(db);
+    const reserveInput = {
+      booking: {
+        propertyId: "property-1",
+        unitId: "unit-1",
+        idempotencyKey: "idem-scope-1",
+        checkInDate: new Date("2026-08-20T12:00:00.000Z"),
+        checkOutDate: new Date("2026-08-22T09:00:00.000Z"),
+        guestFullName: "Scoped Guest",
+        guestEmail: "guest@example.com",
+        guestPhone: "+237600000003",
+        adultsCount: 2,
+        pricing: {
+          checkInDate: new Date("2026-08-20T12:00:00.000Z"),
+          checkOutDate: new Date("2026-08-22T09:00:00.000Z"),
+          currency: "XAF" as const,
+          selectedUnit: {
+            unitId: "unit-1",
+            code: "A-410",
+            nightlyRateMinor: minor(23000),
+          },
+          selectedUnitType: {
+            unitTypeId: "type-1",
+            slug: "standard",
+            basePriceMinor: minor(23000),
+          },
+        },
+      },
+      payment: {
+        provider: "NOTCHPAY" as const,
+        method: "MOMO" as const,
+      },
+    };
+
+    await service.reserve({
+      ...reserveInput,
+      idempotencyScope: "bookings:start:guest:user-1",
+    });
+    await service.reserve({
+      ...reserveInput,
+      idempotencyScope: "bookings:start:guest:user-2",
+    });
+
+    expect(bookingIdempotencyKeys).toEqual([
+      "bookings:start:guest:user-1:idem-scope-1",
+      "bookings:start:guest:user-2:idem-scope-1",
+    ]);
+    expect(paymentIdempotencyKeys).toEqual([
+      "bookings:start:guest:user-1:idem-scope-1",
+      "bookings:start:guest:user-2:idem-scope-1",
+    ]);
   });
 
   it("replays the same booking/payment intent deterministically on idempotency retry", async () => {

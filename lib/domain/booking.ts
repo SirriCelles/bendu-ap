@@ -170,6 +170,7 @@ export type BookingServicePaymentSeed = {
 export type BookingServiceReserveInput = {
   booking: BookingReserveInput;
   payment: BookingServicePaymentSeed;
+  idempotencyScope?: string | null;
 };
 
 export type BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord> = {
@@ -305,6 +306,18 @@ function mapProviderToPrismaPaymentProvider(provider: PaymentProviderKey): "CUST
 
   // MVP maps gateway-backed providers to CUSTOM and stores canonical provider in metadata.
   return "CUSTOM";
+}
+
+function toScopedIdempotencyKey(
+  rawIdempotencyKey: string | null,
+  scope: string | null | undefined
+): string | null {
+  if (!rawIdempotencyKey) {
+    return null;
+  }
+
+  const normalizedScope = scope?.trim() || "bookings:anonymous";
+  return `${normalizedScope}:${rawIdempotencyKey}`;
 }
 
 type IdempotencyComparableBooking = {
@@ -518,7 +531,10 @@ export function createBookingService<
       input: BookingServiceReserveInput
     ): Promise<BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord>> {
       const validatedInput = parseBookingReserveInput(input.booking);
-      const idempotencyKey = validatedInput.idempotencyKey?.trim() ?? null;
+      const idempotencyKey = toScopedIdempotencyKey(
+        validatedInput.idempotencyKey?.trim() ?? null,
+        input.idempotencyScope
+      );
       const snapshot = buildPriceSnapshot(validatedInput.pricing);
       const paymentId =
         input.payment.paymentId?.trim() || `pay_${crypto.randomUUID().replace(/-/g, "")}`;
@@ -537,7 +553,7 @@ export function createBookingService<
             data: {
               propertyId: validatedInput.propertyId,
               unitId: validatedInput.unitId,
-              idempotencyKey: validatedInput.idempotencyKey ?? null,
+              idempotencyKey,
               status: "RESERVED",
               paymentStatus: "PENDING",
               checkInDate: validatedInput.checkInDate,
@@ -641,6 +657,10 @@ export async function reserveBookingWithPayment<TBookingRecord extends PaymentBa
       idempotencyKey: input.payment.idempotencyKey,
       metadata: input.payment.metadata,
     },
+    idempotencyScope:
+      typeof input.payment.metadata?.idempotencyScope === "string"
+        ? input.payment.metadata.idempotencyScope
+        : null,
   });
 
   const payment = await deps.paymentService.startPayment({

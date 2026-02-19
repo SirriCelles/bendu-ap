@@ -64,6 +64,7 @@ function makeRequest(body: Record<string, unknown>, headers: Record<string, stri
 
 function buildHarness(options?: {
   booking?: Partial<BookingFixture>;
+  actorId?: string;
   actorEmail?: string;
   actorRole?: string;
   providerSupportsCard?: boolean;
@@ -84,6 +85,9 @@ function buildHarness(options?: {
   };
 
   const paymentIntents: PaymentIntentFixture[] = [];
+  const actorState = {
+    actorId: options?.actorId ?? "guest:user-1",
+  };
   const initiatePayment = vi.fn(async (input: { paymentId: string }) => {
     if (options?.providerError) {
       throw options.providerError;
@@ -151,7 +155,7 @@ function buildHarness(options?: {
   const handler = createPaymentsStartPostHandler({
     auth: vi.fn(async () => ({
       user: {
-        id: "guest:user-1",
+        id: actorState.actorId,
         email: options?.actorEmail ?? booking.guestEmail,
         role: options?.actorRole ?? "GUEST",
       },
@@ -173,6 +177,9 @@ function buildHarness(options?: {
     handler,
     paymentIntents,
     initiatePayment,
+    setActorId(nextActorId: string) {
+      actorState.actorId = nextActorId;
+    },
   };
 }
 
@@ -211,6 +218,26 @@ describe("POST /api/payments/start", () => {
     expect(second.status).toBe(200);
     expect(secondBody).toEqual(firstBody);
     expect(harness.initiatePayment).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not replay between different actors for the same raw idempotency key", async () => {
+    const harness = buildHarness({ actorId: "guest:user-1" });
+    const request = makeRequest(baseBody(), { "idempotency-key": "idem_shared_1234" });
+
+    const first = await harness.handler(request.clone());
+    harness.setActorId("guest:user-2");
+    const second = await harness.handler(request.clone());
+
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    expect(harness.initiatePayment).toHaveBeenCalledTimes(2);
+    expect(harness.paymentIntents).toHaveLength(2);
+    expect(harness.paymentIntents[0].idempotencyKey).toBe(
+      "payments:start:guest:user-1:idem_shared_1234"
+    );
+    expect(harness.paymentIntents[1].idempotencyKey).toBe(
+      "payments:start:guest:user-2:idem_shared_1234"
+    );
   });
 
   it("returns 409 when booking is already confirmed with successful payment", async () => {

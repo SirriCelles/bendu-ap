@@ -74,6 +74,10 @@ type PaymentStartDeps = {
 const DEFAULT_REQUEST_ID_HEADER = "x-request-id";
 const GUEST_SESSION_HEADER = "x-guest-session";
 
+function toScopedIdempotencyKey(actorId: string, rawIdempotencyKey: string): string {
+  return `payments:start:${actorId}:${rawIdempotencyKey}`;
+}
+
 async function parsePaymentStartBodyFromRequest(
   request: Request
 ): Promise<PaymentStartRequestBody> {
@@ -328,6 +332,10 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
       }
 
       const body = await parsePaymentStartBodyFromRequest(request);
+      const scopedIdempotencyKey = toScopedIdempotencyKey(
+        actor.actorId,
+        parsedHeaders.idempotencyKey
+      );
 
       const booking = await deps.db.booking.findUnique({
         where: {
@@ -356,7 +364,7 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
       const existingPayment = await deps.db.paymentIntent.findFirst({
         where: {
           bookingId: booking.id,
-          idempotencyKey: parsedHeaders.idempotencyKey,
+          idempotencyKey: scopedIdempotencyKey,
         },
         select: {
           id: true,
@@ -412,6 +420,9 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
           cancelUrl: body.cancelUrl,
         },
         idempotencyKey: parsedHeaders.idempotencyKey,
+        metadata: {
+          idempotencyScope: `payments:start:${actor.actorId}`,
+        },
         requestId,
       });
 
@@ -430,7 +441,7 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
             provider: mapProviderToPrismaProvider(body.provider),
             status: persistedStatus,
             providerIntentRef: providerResult.providerReference,
-            idempotencyKey: parsedHeaders.idempotencyKey,
+            idempotencyKey: scopedIdempotencyKey,
             metadata: {
               canonicalProvider: body.provider,
               canonicalMethod: body.method,
@@ -438,6 +449,8 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
               checkoutUrl: providerResult.checkoutUrl,
               requestId,
               actorId: actor.actorId,
+              idempotencyScope: `payments:start:${actor.actorId}`,
+              idempotencyKeyRaw: parsedHeaders.idempotencyKey,
             },
           },
         });
@@ -445,7 +458,7 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
         const maybeReplay = await deps.db.paymentIntent.findFirst({
           where: {
             bookingId: booking.id,
-            idempotencyKey: parsedHeaders.idempotencyKey,
+            idempotencyKey: scopedIdempotencyKey,
           },
           select: {
             id: true,
