@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { PaymentService } from "@/lib/domain/payments";
-import type { BookingReservationDbClient } from "@/lib/domain/booking";
-import { reserveBookingWithPayment, reserveBookingWithSnapshot } from "@/lib/domain/booking";
+import type { BookingReservationDbClient, BookingServiceDbClient } from "@/lib/domain/booking";
+import {
+  createBookingService,
+  reserveBookingWithPayment,
+  reserveBookingWithSnapshot,
+} from "@/lib/domain/booking";
 import type { MinorUnitAmount } from "@/lib/domain/pricing";
 import {
   PricingCalculationError,
@@ -316,6 +320,167 @@ describe("integration: booking-time snapshot persistence", () => {
       taxesMinor: 1000,
       feesMinor: 500,
       totalAmountMinor: 74500,
+    });
+  });
+});
+
+describe("createBookingService.reserve", () => {
+  it("persists booking, snapshot, and payment intent atomically without provider calls", async () => {
+    let inTransaction = false;
+    let bookingCreateData: unknown;
+    let paymentIntentCreateData: unknown;
+
+    const db: BookingServiceDbClient<
+      { id: string; currency: "XAF"; totalAmountMinor: number },
+      { id: string; status: "PENDING" }
+    > = {
+      async $transaction(callback) {
+        inTransaction = true;
+        try {
+          return await callback({
+            booking: {
+              async create(args) {
+                expect(inTransaction).toBe(true);
+                bookingCreateData = args.data;
+                return {
+                  id: "booking-service-1",
+                  currency: "XAF",
+                  totalAmountMinor: args.data.totalAmountMinor,
+                };
+              },
+            },
+            paymentIntent: {
+              async create(args) {
+                expect(inTransaction).toBe(true);
+                paymentIntentCreateData = args.data;
+                return {
+                  id: "payment-intent-1",
+                  status: "PENDING",
+                };
+              },
+            },
+          });
+        } finally {
+          inTransaction = false;
+        }
+      },
+    };
+
+    const service = createBookingService(db);
+    const result = await service.reserve({
+      booking: {
+        propertyId: "property-1",
+        unitId: "unit-1",
+        idempotencyKey: "booking-key-1",
+        checkInDate: new Date("2026-08-01T12:00:00.000Z"),
+        checkOutDate: new Date("2026-08-03T09:00:00.000Z"),
+        guestFullName: "Service Guest",
+        guestEmail: "guest@example.com",
+        guestPhone: "+237600000003",
+        adultsCount: 2,
+        pricing: {
+          checkInDate: new Date("2026-08-01T12:00:00.000Z"),
+          checkOutDate: new Date("2026-08-03T09:00:00.000Z"),
+          currency: "XAF",
+          selectedUnit: {
+            unitId: "unit-1",
+            code: "A-401",
+            nightlyRateMinor: minor(23000),
+          },
+          selectedUnitType: {
+            unitTypeId: "type-1",
+            slug: "standard",
+            basePriceMinor: minor(23000),
+          },
+        },
+      },
+      payment: {
+        paymentId: "pay-seed-1",
+        provider: "NOTCHPAY",
+        method: "MOMO",
+        idempotencyKey: "pay-seed-key-1",
+      },
+    });
+
+    expect(result.booking.id).toBe("booking-service-1");
+    expect(result.paymentIntent.id).toBe("payment-intent-1");
+
+    expect(bookingCreateData).toMatchObject({
+      status: "RESERVED",
+      paymentStatus: "PENDING",
+      idempotencyKey: "booking-key-1",
+      priceSnapshot: {
+        create: {
+          currency: "XAF",
+        },
+      },
+    });
+
+    expect(paymentIntentCreateData).toMatchObject({
+      bookingId: "booking-service-1",
+      status: "PENDING",
+      provider: "CUSTOM",
+      method: "MOBILE_MONEY",
+      providerIntentRef: "pay-seed-1",
+      idempotencyKey: "pay-seed-key-1",
+      metadata: {
+        canonicalProvider: "NOTCHPAY",
+        canonicalMethod: "MOMO",
+        canonicalStatus: "INITIATED",
+      },
+    });
+  });
+
+  it("maps overlap conflicts from the transactional reserve path to typed domain conflict", async () => {
+    const db: BookingServiceDbClient<
+      { id: string; currency: "XAF"; totalAmountMinor: number },
+      { id: string; status: "PENDING" }
+    > = {
+      async $transaction() {
+        const error = Object.assign(new Error("overlap"), {
+          code: "23P01",
+        });
+        throw error;
+      },
+    };
+
+    const service = createBookingService(db);
+
+    await expect(
+      service.reserve({
+        booking: {
+          propertyId: "property-1",
+          unitId: "unit-1",
+          checkInDate: new Date("2026-08-01T12:00:00.000Z"),
+          checkOutDate: new Date("2026-08-03T09:00:00.000Z"),
+          guestFullName: "Service Guest",
+          guestEmail: "guest@example.com",
+          guestPhone: "+237600000003",
+          adultsCount: 2,
+          pricing: {
+            checkInDate: new Date("2026-08-01T12:00:00.000Z"),
+            checkOutDate: new Date("2026-08-03T09:00:00.000Z"),
+            currency: "XAF",
+            selectedUnit: {
+              unitId: "unit-1",
+              code: "A-401",
+              nightlyRateMinor: minor(23000),
+            },
+            selectedUnitType: {
+              unitTypeId: "type-1",
+              slug: "standard",
+              basePriceMinor: minor(23000),
+            },
+          },
+        },
+        payment: {
+          provider: "NOTCHPAY",
+          method: "MOMO",
+        },
+      })
+    ).rejects.toMatchObject({
+      code: "BOOKING_CONFLICT",
+      reason: "OVERLAPPING_BOOKING",
     });
   });
 });

@@ -1,5 +1,7 @@
 import type { BookingStatus, Currency, PaymentStatus } from "@/generated/prisma";
 import type {
+  PaymentMethodKey,
+  PaymentProviderKey,
   PaymentService,
   PaymentStartRequest,
   PaymentStartResult,
@@ -100,6 +102,19 @@ type BookingCreateData = {
   };
 };
 
+type PaymentIntentCreateData = {
+  propertyId: string;
+  bookingId: string;
+  amountMinor: number;
+  currency: BuildPriceSnapshotInput["currency"];
+  method: "MOBILE_MONEY" | "CARD";
+  provider: "CUSTOM" | "STRIPE";
+  status: PaymentStatus;
+  providerIntentRef: string | null;
+  idempotencyKey: string | null;
+  metadata: Record<string, unknown>;
+};
+
 export type BookingReservationTransactionClient<TBookingRecord> = {
   booking: {
     create(args: { data: BookingCreateData }): Promise<TBookingRecord>;
@@ -127,6 +142,48 @@ export type PaymentBackedBookingRecord = {
   currency: Currency;
   totalAmountMinor: number;
 };
+
+export type BookingServicePaymentSeed = {
+  paymentId?: string;
+  provider: PaymentProviderKey;
+  method: PaymentMethodKey;
+  idempotencyKey?: string | null;
+  metadata?: Readonly<Record<string, unknown>>;
+};
+
+export type BookingServiceReserveInput = {
+  booking: BookingReserveInput;
+  payment: BookingServicePaymentSeed;
+};
+
+export type BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord> = {
+  booking: TBookingRecord;
+  paymentIntent: TPaymentIntentRecord;
+};
+
+export type BookingServiceTransactionClient<TBookingRecord, TPaymentIntentRecord> = {
+  booking: {
+    create(args: { data: BookingCreateData }): Promise<TBookingRecord>;
+  };
+  paymentIntent: {
+    create(args: { data: PaymentIntentCreateData }): Promise<TPaymentIntentRecord>;
+  };
+};
+
+export type BookingServiceDbClient<TBookingRecord, TPaymentIntentRecord> = {
+  $transaction<TResult>(
+    callback: (
+      tx: BookingServiceTransactionClient<TBookingRecord, TPaymentIntentRecord>
+    ) => Promise<TResult>
+  ): Promise<TResult>;
+};
+
+export interface BookingServiceContract<TBookingRecord, TPaymentIntentRecord> {
+  // Reserve boundary is one transaction: booking + snapshot + payment intent seed.
+  reserve(
+    input: BookingServiceReserveInput
+  ): Promise<BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord>>;
+}
 
 function extractErrorMetadata(error: unknown): {
   code?: string;
@@ -207,6 +264,23 @@ function mapBookingPersistenceConflict(error: unknown): BookingConflictError | n
   }
 
   return null;
+}
+
+function mapMethodToPrismaPaymentMethod(method: PaymentMethodKey): "MOBILE_MONEY" | "CARD" {
+  if (method === "CARD") {
+    return "CARD";
+  }
+
+  return "MOBILE_MONEY";
+}
+
+function mapProviderToPrismaPaymentProvider(provider: PaymentProviderKey): "CUSTOM" | "STRIPE" {
+  if (provider === "STRIPE") {
+    return "STRIPE";
+  }
+
+  // MVP maps gateway-backed providers to CUSTOM and stores canonical provider in metadata.
+  return "CUSTOM";
 }
 
 // Centralized booking status mutation path backed by transition guards.
@@ -335,6 +409,97 @@ export async function reserveBookingWithSnapshot<TBookingRecord>(
     }
     throw error;
   }
+}
+
+export function createBookingService<
+  TBookingRecord extends PaymentBackedBookingRecord,
+  TPaymentIntentRecord,
+>(
+  db: BookingServiceDbClient<TBookingRecord, TPaymentIntentRecord>
+): BookingServiceContract<TBookingRecord, TPaymentIntentRecord> {
+  return {
+    async reserve(
+      input: BookingServiceReserveInput
+    ): Promise<BookingServiceReserveResult<TBookingRecord, TPaymentIntentRecord>> {
+      const validatedInput = parseBookingReserveInput(input.booking);
+      const snapshot = buildPriceSnapshot(validatedInput.pricing);
+      const paymentId =
+        input.payment.paymentId?.trim() || `pay_${crypto.randomUUID().replace(/-/g, "")}`;
+      const paymentIdempotencyKey =
+        input.payment.idempotencyKey ?? validatedInput.idempotencyKey ?? null;
+
+      try {
+        return await db.$transaction(async (tx) => {
+          const booking = await tx.booking.create({
+            data: {
+              propertyId: validatedInput.propertyId,
+              unitId: validatedInput.unitId,
+              idempotencyKey: validatedInput.idempotencyKey ?? null,
+              status: "RESERVED",
+              paymentStatus: "PENDING",
+              checkInDate: validatedInput.checkInDate,
+              checkOutDate: validatedInput.checkOutDate,
+              guestFullName: validatedInput.guestFullName,
+              guestEmail: validatedInput.guestEmail,
+              guestPhone: validatedInput.guestPhone,
+              adultsCount: validatedInput.adultsCount,
+              childrenCount: validatedInput.childrenCount ?? 0,
+              currency: snapshot.currency,
+              totalAmountMinor: snapshot.totalAmountMinor,
+              notes: validatedInput.notes ?? null,
+              priceSnapshot: {
+                create: {
+                  propertyId: validatedInput.propertyId,
+                  currency: snapshot.currency,
+                  nightsCount: snapshot.nightsCount,
+                  nightlyRateMinor: snapshot.nightlyRateMinor,
+                  subtotalMinor: snapshot.subtotalMinor,
+                  discountsMinor: snapshot.discountsMinor,
+                  taxesMinor: snapshot.taxesMinor,
+                  feesMinor: snapshot.feesMinor,
+                  totalAmountMinor: snapshot.totalAmountMinor,
+                  pricingVersion: snapshot.pricingVersion,
+                  promotionCode: snapshot.promotionCode,
+                  capturedAt: snapshot.capturedAt,
+                },
+              },
+            },
+          });
+
+          const paymentIntent = await tx.paymentIntent.create({
+            data: {
+              propertyId: validatedInput.propertyId,
+              bookingId: booking.id,
+              amountMinor: snapshot.totalAmountMinor,
+              currency: snapshot.currency,
+              method: mapMethodToPrismaPaymentMethod(input.payment.method),
+              provider: mapProviderToPrismaPaymentProvider(input.payment.provider),
+              status: "PENDING",
+              providerIntentRef: paymentId,
+              idempotencyKey: paymentIdempotencyKey,
+              metadata: {
+                canonicalProvider: input.payment.provider,
+                canonicalMethod: input.payment.method,
+                canonicalStatus: "INITIATED",
+                ...(input.payment.metadata ?? {}),
+              },
+            },
+          });
+
+          return {
+            booking,
+            paymentIntent,
+          };
+        });
+      } catch (error) {
+        const domainConflict = mapBookingPersistenceConflict(error);
+        if (domainConflict) {
+          throw domainConflict;
+        }
+        throw error;
+      }
+    },
+  };
 }
 
 // Payment-aware booking entry point that keeps provider implementation details outside the core domain flow.
