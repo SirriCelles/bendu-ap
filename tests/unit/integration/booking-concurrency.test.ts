@@ -26,6 +26,7 @@ type BookingCreateData = {
   unitId: string;
   status: BookingStatus;
   idempotencyKey: string | null;
+  expiresAt: Date | null;
   checkInDate: Date;
   checkOutDate: Date;
   priceSnapshot: {

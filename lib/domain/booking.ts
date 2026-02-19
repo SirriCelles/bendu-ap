@@ -18,6 +18,7 @@ import {
   assertCanonicalPaymentStatusTransition,
   assertPaymentStatusTransition,
 } from "./booking-status";
+import { computeBookingExpiresAt } from "./booking-expiry";
 import type { BuildPriceSnapshotInput, PriceSnapshotPersistencePayload } from "./pricing";
 import { buildPriceSnapshot } from "./pricing";
 
@@ -99,6 +100,7 @@ type BookingCreateData = {
   currency: BuildPriceSnapshotInput["currency"];
   totalAmountMinor: PriceSnapshotPersistencePayload["totalAmountMinor"];
   notes: string | null;
+  expiresAt: Date | null;
   priceSnapshot: {
     create: {
       propertyId: string;
@@ -492,6 +494,7 @@ export async function reserveBookingWithSnapshot<TBookingRecord>(
           currency: bookingCurrency,
           totalAmountMinor: snapshot.totalAmountMinor,
           notes: validatedInput.notes ?? null,
+          expiresAt: null,
           priceSnapshot: {
             create: {
               propertyId: validatedInput.propertyId,
@@ -536,6 +539,7 @@ export function createBookingService<
         input.idempotencyScope
       );
       const snapshot = buildPriceSnapshot(validatedInput.pricing);
+      const expiresAt = computeBookingExpiresAt(new Date());
       const paymentId =
         input.payment.paymentId?.trim() || `pay_${crypto.randomUUID().replace(/-/g, "")}`;
       const paymentIdempotencyKey = input.payment.idempotencyKey ?? idempotencyKey ?? null;
@@ -566,6 +570,7 @@ export function createBookingService<
               currency: snapshot.currency,
               totalAmountMinor: snapshot.totalAmountMinor,
               notes: validatedInput.notes ?? null,
+              expiresAt,
               priceSnapshot: {
                 create: {
                   propertyId: validatedInput.propertyId,

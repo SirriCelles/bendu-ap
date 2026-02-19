@@ -103,12 +103,13 @@ describe("availability aggregation", () => {
 });
 
 describe("availability blocking and filtering rules", () => {
-  it("treats RESERVED/CONFIRMED/CHECKED_IN as blocking and CANCELLED/COMPLETED as non-blocking", () => {
+  it("treats RESERVED/CONFIRMED/CHECKED_IN as blocking and CANCELLED/COMPLETED/EXPIRED as non-blocking", () => {
     expect(isInventoryBlockingBookingStatus("RESERVED")).toBe(true);
     expect(isInventoryBlockingBookingStatus("CONFIRMED")).toBe(true);
     expect(isInventoryBlockingBookingStatus("CHECKED_IN")).toBe(true);
     expect(isInventoryBlockingBookingStatus("CANCELLED")).toBe(false);
     expect(isInventoryBlockingBookingStatus("COMPLETED")).toBe(false);
+    expect(isInventoryBlockingBookingStatus("EXPIRED")).toBe(false);
   });
 
   it("filters out only units with overlapping blocking bookings", () => {

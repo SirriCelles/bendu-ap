@@ -28,6 +28,7 @@ enum BookingStatus {
   CHECKED_IN
   COMPLETED
   CANCELLED
+  EXPIRED
 }
 
 enum PaymentStatus {
@@ -36,6 +37,7 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+  EXPIRED
 }
 
 enum PaymentMethod {
@@ -162,6 +164,7 @@ model Booking {
   totalAmountMinor Int
   notes            String?
   cancelledAt      DateTime?
+  expiresAt        DateTime?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   priceSnapshot    PriceSnapshot?
@@ -174,6 +177,7 @@ model Booking {
 
   @@unique([idempotencyKey])
   @@index([propertyId, status, checkInDate])
+  @@index([status, paymentStatus, expiresAt])
   @@index([propertyId, unitId, checkInDate, checkOutDate])
   @@index([unitId, checkInDate, checkOutDate])
   @@index([guestEmail, createdAt])

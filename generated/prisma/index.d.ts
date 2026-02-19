@@ -96,7 +96,8 @@ export const BookingStatus: {
   CONFIRMED: 'CONFIRMED',
   CHECKED_IN: 'CHECKED_IN',
   COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED'
 };
 
 export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
@@ -107,7 +108,8 @@ export const PaymentStatus: {
   PENDING: 'PENDING',
   PAID: 'PAID',
   FAILED: 'FAILED',
-  REFUNDED: 'REFUNDED'
+  REFUNDED: 'REFUNDED',
+  EXPIRED: 'EXPIRED'
 };
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
@@ -6006,6 +6008,7 @@ export namespace Prisma {
     totalAmountMinor: number | null
     notes: string | null
     cancelledAt: Date | null
+    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6028,6 +6031,7 @@ export namespace Prisma {
     totalAmountMinor: number | null
     notes: string | null
     cancelledAt: Date | null
+    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6050,6 +6054,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes: number
     cancelledAt: number
+    expiresAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6086,6 +6091,7 @@ export namespace Prisma {
     totalAmountMinor?: true
     notes?: true
     cancelledAt?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6108,6 +6114,7 @@ export namespace Prisma {
     totalAmountMinor?: true
     notes?: true
     cancelledAt?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6130,6 +6137,7 @@ export namespace Prisma {
     totalAmountMinor?: true
     notes?: true
     cancelledAt?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6239,6 +6247,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes: string | null
     cancelledAt: Date | null
+    expiresAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: BookingCountAggregateOutputType | null
@@ -6280,6 +6289,7 @@ export namespace Prisma {
     totalAmountMinor?: boolean
     notes?: boolean
     cancelledAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     priceSnapshot?: boolean | Booking$priceSnapshotArgs<ExtArgs>
@@ -6309,6 +6319,7 @@ export namespace Prisma {
     totalAmountMinor?: boolean
     notes?: boolean
     cancelledAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     property?: boolean | PropertyDefaultArgs<ExtArgs>
@@ -6333,6 +6344,7 @@ export namespace Prisma {
     totalAmountMinor?: boolean
     notes?: boolean
     cancelledAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     property?: boolean | PropertyDefaultArgs<ExtArgs>
@@ -6357,11 +6369,12 @@ export namespace Prisma {
     totalAmountMinor?: boolean
     notes?: boolean
     cancelledAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BookingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "propertyId" | "unitId" | "idempotencyKey" | "status" | "paymentStatus" | "checkInDate" | "checkOutDate" | "guestFullName" | "guestEmail" | "guestPhone" | "adultsCount" | "childrenCount" | "currency" | "totalAmountMinor" | "notes" | "cancelledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
+  export type BookingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "propertyId" | "unitId" | "idempotencyKey" | "status" | "paymentStatus" | "checkInDate" | "checkOutDate" | "guestFullName" | "guestEmail" | "guestPhone" | "adultsCount" | "childrenCount" | "currency" | "totalAmountMinor" | "notes" | "cancelledAt" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
   export type BookingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     priceSnapshot?: boolean | Booking$priceSnapshotArgs<ExtArgs>
     paymentIntents?: boolean | Booking$paymentIntentsArgs<ExtArgs>
@@ -6408,6 +6421,7 @@ export namespace Prisma {
       totalAmountMinor: number
       notes: string | null
       cancelledAt: Date | null
+      expiresAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["booking"]>
@@ -6856,6 +6870,7 @@ export namespace Prisma {
     readonly totalAmountMinor: FieldRef<"Booking", 'Int'>
     readonly notes: FieldRef<"Booking", 'String'>
     readonly cancelledAt: FieldRef<"Booking", 'DateTime'>
+    readonly expiresAt: FieldRef<"Booking", 'DateTime'>
     readonly createdAt: FieldRef<"Booking", 'DateTime'>
     readonly updatedAt: FieldRef<"Booking", 'DateTime'>
   }
@@ -15911,6 +15926,7 @@ export namespace Prisma {
     totalAmountMinor: 'totalAmountMinor',
     notes: 'notes',
     cancelledAt: 'cancelledAt',
+    expiresAt: 'expiresAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -16650,6 +16666,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFilter<"Booking"> | number
     notes?: StringNullableFilter<"Booking"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Booking"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Booking"> | Date | string | null
     createdAt?: DateTimeFilter<"Booking"> | Date | string
     updatedAt?: DateTimeFilter<"Booking"> | Date | string
     priceSnapshot?: XOR<PriceSnapshotNullableScalarRelationFilter, PriceSnapshotWhereInput> | null
@@ -16678,6 +16695,7 @@ export namespace Prisma {
     totalAmountMinor?: SortOrder
     notes?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     priceSnapshot?: PriceSnapshotOrderByWithRelationInput
@@ -16709,6 +16727,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFilter<"Booking"> | number
     notes?: StringNullableFilter<"Booking"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Booking"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Booking"> | Date | string | null
     createdAt?: DateTimeFilter<"Booking"> | Date | string
     updatedAt?: DateTimeFilter<"Booking"> | Date | string
     priceSnapshot?: XOR<PriceSnapshotNullableScalarRelationFilter, PriceSnapshotWhereInput> | null
@@ -16737,6 +16756,7 @@ export namespace Prisma {
     totalAmountMinor?: SortOrder
     notes?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: BookingCountOrderByAggregateInput
@@ -16767,6 +16787,7 @@ export namespace Prisma {
     totalAmountMinor?: IntWithAggregatesFilter<"Booking"> | number
     notes?: StringNullableWithAggregatesFilter<"Booking"> | string | null
     cancelledAt?: DateTimeNullableWithAggregatesFilter<"Booking"> | Date | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"Booking"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Booking"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Booking"> | Date | string
   }
@@ -17854,6 +17875,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotCreateNestedOneWithoutBookingInput
@@ -17882,6 +17904,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotUncheckedCreateNestedOneWithoutBookingInput
@@ -17906,6 +17929,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUpdateOneWithoutBookingNestedInput
@@ -17934,6 +17958,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUncheckedUpdateOneWithoutBookingNestedInput
@@ -17960,6 +17985,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17980,6 +18006,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18002,6 +18029,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19304,6 +19332,7 @@ export namespace Prisma {
     totalAmountMinor?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19332,6 +19361,7 @@ export namespace Prisma {
     totalAmountMinor?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19354,6 +19384,7 @@ export namespace Prisma {
     totalAmountMinor?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21521,6 +21552,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotCreateNestedOneWithoutBookingInput
@@ -21547,6 +21579,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotUncheckedCreateNestedOneWithoutBookingInput
@@ -21846,6 +21879,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFilter<"Booking"> | number
     notes?: StringNullableFilter<"Booking"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Booking"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Booking"> | Date | string | null
     createdAt?: DateTimeFilter<"Booking"> | Date | string
     updatedAt?: DateTimeFilter<"Booking"> | Date | string
   }
@@ -22171,6 +22205,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotCreateNestedOneWithoutBookingInput
@@ -22197,6 +22232,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotUncheckedCreateNestedOneWithoutBookingInput
@@ -22938,6 +22974,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     paymentIntents?: PaymentIntentCreateNestedManyWithoutBookingInput
@@ -22965,6 +23002,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     paymentIntents?: PaymentIntentUncheckedCreateNestedManyWithoutBookingInput
@@ -23061,6 +23099,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentIntents?: PaymentIntentUpdateManyWithoutBookingNestedInput
@@ -23088,6 +23127,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentIntents?: PaymentIntentUncheckedUpdateManyWithoutBookingNestedInput
@@ -23162,6 +23202,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotCreateNestedOneWithoutBookingInput
@@ -23189,6 +23230,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotUncheckedCreateNestedOneWithoutBookingInput
@@ -23363,6 +23405,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUpdateOneWithoutBookingNestedInput
@@ -23390,6 +23433,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUncheckedUpdateOneWithoutBookingNestedInput
@@ -23709,6 +23753,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotCreateNestedOneWithoutBookingInput
@@ -23736,6 +23781,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotUncheckedCreateNestedOneWithoutBookingInput
@@ -23908,6 +23954,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUpdateOneWithoutBookingNestedInput
@@ -23935,6 +23982,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUncheckedUpdateOneWithoutBookingNestedInput
@@ -24128,6 +24176,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotCreateNestedOneWithoutBookingInput
@@ -24155,6 +24204,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     priceSnapshot?: PriceSnapshotUncheckedCreateNestedOneWithoutBookingInput
@@ -24284,6 +24334,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUpdateOneWithoutBookingNestedInput
@@ -24311,6 +24362,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUncheckedUpdateOneWithoutBookingNestedInput
@@ -24404,6 +24456,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24581,6 +24634,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUpdateOneWithoutBookingNestedInput
@@ -24607,6 +24661,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUncheckedUpdateOneWithoutBookingNestedInput
@@ -24632,6 +24687,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24904,6 +24960,7 @@ export namespace Prisma {
     totalAmountMinor: number
     notes?: string | null
     cancelledAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24924,6 +24981,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUpdateOneWithoutBookingNestedInput
@@ -24950,6 +25008,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     priceSnapshot?: PriceSnapshotUncheckedUpdateOneWithoutBookingNestedInput
@@ -24975,6 +25034,7 @@ export namespace Prisma {
     totalAmountMinor?: IntFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

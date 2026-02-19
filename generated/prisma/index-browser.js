@@ -187,6 +187,7 @@ exports.Prisma.BookingScalarFieldEnum = {
   totalAmountMinor: 'totalAmountMinor',
   notes: 'notes',
   cancelledAt: 'cancelledAt',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -354,7 +355,8 @@ exports.BookingStatus = exports.$Enums.BookingStatus = {
   CONFIRMED: 'CONFIRMED',
   CHECKED_IN: 'CHECKED_IN',
   COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED'
 };
 
 exports.PaymentStatus = exports.$Enums.PaymentStatus = {
@@ -362,7 +364,8 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',
   FAILED: 'FAILED',
-  REFUNDED: 'REFUNDED'
+  REFUNDED: 'REFUNDED',
+  EXPIRED: 'EXPIRED'
 };
 
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {

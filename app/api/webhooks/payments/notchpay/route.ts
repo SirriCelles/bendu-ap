@@ -65,6 +65,10 @@ function mapCanonicalToDbPaymentStatus(
     return "PENDING";
   }
 
+  if (status === "EXPIRED") {
+    return "EXPIRED";
+  }
+
   return "FAILED";
 }
 
@@ -299,6 +303,16 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
             data: {
               ...createBookingStatusUpdate(payment.booking.status, "CONFIRMED"),
               paymentStatus: "PAID",
+            },
+          });
+        } else if (event.status === "EXPIRED" && payment.booking.status === "RESERVED") {
+          await tx.booking.update({
+            where: {
+              id: payment.booking.id,
+            },
+            data: {
+              ...createBookingStatusUpdate(payment.booking.status, "EXPIRED"),
+              paymentStatus: "EXPIRED",
             },
           });
         } else if (targetPaymentStatus && payment.booking.paymentStatus !== targetPaymentStatus) {

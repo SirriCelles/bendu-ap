@@ -19,6 +19,7 @@ type BookingFixture = {
   id: string;
   status: "RESERVED" | "CONFIRMED" | "CANCELLED";
   paymentStatus: "NOT_REQUIRED" | "PENDING" | "PAID" | "FAILED";
+  expiresAt: Date | null;
   propertyId: string;
   guestEmail: string;
   guestPhone: string;
@@ -75,6 +76,7 @@ function buildHarness(options?: {
     id: "bk_123",
     status: "RESERVED",
     paymentStatus: "NOT_REQUIRED",
+    expiresAt: null,
     propertyId: "prop_1",
     guestEmail: "guest@example.com",
     guestPhone: "+237670000000",
@@ -126,6 +128,28 @@ function buildHarness(options?: {
         }
         return booking;
       }),
+      update: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: string };
+          data: { paymentStatus?: BookingFixture["paymentStatus"]; expiresAt?: Date | null };
+        }) => {
+          if (where.id !== booking.id) {
+            throw new Error("booking not found");
+          }
+
+          if (data.paymentStatus) {
+            booking.paymentStatus = data.paymentStatus;
+          }
+          if ("expiresAt" in data) {
+            booking.expiresAt = data.expiresAt ?? null;
+          }
+
+          return booking;
+        }
+      ),
     },
     paymentIntent: {
       findFirst: vi.fn(

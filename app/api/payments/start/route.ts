@@ -29,6 +29,7 @@ import {
   type PaymentStartRequestBody,
   type PaymentStartResponse,
 } from "@/lib/validation/payments-start";
+import { computeBookingExpiresAt } from "@/lib/domain/booking-expiry";
 
 type ActorContext =
   | {
@@ -46,6 +47,7 @@ type BookingRecord = {
   id: string;
   status: BookingStatus;
   paymentStatus: PaymentStatus;
+  expiresAt: Date | null;
   propertyId: string;
   guestEmail: string;
   guestPhone: string;
@@ -134,6 +136,10 @@ function mapCanonicalStatusToPaymentIntentStatus(
     return "PENDING";
   }
 
+  if (status === "EXPIRED") {
+    return "EXPIRED";
+  }
+
   return "FAILED";
 }
 
@@ -154,6 +160,10 @@ function mapPaymentIntentStatusToCanonical(
 
   if (status === "REFUNDED") {
     return "CANCELLED";
+  }
+
+  if (status === "EXPIRED") {
+    return "EXPIRED";
   }
 
   return "FAILED";
@@ -345,6 +355,7 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
           id: true,
           status: true,
           paymentStatus: true,
+          expiresAt: true,
           propertyId: true,
           guestEmail: true,
           guestPhone: true,
@@ -454,6 +465,18 @@ export function createPaymentsStartPostHandler(deps: PaymentStartDeps) {
             },
           },
         });
+
+        if (persistedStatus === "PENDING" && booking.paymentStatus !== "PENDING") {
+          await deps.db.booking.update({
+            where: {
+              id: booking.id,
+            },
+            data: {
+              paymentStatus: "PENDING",
+              expiresAt: booking.expiresAt ?? computeBookingExpiresAt(new Date()),
+            },
+          });
+        }
       } catch (error) {
         const maybeReplay = await deps.db.paymentIntent.findFirst({
           where: {

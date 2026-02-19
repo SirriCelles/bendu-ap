@@ -600,7 +600,8 @@ Verification: 2026-02-16 (`pnpm test:unit tests/unit/validation/booking.test.ts 
 
 <!-- issue: bookeasy:T-025 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/domain/booking-expiry-cleanup.test.ts tests/unit/api/admin-bookings-expire-route.test.ts tests/unit/api/payments-start-route.test.ts tests/unit/domain/pricing-and-reserve-flow.test.ts tests/unit/integration/booking-concurrency.test.ts tests/unit/domain/booking-status.test.ts tests/unit/domain/availability.test.ts tests/unit/api/notchpay-webhook-route.test.ts tests/unit/api/payments-verify-route.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments
 - **Context:** Payment abstraction must support live gateway integrations without booking-service refactors.
@@ -1032,9 +1033,9 @@ Status: TODO
 - **Scope Included:** `expiresAt` semantics, background cleanup job/cron, safe status transitions to `EXPIRED`.
 - **Scope Excluded:** Customer reminder notification workflow.
 - **Acceptance Criteria:**
-- [ ] New RESERVED bookings include expiration timestamp where payment is pending
-- [ ] Cleanup job transitions expired pending bookings and related payments safely
-- [ ] Expired bookings no longer block inventory
+- [x] New RESERVED bookings include expiration timestamp where payment is pending
+- [x] Cleanup job transitions expired pending bookings and related payments safely
+- [x] Expired bookings no longer block inventory
 - **Implementation Notes:** Use Vercel/GitHub cron + admin fallback endpoint as noted in architecture docs.
 - **Dependencies:** 051, 026, 056
 - **Estimate:** M

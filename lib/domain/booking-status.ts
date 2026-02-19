@@ -112,6 +112,7 @@ export const BOOKING_STATUSES = [
   "CHECKED_IN",
   "COMPLETED",
   "CANCELLED",
+  "EXPIRED",
 ] as const satisfies readonly BookingStatus[];
 
 export const PAYMENT_STATUSES = [
@@ -120,6 +121,7 @@ export const PAYMENT_STATUSES = [
   "PAID",
   "FAILED",
   "REFUNDED",
+  "EXPIRED",
 ] as const satisfies readonly PaymentStatus[];
 
 // MVP default: bookings can be confirmed with payment not required.
@@ -136,27 +138,30 @@ export const BOOKING_INVENTORY_BLOCKING_STATUSES = [
 export const BOOKING_TERMINAL_NON_BLOCKING_STATUSES = [
   "CANCELLED",
   "COMPLETED",
+  "EXPIRED",
 ] as const satisfies readonly BookingStatus[];
 
 // Explicit lifecycle graph for booking status progression.
 export const BOOKING_STATUS_TRANSITIONS: TransitionMap<BookingStatus> = {
   DRAFT: ["RESERVED", "CANCELLED"],
   // MVP allows confirmation without requiring online payment first.
-  RESERVED: ["CONFIRMED", "CANCELLED"],
+  RESERVED: ["CONFIRMED", "CANCELLED", "EXPIRED"],
   CONFIRMED: ["CHECKED_IN", "CANCELLED"],
   CHECKED_IN: ["COMPLETED"],
   COMPLETED: [],
   CANCELLED: [],
+  EXPIRED: [],
 };
 
 // Explicit lifecycle graph for payment status progression.
 export const PAYMENT_STATUS_TRANSITIONS: TransitionMap<PaymentStatus> = {
   // Valid MVP terminal default when no online payment is required.
   NOT_REQUIRED: [],
-  PENDING: ["PAID", "FAILED"],
+  PENDING: ["PAID", "FAILED", "EXPIRED"],
   PAID: ["REFUNDED"],
-  FAILED: ["PENDING"],
+  FAILED: ["PENDING", "EXPIRED"],
   REFUNDED: [],
+  EXPIRED: [],
 };
 
 // Source-of-truth matrix for payment-first flow described in architecture/API docs.

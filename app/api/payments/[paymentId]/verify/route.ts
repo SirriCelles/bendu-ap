@@ -161,6 +161,10 @@ function mapDbPaymentStatusToCanonical(
     return "CANCELLED";
   }
 
+  if (status === "EXPIRED") {
+    return "EXPIRED";
+  }
+
   return "FAILED";
 }
 
@@ -173,6 +177,10 @@ function mapCanonicalStatusToDbPaymentStatus(
 
   if (status === "PENDING" || status === "INITIATED") {
     return "PENDING";
+  }
+
+  if (status === "EXPIRED") {
+    return "EXPIRED";
   }
 
   return "FAILED";
@@ -212,7 +220,7 @@ function mapProviderFailure(error: PaymentDomainError): HttpError {
 }
 
 function isTerminalPaymentStatus(status: PaymentStatus): boolean {
-  return status === "PAID" || status === "FAILED" || status === "REFUNDED";
+  return status === "PAID" || status === "FAILED" || status === "REFUNDED" || status === "EXPIRED";
 }
 
 function canTransitionPaymentStatus(from: PaymentStatus, to: PaymentStatus): boolean {
