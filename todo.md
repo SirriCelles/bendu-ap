@@ -821,7 +821,8 @@ Status: DONE
 
 <!-- issue: bookeasy:T-031A -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/public/rooms-loading.test.tsx tests/unit/public/room-detail-loading.test.tsx tests/unit/public/room-detail-page-ssr.test.tsx` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Booking/Payments
 - **Context:** Pay-later is explicitly deferred until MoMo and Stripe flows are production-ready.
@@ -1579,6 +1580,24 @@ Status: TODO
 - **Implementation Notes:** Add `tests/contract/payment-provider.contract.test.ts`, `tests/unit/currency.test.ts`.
 - **Dependencies:** 049, 051, 052, 059, 066
 - **Estimate:** M
+
+## T-068 — Add room-detail streaming loading UI matching final layout
+
+<!-- issue: bookeasy:T-068 -->
+
+Status: TODO
+
+- **Feature Area:** Public UX/Performance
+- **Context:** Navigating from rooms listing to room detail should show an intentional streaming skeleton instead of abrupt fallback.
+- **Scope Included:** `app/(public)/rooms/[id]/loading.tsx` with room-detail-shaped skeleton states and responsive layout parity.
+- **Scope Excluded:** Data fetching or business logic changes in room detail route.
+- **Acceptance Criteria:**
+- [x] Navigating from `/rooms` to `/rooms/[id]` renders a dedicated loading state while data streams
+- [x] Loading UI mirrors key room-detail sections (hero/media, title/meta, pricing/CTA, amenities/info blocks)
+- [x] Loading layout is responsive and visually stable on mobile and desktop (no major layout shift)
+- **Implementation Notes:** Keep skeleton structure close to `app/(public)/rooms/[id]/page.tsx`; validate with SSR/component tests.
+- **Dependencies:** 019A, 020
+- **Estimate:** S
 
 ## Immediate Next Actions (Start Milestone 0)
 
