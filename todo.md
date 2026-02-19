@@ -968,19 +968,27 @@ Verification: 2026-02-18 (`pnpm exec vitest run tests/unit/api/notchpay-webhook-
 
 <!-- issue: bookeasy:T-055 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/api/payments-verify-route.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Payments/API
 - **Context:** Users may return before webhook delivery; verification fallback is required by API spec.
 - **Scope Included:** `POST /api/payments/{paymentId}/verify` endpoint, provider verify call, canonical transition apply.
 - **Scope Excluded:** Manual admin overrides.
 - **Acceptance Criteria:**
-- [ ] Verify endpoint updates internal payment/booking state when provider reports successful payment
-- [ ] Provider downtime maps to `PAYMENT_PROVIDER_ERROR` with safe retry semantics
-- [ ] Endpoint is idempotent for already-terminal payment states
+- [x] Verify endpoint updates internal payment/booking state when provider reports successful payment
+- [x] Provider downtime maps to `PAYMENT_PROVIDER_ERROR` with safe retry semantics
+- [x] Endpoint is idempotent for already-terminal payment states
 - **Implementation Notes:** Reuse PaymentService reconciliation path to avoid divergent transition logic.
 - **Dependencies:** 052, 054
 - **Estimate:** S
+- **Subtasks:**
+- [x] `T-055.1` Add `POST /api/payments/[paymentId]/verify` route scaffold with actor/session guards and route-param validation.
+- [x] `T-055.2` Resolve provider key/method from stored payment intent metadata and provider registry.
+- [x] `T-055.3` Implement verify-provider call path and canonical status reconciliation to DB payment/booking states.
+- [x] `T-055.4` Add idempotent replay behavior for terminal payment states without extra provider calls.
+- [x] `T-055.5` Add provider failure mapping to stable `PAYMENT_PROVIDER_ERROR` (retry-safe `502`).
+- [x] `T-055.6` Add route-level tests for success, terminal replay, provider downtime, ownership/not-found, and rate limits.
 
 ## T-056 — Enforce DB-backed idempotency for booking create and payment start flows
 
