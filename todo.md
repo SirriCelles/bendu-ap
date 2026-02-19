@@ -680,7 +680,7 @@ Status: SUPERSEDED
 
 <!-- issue: bookeasy:T-025D -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Payments/Observability
 - **Context:** Payment failures need traceability and safe retries.
@@ -728,7 +728,8 @@ Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/domain/pricing-and-re
 
 <!-- issue: bookeasy:T-027 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/domain/booking-expiry-cleanup.test.ts tests/unit/api/admin-bookings-expire-route.test.ts tests/unit/api/payments-start-route.test.ts tests/unit/domain/pricing-and-reserve-flow.test.ts tests/unit/integration/booking-concurrency.test.ts tests/unit/domain/booking-status.test.ts tests/unit/domain/availability.test.ts tests/unit/api/notchpay-webhook-route.test.ts tests/unit/api/payments-verify-route.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Booking
 - **Context:** Public booking endpoint needs both correctness and abuse controls.
@@ -746,7 +747,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-028 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Booking
 - **Context:** Checkout must complete online payment before booking confirmation.
@@ -765,7 +766,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-029 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Booking
 - **Context:** Guests need to view and manage their own reservations.
@@ -1008,7 +1009,7 @@ Verification: 2026-02-19 (`pnpm exec vitest run tests/unit/api/payments-verify-r
 
 <!-- issue: bookeasy:T-056 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Reliability
 - **Context:** API spec requires idempotent writes for booking creation and payment initiation.
@@ -1026,7 +1027,7 @@ Status: TODO
 
 <!-- issue: bookeasy:T-057 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Booking/Reliability
 - **Context:** RESERVED bookings should expire when payment is not completed within configured TTL.
