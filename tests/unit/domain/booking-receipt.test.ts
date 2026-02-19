@@ -118,4 +118,18 @@ describe("createBookingReceiptService", () => {
       code: "BOOKING_RECEIPT_INVALID_STATE",
     } satisfies Partial<BookingReceiptError>);
   });
+
+  it("rejects confirmed booking when payment is not successful", async () => {
+    const service = createHarness({
+      bookingStatus: "CONFIRMED",
+      paymentStatus: "FAILED",
+    });
+
+    await expect(service.getReceipt("bk_123")).rejects.toMatchObject({
+      code: "BOOKING_RECEIPT_INVALID_STATE",
+      details: expect.objectContaining({
+        reason: "BOOKING_NOT_CONFIRMED_OR_PAID",
+      }),
+    });
+  });
 });

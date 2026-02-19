@@ -185,7 +185,9 @@ describe("GET /api/bookings/[bookingId]/receipt", () => {
     const notFoundResponse = await notFoundHarness.handler(notFoundHarness.request, {
       params: { bookingId: "missing" },
     });
+    const notFoundBody = await notFoundResponse.json();
     expect(notFoundResponse.status).toBe(404);
+    expect(notFoundBody.error.code).toBe("NOT_FOUND");
 
     const conflictHarness = buildHarness({
       actor: {
@@ -197,6 +199,8 @@ describe("GET /api/bookings/[bookingId]/receipt", () => {
     const conflictResponse = await conflictHarness.handler(conflictHarness.request, {
       params: { bookingId: "bk_123" },
     });
+    const conflictBody = await conflictResponse.json();
     expect(conflictResponse.status).toBe(409);
+    expect(conflictBody.error.code).toBe("CONFLICT");
   });
 });
