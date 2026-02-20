@@ -101,4 +101,37 @@ describe("RoomsPage SSR states", () => {
       screen.getByRole("link", { name: "Clear filters and show all rooms" })
     ).toBeInTheDocument();
   });
+
+  it("disables booking CTA for unavailable rooms", async () => {
+    mocks.queryRoomsListingMock.mockResolvedValue({
+      query: {
+        checkInDate: new Date("2026-11-10T00:00:00.000Z"),
+        checkOutDate: new Date("2026-11-12T00:00:00.000Z"),
+        guestCount: 2,
+      },
+      roomCards: [
+        {
+          unitTypeId: "type-a",
+          slug: "standard-room",
+          name: "Standard Room",
+          description: "Comfortable room",
+          coverImageUrl: null,
+          estimatedRating: 4.7,
+          maxGuests: 2,
+          nightlyRateMinor: 20000,
+          currency: "XAF",
+          availableUnitsCount: 0,
+          availabilityState: "UNAVAILABLE",
+        },
+      ],
+      hasAnyAvailability: false,
+    });
+
+    const page = await RoomsPage({ searchParams: Promise.resolve({}) });
+    render(page);
+
+    expect(screen.getByText("UNAVAILABLE")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Book Now" })).toBeDisabled();
+    expect(screen.queryByRole("link", { name: "Book Now" })).not.toBeInTheDocument();
+  });
 });

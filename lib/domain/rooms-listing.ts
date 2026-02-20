@@ -157,7 +157,15 @@ export function buildRoomsListingOutput(
       ...card,
       availabilityState: computeRoomsListingAvailabilityState(card.availableUnitsCount),
     }))
-    .sort((a, b) => a.nightlyRateMinor - b.nightlyRateMinor || a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      const aUnavailable = a.availabilityState === "UNAVAILABLE" ? 1 : 0;
+      const bUnavailable = b.availabilityState === "UNAVAILABLE" ? 1 : 0;
+      if (aUnavailable !== bUnavailable) {
+        return aUnavailable - bUnavailable;
+      }
+
+      return a.nightlyRateMinor - b.nightlyRateMinor || a.name.localeCompare(b.name);
+    });
 
   return {
     query,

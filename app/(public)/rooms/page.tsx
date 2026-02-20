@@ -182,21 +182,31 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
                   <p className="text-sm font-semibold uppercase text-foreground">
                     {formatMinorUnits(room.nightlyRateMinor, room.currency)}
                   </p>
-                  <Button
-                    size="sm"
-                    asChild
-                    className="h-7 from-primary to-secondary px-3 text-xs font-semibold text-primary-foreground"
-                  >
-                    <Link
-                      href={`/rooms/${room.slug}?${new URLSearchParams({
-                        checkInDate: listing.query.checkInDate.toISOString().slice(0, 10),
-                        checkOutDate: listing.query.checkOutDate.toISOString().slice(0, 10),
-                        guests: String(listing.query.guestCount),
-                      }).toString()}`}
+                  {room.availabilityState === "UNAVAILABLE" ? (
+                    <Button
+                      size="sm"
+                      disabled
+                      className="h-7 from-primary to-secondary px-3 text-xs font-semibold text-primary-foreground"
                     >
                       Book Now
-                    </Link>
-                  </Button>
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      asChild
+                      className="h-7 from-primary to-secondary px-3 text-xs font-semibold text-primary-foreground"
+                    >
+                      <Link
+                        href={`/rooms/${room.slug}?${new URLSearchParams({
+                          checkInDate: listing.query.checkInDate.toISOString().slice(0, 10),
+                          checkOutDate: listing.query.checkOutDate.toISOString().slice(0, 10),
+                          guests: String(listing.query.guestCount),
+                        }).toString()}`}
+                      >
+                        Book Now
+                      </Link>
+                    </Button>
+                  )}
                 </div>
 
                 <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-muted-foreground">

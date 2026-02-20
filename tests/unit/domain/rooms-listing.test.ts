@@ -108,12 +108,12 @@ describe("rooms listing output contract", () => {
 
     expect(output.roomCards).toHaveLength(2);
     expect(output.roomCards[0]).toMatchObject({
-      unitTypeId: "type-a",
-      availabilityState: "UNAVAILABLE",
-    });
-    expect(output.roomCards[1]).toMatchObject({
       unitTypeId: "type-b",
       availabilityState: "AVAILABLE",
+    });
+    expect(output.roomCards[1]).toMatchObject({
+      unitTypeId: "type-a",
+      availabilityState: "UNAVAILABLE",
     });
     expect(output.hasAnyAvailability).toBe(true);
   });
