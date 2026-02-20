@@ -382,7 +382,10 @@ export default async function BookingSuccessPage({
 
         <div className="mt-3 flex flex-col justify-center gap-2 sm:flex-row">
           <Button asChild>
-            <Link href="#">See My Bookings</Link>
+            <Link href="/bookings">See My Bookings</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/auth/login?returnTo=/bookings">Sign In To Manage Bookings</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href="/">Go Home</Link>

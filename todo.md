@@ -1665,13 +1665,13 @@ Status: TODO
       Acceptance Criteria: Existing user is reused by canonical email; first-time OAuth creates exactly one user record.
 - [x] `T-070.4` Normalize session payload for booking flows.
       Acceptance Criteria: Session includes stable identity fields (`user.id`, `user.email`, `role`) used by booking ownership checks.
-- [ ] `T-070.5` Add public auth entry points (sign in/sign up CTAs) from booking and success contexts.
+- [x] `T-070.5` Add public auth entry points (sign in/sign up CTAs) from booking and success contexts.
       Acceptance Criteria: User can start OAuth from rooms/detail/success paths without breaking guest flow.
-- [ ] `T-070.6` Implement post-login redirect continuity.
+- [x] `T-070.6` Implement post-login redirect continuity.
       Acceptance Criteria: `returnTo`/callback flow returns user to original target page after OAuth completion.
-- [ ] `T-070.7` Add auth error handling UX.
+- [x] `T-070.7` Add auth error handling UX.
       Acceptance Criteria: Denied/failed OAuth attempts render user-safe error messages with retry path.
-- [ ] `T-070.8` Add route guard updates for authenticated user pages.
+- [x] `T-070.8` Add route guard updates for authenticated user pages.
       Acceptance Criteria: Protected user routes require session and redirect unauthenticated users to login with preserved target.
 - [ ] `T-070.9` Add unit tests for callback/session normalization and deterministic user creation.
       Acceptance Criteria: Tests cover first login, repeat login, and malformed profile payload handling.

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarCheck2, Sparkles, Star } from "lucide-react";
+import { Sparkles, Star } from "lucide-react";
 
 import { PayNowSubmitButton } from "@/components/public/rooms/pay-now-submit-button";
 import { Button } from "@/components/ui/button";
@@ -73,24 +73,6 @@ function formatMinorUnits(amountMinor: number, currency: string): string {
 
 function formatDateForForm(date: Date): string {
   return date.toISOString().slice(0, 10);
-}
-
-function buildReserveComingSoonHref(
-  roomSlug: string,
-  bookingContext: { checkInDate: Date; checkOutDate: Date; guestCount: number } | undefined
-): string {
-  const params = new URLSearchParams({
-    action: "reserve",
-    room: roomSlug,
-  });
-
-  if (bookingContext) {
-    params.set("checkInDate", formatDateForForm(bookingContext.checkInDate));
-    params.set("checkOutDate", formatDateForForm(bookingContext.checkOutDate));
-    params.set("guests", String(bookingContext.guestCount));
-  }
-
-  return `/coming-soon?${params.toString()}`;
 }
 
 export default async function RoomDetailPage({ params, searchParams }: RoomDetailPageProps) {
@@ -386,14 +368,9 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
 
                     <div className="grid grid-cols-1 gap-2">
                       <PayNowSubmitButton disabled={!payNowEnabled} />
-                      {/* <Button asChild className="w-full">
-                        <Link
-                          href={buildReserveComingSoonHref(room.slug, parsed.input.bookingContext)}
-                        >
-                          <CalendarCheck2 className="h-4 w-4" aria-hidden />
-                          Reserve Now
-                        </Link>
-                      </Button> */}
+                      <Button variant="outline" asChild className="w-full">
+                        <Link href="/auth/login?returnTo=/bookings">View Bookings</Link>
+                      </Button>
                     </div>
                   </form>
                 </CardContent>

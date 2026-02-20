@@ -9,6 +9,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   });
 
+  if (request.nextUrl.pathname.startsWith("/bookings") || request.nextUrl.pathname === "/account") {
+    if (!token?.sub) {
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("returnTo", request.nextUrl.pathname + request.nextUrl.search);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   const decision = decideAdminMiddlewareAccess({
     token,
     requestUrl: request.url,
@@ -23,5 +31,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/bookings/:path*", "/account"],
 };

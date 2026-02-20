@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 
-export default function AppLayout({ children }: { children: ReactNode }) {
+import { auth } from "@/auth";
+
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/auth/login?returnTo=/bookings");
+  }
+
   return <>{children}</>;
 }

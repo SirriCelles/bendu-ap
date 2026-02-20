@@ -28,6 +28,20 @@ export function PublicHeader() {
           <Button asChild className="hidden font-bold md:inline-flex">
             <Link href={primaryCta.href}>{primaryCta.label}</Link>
           </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="hidden border-white/70 bg-transparent text-white hover:bg-background/20 hover:text-white md:inline-flex"
+          >
+            <Link href="/auth/login?returnTo=/bookings">Login</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="hidden border-white/70 bg-transparent text-white hover:bg-background/20 hover:text-white md:inline-flex"
+          >
+            <Link href="/auth/register?returnTo=/bookings">Sign Up</Link>
+          </Button>
           <MobileNav />
         </div>
       </div>

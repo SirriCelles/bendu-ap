@@ -31,7 +31,7 @@ describe("RoomDetailPage SSR states", () => {
     vi.clearAllMocks();
   });
 
-  it("renders pay-now form wiring and reserve CTA with context params", async () => {
+  it("renders pay-now form wiring and booking auth CTA with context params", async () => {
     mocks.queryRoomDetailMock.mockResolvedValue({
       unitTypeId: "type-a",
       slug: "standard-room",
@@ -78,10 +78,8 @@ describe("RoomDetailPage SSR states", () => {
     expect(payNowForm?.getAttribute("action")).toBe("/api/public/pay-now");
     expect(payNowForm?.getAttribute("method")).toBe("post");
 
-    const reserveLink = screen.getByRole("link", { name: "Reserve Now" });
-    expect(reserveLink.getAttribute("href")).toBe(
-      "/coming-soon?action=reserve&room=standard-room&checkInDate=2026-11-10&checkOutDate=2026-11-12&guests=2"
-    );
+    const viewBookingsLink = screen.getByRole("link", { name: "View Bookings" });
+    expect(viewBookingsLink.getAttribute("href")).toBe("/auth/login?returnTo=/bookings");
   });
 
   it("renders notFound for missing room", async () => {
@@ -95,7 +93,7 @@ describe("RoomDetailPage SSR states", () => {
     ).rejects.toThrow("NEXT_NOT_FOUND");
   });
 
-  it("disables pay-now without booking context and keeps reserve CTA deterministic", async () => {
+  it("disables pay-now without booking context and keeps booking auth CTA deterministic", async () => {
     mocks.queryRoomDetailMock.mockResolvedValue({
       unitTypeId: "type-a",
       slug: "standard-room",
@@ -133,8 +131,8 @@ describe("RoomDetailPage SSR states", () => {
       screen.getByText("Select valid dates with available inventory before starting payment.")
     ).toBeInTheDocument();
 
-    const reserveLink = screen.getByRole("link", { name: "Reserve Now" });
-    expect(reserveLink.getAttribute("href")).toBe("/coming-soon?action=reserve&room=standard-room");
+    const viewBookingsLink = screen.getByRole("link", { name: "View Bookings" });
+    expect(viewBookingsLink.getAttribute("href")).toBe("/auth/login?returnTo=/bookings");
   });
 
   it("renders controlled fallback on data access failure", async () => {
