@@ -1,6 +1,7 @@
 import "../lib/env/load-env";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/index.js";
+import { normalizePostgresConnectionString } from "../lib/db/connection-string";
 
 import { seedMvpInventory } from "./seed-orchestrator";
 import type { SeedDbClient } from "./seed-orchestrator";
@@ -12,7 +13,9 @@ async function main(): Promise<void> {
     throw new Error("Missing DIRECT_URL or DATABASE_URL for seed execution.");
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const adapter = new PrismaPg({
+    connectionString: normalizePostgresConnectionString(connectionString),
+  });
   const prisma = new PrismaClient({
     adapter,
     transactionOptions: {

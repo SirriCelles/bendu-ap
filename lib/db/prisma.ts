@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma";
+import { normalizePostgresConnectionString } from "@/lib/db/connection-string";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -13,7 +14,9 @@ export const prisma =
       throw new Error("Missing DIRECT_URL or DATABASE_URL for Prisma client initialization.");
     }
 
-    const adapter = new PrismaPg({ connectionString });
+    const adapter = new PrismaPg({
+      connectionString: normalizePostgresConnectionString(connectionString),
+    });
     return new PrismaClient({
       adapter,
       log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],

@@ -179,12 +179,12 @@ export function renderBookingConfirmationEmailHtml(input: {
               <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:18px;font-size:16px;color:#374151;">Hey, ${input.guestName}</td>
             </tr>
             <tr>
-              <td colspan="2" style="padding-top:10px;font-size:36px;line-height:1.02;font-weight:500;color:#0f172a;">Your reservation is confirmed!</td>
+              <td colspan="2" style="padding-top:10px;font-size:24px;line-height:1.02;font-weight:800;color:#0f172a;">Your reservation is confirmed!</td>
             </tr>
             <tr>
-              <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:16px;padding-bottom:12px;font-size:24px;">
-                <span style="font-weight:500;color:#111827;">Confirmation Number:</span>
-                <span style="font-weight:400;color:#f59e0b;"> ${input.bookingId}</span>
+              <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:16px;padding-bottom:12px;font-size:20px;">
+                <span style="font-weight:400;color:#111827;">Confirmation Number:</span>
+                <span style="font-weight:400;color:#1A3D63;"> ${input.bookingId}</span>
               </td>
             </tr>
             <tr>
@@ -195,11 +195,11 @@ export function renderBookingConfirmationEmailHtml(input: {
             <tr>
               <td width="50%" style="padding-bottom:18px;vertical-align:top;">
                 <div style="font-size:14px;color:#6b7280;">Check-In</div>
-                <div style="font-size:20px;font-weight:700;color:#111827;padding-top:4px;">${input.checkInDate}</div>
+                <div style="font-size:20px;font-weight:600;color:#111827;padding-top:4px;">${input.checkInDate}</div>
               </td>
               <td width="50%" style="padding-bottom:18px;vertical-align:top;">
                 <div style="font-size:14px;color:#6b7280;">Check-Out</div>
-                <div style="font-size:20px;font-weight:700;color:#111827;padding-top:4px;">${input.checkOutDate}</div>
+                <div style="font-size:20px;font-weight:600;color:#111827;padding-top:4px;">${input.checkOutDate}</div>
               </td>
             </tr>
             <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>
@@ -409,7 +409,7 @@ export async function sendBookingConfirmationEmailByPaymentIntentId(
 
   const payload: BookingConfirmationEmailPayload = {
     to: paymentIntent.booking.guestEmail.toLowerCase(),
-    subject: `Booking Confirmed • ${paymentIntent.booking.id}`,
+    subject: `Booking Confirmed`,
     html: renderBookingConfirmationEmailHtml({
       guestName: paymentIntent.booking.guestFullName,
       bookingId: paymentIntent.booking.id,
