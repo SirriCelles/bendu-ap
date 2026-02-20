@@ -6,6 +6,9 @@ import { CalendarCheck2, Sparkles, Star } from "lucide-react";
 
 import { PayNowSubmitButton } from "@/components/public/rooms/pay-now-submit-button";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/db/prisma";
 import { queryRoomDetail } from "@/lib/db/room-detail-repo";
 import { parseRoomDetailQuery, type RawRoomDetailSearchParams } from "@/lib/domain/room-detail";
@@ -239,181 +242,196 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
               </div>
             </div>
 
-            <aside>
-              <div className="rounded-2xl bg-[#cfcfcf] p-4 sm:p-6">
-                <div className="pb-4 text-center">
-                  <p className="text-2xl font-bold text-[#6f6f6f] sm:text-3xl">Sub Total</p>
-                  <p className="mt-2 text-2xl font-black text-black sm:mt-2.5">
+            <aside className="space-y-4 sm:space-y-5">
+              <Card className="rounded-2xl bg-[#cfcfcf]">
+                <CardHeader className="pb-3 text-center">
+                  <CardTitle className="text-base font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                    Sub Total
+                  </CardTitle>
+                  <p className="mt-1 text-xl font-black text-foreground">
                     {formatMinorUnits(room.price.nightlyRateMinor, room.price.currency)}
                   </p>
-                </div>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                        Check In
+                      </Label>
+                      <Input
+                        readOnly
+                        value={
+                          parsed.input.bookingContext
+                            ? formatDateForForm(parsed.input.bookingContext.checkInDate)
+                            : ""
+                        }
+                        className="h-11 bg-muted"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                        Check Out
+                      </Label>
+                      <Input
+                        readOnly
+                        value={
+                          parsed.input.bookingContext
+                            ? formatDateForForm(parsed.input.bookingContext.checkOutDate)
+                            : ""
+                        }
+                        className="h-11 bg-muted"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                        Guests
+                      </Label>
+                      <Input
+                        readOnly
+                        value={String(
+                          parsed.input.bookingContext?.guestCount ?? room.occupancy.maxGuests
+                        )}
+                        className="h-11 bg-muted"
+                      />
+                    </div>
+                  </div>
 
-                <div className="mt-2 space-y-4 sm:space-y-5">
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:mb-2.5 sm:text-sm">
-                      CHECK IN
-                    </span>
+                  <form action="/api/public/pay-now" method="post" className="space-y-3">
+                    <input type="hidden" name="roomSlug" value={room.slug} />
+                    <input type="hidden" name="unitTypeId" value={room.unitTypeId} />
+                    <input type="hidden" name="attemptId" value={payNowAttemptId} />
                     <input
-                      readOnly
+                      type="hidden"
+                      name="checkInDate"
                       value={
                         parsed.input.bookingContext
                           ? formatDateForForm(parsed.input.bookingContext.checkInDate)
                           : ""
                       }
-                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
                     />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:mb-2.5 sm:text-sm">
-                      CHECK OUT
-                    </span>
                     <input
-                      readOnly
+                      type="hidden"
+                      name="checkOutDate"
                       value={
                         parsed.input.bookingContext
                           ? formatDateForForm(parsed.input.bookingContext.checkOutDate)
                           : ""
                       }
-                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
                     />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:mb-2.5 sm:text-sm">
-                      GUESTS
-                    </span>
                     <input
-                      readOnly
+                      type="hidden"
+                      name="guests"
                       value={String(
                         parsed.input.bookingContext?.guestCount ?? room.occupancy.maxGuests
                       )}
-                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
                     />
-                  </label>
-                </div>
-
-                <form action="/api/public/pay-now" method="post" className="mt-6 space-y-3">
-                  <input type="hidden" name="roomSlug" value={room.slug} />
-                  <input type="hidden" name="unitTypeId" value={room.unitTypeId} />
-                  <input type="hidden" name="attemptId" value={payNowAttemptId} />
-                  <input
-                    type="hidden"
-                    name="checkInDate"
-                    value={
-                      parsed.input.bookingContext
-                        ? formatDateForForm(parsed.input.bookingContext.checkInDate)
-                        : ""
-                    }
-                  />
-                  <input
-                    type="hidden"
-                    name="checkOutDate"
-                    value={
-                      parsed.input.bookingContext
-                        ? formatDateForForm(parsed.input.bookingContext.checkOutDate)
-                        : ""
-                    }
-                  />
-                  <input
-                    type="hidden"
-                    name="guests"
-                    value={String(
-                      parsed.input.bookingContext?.guestCount ?? room.occupancy.maxGuests
-                    )}
-                  />
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:text-sm">
-                      FULL NAME
-                    </span>
-                    <input
-                      type="text"
-                      name="guestFullName"
-                      required
-                      minLength={2}
-                      maxLength={120}
-                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
-                      placeholder="Your full name"
-                    />
-                  </label>
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:text-sm">
-                      EMAIL
-                    </span>
-                    <input
-                      type="email"
-                      name="guestEmail"
-                      required
-                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
-                      placeholder="you@example.com"
-                    />
-                  </label>
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:text-sm">
-                      PHONE (MOMO)
-                    </span>
-                    <input
-                      type="tel"
-                      name="guestPhone"
-                      required
-                      minLength={7}
-                      maxLength={32}
-                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
-                      placeholder="+2376..."
-                    />
-                  </label>
-
-                  {!payNowEnabled ? (
-                    <p className="text-xs text-destructive">
-                      Select valid dates with available inventory before starting payment.
-                    </p>
-                  ) : null}
-
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <PayNowSubmitButton disabled={!payNowEnabled} />
-                    <Button asChild className="w-full">
-                      <Link
-                        href={buildReserveComingSoonHref(room.slug, parsed.input.bookingContext)}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="guestFullName"
+                        className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
                       >
-                        <CalendarCheck2 className="h-4 w-4" aria-hidden />
-                        Reserve Now
-                      </Link>
-                    </Button>
-                  </div>
-                </form>
-              </div>
+                        Full Name
+                      </Label>
+                      <Input
+                        id="guestFullName"
+                        type="text"
+                        name="guestFullName"
+                        required
+                        minLength={2}
+                        maxLength={120}
+                        placeholder="Your full name"
+                        className="h-11"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="guestEmail"
+                        className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
+                      >
+                        Email
+                      </Label>
+                      <Input
+                        id="guestEmail"
+                        type="email"
+                        name="guestEmail"
+                        required
+                        placeholder="you@example.com"
+                        className="h-11"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="guestPhone"
+                        className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
+                      >
+                        Phone (Momo)
+                      </Label>
+                      <Input
+                        id="guestPhone"
+                        type="tel"
+                        name="guestPhone"
+                        required
+                        minLength={7}
+                        maxLength={32}
+                        placeholder="+2376..."
+                        className="h-11"
+                      />
+                    </div>
 
-              <div className="mt-5 rounded-2xl bg-[#bcd0dd] p-5 text-center text-black sm:mt-6 sm:p-8">
-                <h3 className="text-lg font-semibold sm:text-xl">Have any questions?</h3>
-                <p className="mt-1 text-lg font-semibold sm:text-xl">Contact Us</p>
-                <p className="mt-2 inline-flex items-center justify-center gap-2 text-sm tracking-[0.12em] sm:mt-2.5 sm:text-lg sm:tracking-[0.2em]">
-                  <Image
-                    src="/icons/call-svgrepo-com.svg"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="h-5 w-5"
-                    aria-hidden
-                  />
-                  +237 675380531
-                </p>
-                <div className="mt-3">
-                  <Link
-                    href="#"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E8F8EF] px-3 py-1.5 text-sm font-semibold text-[#25D366] underline-offset-2 hover:bg-[#DCF4E6] hover:text-[#1DA851] hover:underline"
-                  >
+                    {!payNowEnabled ? (
+                      <p className="text-xs text-destructive">
+                        Select valid dates with available inventory before starting payment.
+                      </p>
+                    ) : null}
+
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <PayNowSubmitButton disabled={!payNowEnabled} />
+                      <Button asChild className="w-full">
+                        <Link
+                          href={buildReserveComingSoonHref(room.slug, parsed.input.bookingContext)}
+                        >
+                          <CalendarCheck2 className="h-4 w-4" aria-hidden />
+                          Reserve Now
+                        </Link>
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-2xl bg-secondary/40">
+                <CardContent className="p-5 text-center text-foreground sm:p-6">
+                  <h3 className="text-lg font-semibold">Have any questions?</h3>
+                  <p className="mt-1 text-lg font-semibold">Contact Us</p>
+                  <p className="mt-2 inline-flex items-center justify-center gap-2 text-sm tracking-[0.12em] sm:text-base">
                     <Image
-                      src="/icons/whatsapp-svgrepo-com.svg"
+                      src="/icons/call-svgrepo-com.svg"
                       alt=""
-                      width={16}
-                      height={16}
-                      className="h-4 w-4"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
                       aria-hidden
                     />
-                    WhatsApp
-                  </Link>
-                </div>
-              </div>
+                    +237 675380531
+                  </p>
+                  <div className="mt-3">
+                    <Link
+                      href="#"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E8F8EF] px-3 py-1.5 text-sm font-semibold text-[#25D366] underline-offset-2 hover:bg-[#DCF4E6] hover:text-[#1DA851] hover:underline"
+                    >
+                      <Image
+                        src="/icons/whatsapp-svgrepo-com.svg"
+                        alt=""
+                        width={16}
+                        height={16}
+                        className="h-4 w-4"
+                        aria-hidden
+                      />
+                      WhatsApp
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
             </aside>
           </div>
         </div>
