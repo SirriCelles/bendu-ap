@@ -143,24 +143,83 @@ export function renderBookingConfirmationEmailHtml(input: {
   paymentReference: string;
   manageUrl: string;
 }): string {
+  let imageUrl = `${input.manageUrl.replace(/\/+$/, "")}/images/landing/room-image.jpg`;
+  try {
+    const parsed = new URL(input.manageUrl);
+    imageUrl = `${parsed.origin}/images/landing/room-image.jpg`;
+  } catch {
+    // Keep fallback when URL parsing fails.
+  }
+
   return `<!doctype html>
 <html lang="en">
-  <body style="margin:0;padding:24px;background:#f6f7fb;font-family:Arial,sans-serif;color:#111827;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+  <body style="margin:0;padding:24px;background:#f3f4f6;font-family:Inter,Arial,sans-serif;color:#111827;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;margin:0 auto;">
       <tr>
-        <td align="center">
-          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;">
-            <tr><td style="font-size:22px;font-weight:700;padding-bottom:12px;">Booking Confirmed</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:8px;">Hi ${input.guestName}, your reservation is confirmed.</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Booking ID:</strong> ${input.bookingId}</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Room:</strong> ${input.roomName}</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Check-in:</strong> ${input.checkInDate}</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Check-out:</strong> ${input.checkOutDate}</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Total:</strong> ${input.totalAmountLabel}</td></tr>
-            <tr><td style="font-size:14px;padding-bottom:16px;"><strong>Payment Reference:</strong> ${input.paymentReference}</td></tr>
+        <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
             <tr>
-              <td>
-                <a href="${input.manageUrl}" style="display:inline-block;padding:10px 16px;background:#0f766e;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">View Booking</a>
+              <td style="padding-bottom:14px;font-size:20px;font-weight:800;letter-spacing:0.4px;">BookEasy</td>
+              <td align="right" style="padding-bottom:14px;font-size:13px;color:#6b7280;">Buea, Cameroon</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:18px;font-size:16px;color:#374151;">Hey, ${input.guestName}</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding-top:10px;font-size:46px;line-height:1.02;font-weight:900;color:#0f172a;">Your reservation is confirmed!</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:16px;padding-bottom:12px;font-size:34px;">
+                <span style="font-weight:500;color:#111827;">Confirmation Number:</span>
+                <span style="font-weight:800;color:#f59e0b;"> ${input.bookingId}</span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding-bottom:16px;">
+                <img src="${imageUrl}" alt="${input.roomName} room" style="display:block;width:100%;height:auto;border-radius:10px;border:1px solid #e5e7eb;" />
+              </td>
+            </tr>
+            <tr>
+              <td width="50%" style="padding-bottom:18px;vertical-align:top;">
+                <div style="font-size:14px;color:#6b7280;">Check-In</div>
+                <div style="font-size:20px;font-weight:700;color:#111827;padding-top:4px;">${input.checkInDate}</div>
+              </td>
+              <td width="50%" style="padding-bottom:18px;vertical-align:top;">
+                <div style="font-size:14px;color:#6b7280;">Check-Out</div>
+                <div style="font-size:20px;font-weight:700;color:#111827;padding-top:4px;">${input.checkOutDate}</div>
+              </td>
+            </tr>
+            <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>
+            <tr>
+              <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#374151;">Name</td>
+              <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#111827;font-weight:600;">${input.guestName}</td>
+            </tr>
+            <tr>
+              <td style="padding-top:6px;padding-bottom:6px;font-size:15px;color:#374151;">Room Type</td>
+              <td style="padding-top:6px;padding-bottom:6px;font-size:15px;color:#111827;font-weight:600;">${input.roomName}</td>
+            </tr>
+            <tr>
+              <td style="padding-top:6px;padding-bottom:6px;font-size:15px;color:#374151;">Amount</td>
+              <td style="padding-top:6px;padding-bottom:6px;font-size:15px;color:#111827;font-weight:700;">${input.totalAmountLabel}</td>
+            </tr>
+            <tr>
+              <td style="padding-top:6px;padding-bottom:16px;font-size:15px;color:#374151;">Payment Ref</td>
+              <td style="padding-top:6px;padding-bottom:16px;font-size:15px;color:#111827;">${input.paymentReference}</td>
+            </tr>
+            <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>
+            <tr>
+              <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#374151;vertical-align:top;">Need help?</td>
+              <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#4b5563;line-height:1.55;">For special requests or support, reply to this email or contact our front desk in Buea.</td>
+            </tr>
+            <tr>
+              <td style="padding-top:6px;padding-bottom:18px;font-size:15px;color:#374151;vertical-align:top;">Property Address</td>
+              <td style="padding-top:6px;padding-bottom:18px;font-size:15px;color:#4b5563;line-height:1.55;">BookEasy Guest House, Molyko, Buea, Southwest Region, Cameroon.</td>
+            </tr>
+            <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>
+            <tr>
+              <td style="padding-top:16px;font-size:12px;color:#6b7280;">BookEasy © ${new Date().getFullYear()}</td>
+              <td align="right" style="padding-top:12px;">
+                <a href="${input.manageUrl}" style="display:inline-block;padding:10px 14px;background:#0f766e;color:#ffffff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:700;">View Booking</a>
               </td>
             </tr>
           </table>

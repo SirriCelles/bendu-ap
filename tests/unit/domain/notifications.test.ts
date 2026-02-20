@@ -56,7 +56,9 @@ describe("notification email template rendering", () => {
       manageUrl: "http://localhost:3000/booking/bk_1/success",
     });
 
-    expect(html).toContain("Booking Confirmed");
+    expect(html).toContain("Your reservation is confirmed!");
+    expect(html).toContain("BookEasy");
+    expect(html).toContain("Buea, Cameroon");
     expect(html).toContain("bk_1");
     expect(html).toContain("np_ref_1");
   });
