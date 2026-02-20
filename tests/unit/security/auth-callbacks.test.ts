@@ -5,12 +5,19 @@ import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callback
 describe("auth role callbacks", () => {
   it("stores admin role and subject on sign-in", () => {
     const token = { sub: "existing" };
-    const user = { id: "admin:root@example.com", role: "ADMIN" as const };
+    const user = {
+      id: "admin:root@example.com",
+      role: "ADMIN" as const,
+      email: "ROOT@EXAMPLE.COM",
+      name: "Root",
+    };
 
     const nextToken = applyRoleToJwt({ token, user });
 
     expect(nextToken.sub).toBe("admin:root@example.com");
     expect(nextToken.role).toBe("ADMIN");
+    expect(nextToken.email).toBe("root@example.com");
+    expect(nextToken.name).toBe("Root");
   });
 
   it("falls back to guest role when token role is missing", () => {
@@ -70,5 +77,31 @@ describe("auth role callbacks", () => {
 
     expect(nextSession.user.id).toBe("guest:guest@example.com");
     expect(nextSession.user.role).toBe("GUEST");
+  });
+
+  it("propagates normalized email and name to session from token", () => {
+    const session = {
+      user: {
+        id: "",
+        role: "GUEST" as const,
+        name: null,
+        email: null,
+        image: null,
+      },
+      expires: "2099-01-01T00:00:00.000Z",
+    };
+    const token = {
+      sub: "user:jane@example.com",
+      role: "GUEST" as const,
+      email: "jane@example.com",
+      name: "Jane Doe",
+    };
+
+    const nextSession = applyRoleToSession({ session, token });
+
+    expect(nextSession.user.id).toBe("user:jane@example.com");
+    expect(nextSession.user.role).toBe("GUEST");
+    expect(nextSession.user.email).toBe("jane@example.com");
+    expect(nextSession.user.name).toBe("Jane Doe");
   });
 });

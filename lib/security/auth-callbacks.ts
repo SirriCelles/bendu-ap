@@ -17,10 +17,15 @@ export function applyRoleToJwt({ token, user }: JwtRoleCallbackInput): JWT {
   if (user) {
     token.sub = user.id;
     token.role = resolveUserRole(user.role);
+    token.email = user.email?.trim().toLowerCase() ?? token.email;
+    token.name = user.name ?? token.name;
     return token;
   }
 
   token.role = resolveUserRole(token.role);
+  if (typeof token.email === "string") {
+    token.email = token.email.trim().toLowerCase();
+  }
   return token;
 }
 
@@ -28,6 +33,12 @@ export function applyRoleToSession({ session, token }: SessionRoleCallbackInput)
   if (session.user) {
     session.user.id = token.sub ?? "";
     session.user.role = resolveUserRole(token.role);
+    if (typeof token.email === "string") {
+      session.user.email = token.email;
+    }
+    if (typeof token.name === "string") {
+      session.user.name = token.name;
+    }
   }
 
   return session;

@@ -194,12 +194,12 @@ export function renderBookingConfirmationEmailHtml(input: {
             </tr>
             <tr>
               <td width="50%" style="padding-bottom:18px;vertical-align:top;">
-                <div style="font-size:14px;color:#6b7280;">Check-In</div>
-                <div style="font-size:20px;font-weight:600;color:#111827;padding-top:4px;">${input.checkInDate}</div>
+                <div style="font-size:15px;color:#6b7280;">Check-In</div>
+                <div style="font-size:15px;font-weight:600;color:#111827;padding-top:4px;">${input.checkInDate}</div>
               </td>
               <td width="50%" style="padding-bottom:18px;vertical-align:top;">
-                <div style="font-size:14px;color:#6b7280;">Check-Out</div>
-                <div style="font-size:20px;font-weight:600;color:#111827;padding-top:4px;">${input.checkOutDate}</div>
+                <div style="font-size:15px;color:#6b7280;">Check-Out</div>
+                <div style="font-size:15px;font-weight:600;color:#111827;padding-top:4px;">${input.checkOutDate}</div>
               </td>
             </tr>
             <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>

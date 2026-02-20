@@ -1656,6 +1656,27 @@ Status: TODO
 - **Implementation Notes:** Extend existing Auth.js setup from `T-004`; add user-facing auth screens/entry points and callback guards.
 - **Dependencies:** 004
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-070.1` Define OAuth provider config contract (Google MVP) and required env validation.
+      Acceptance Criteria: Missing OAuth env vars fail fast with stable startup/config errors; secrets are never logged.
+- [x] `T-070.2` Wire Auth.js provider setup and callback mapping in auth config.
+      Acceptance Criteria: Google provider is registered and callback path resolves without runtime errors in dev/prod.
+- [x] `T-070.3` Implement deterministic user upsert on OAuth callback.
+      Acceptance Criteria: Existing user is reused by canonical email; first-time OAuth creates exactly one user record.
+- [x] `T-070.4` Normalize session payload for booking flows.
+      Acceptance Criteria: Session includes stable identity fields (`user.id`, `user.email`, `role`) used by booking ownership checks.
+- [ ] `T-070.5` Add public auth entry points (sign in/sign up CTAs) from booking and success contexts.
+      Acceptance Criteria: User can start OAuth from rooms/detail/success paths without breaking guest flow.
+- [ ] `T-070.6` Implement post-login redirect continuity.
+      Acceptance Criteria: `returnTo`/callback flow returns user to original target page after OAuth completion.
+- [ ] `T-070.7` Add auth error handling UX.
+      Acceptance Criteria: Denied/failed OAuth attempts render user-safe error messages with retry path.
+- [ ] `T-070.8` Add route guard updates for authenticated user pages.
+      Acceptance Criteria: Protected user routes require session and redirect unauthenticated users to login with preserved target.
+- [ ] `T-070.9` Add unit tests for callback/session normalization and deterministic user creation.
+      Acceptance Criteria: Tests cover first login, repeat login, and malformed profile payload handling.
+- [ ] `T-070.10` Add integration tests for OAuth entry + return flow.
+      Acceptance Criteria: Tests validate login initiation, callback success, and return-to-target behavior (mocked provider boundary).
 
 ## T-071 — Implement guest-to-user booking ownership linking after authentication
 

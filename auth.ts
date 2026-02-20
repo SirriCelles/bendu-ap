@@ -1,8 +1,10 @@
 import NextAuth, { type User, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 
 import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callbacks";
 import { DEFAULT_GUEST_ROLE, type UserRole } from "@/lib/security/auth-role";
+import { loadGoogleOAuthProviderConfig } from "@/lib/security/oauth-provider-config";
 
 type AuthUser = {
   id: string;
@@ -37,6 +39,51 @@ function resolveAuthenticatedUser(email: string, password: string, name?: string
   };
 }
 
+function resolveRoleForEmail(email: string): UserRole {
+  const normalizedEmail = email.trim().toLowerCase();
+  const adminEmail = process.env.AUTH_ADMIN_EMAIL?.trim().toLowerCase();
+  if (adminEmail && normalizedEmail === adminEmail) {
+    return "ADMIN";
+  }
+
+  return DEFAULT_GUEST_ROLE;
+}
+
+function resolveOAuthUser(input: {
+  email: string;
+  name?: string | null;
+  image?: string | null;
+}): User {
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const role = resolveRoleForEmail(normalizedEmail);
+
+  return {
+    id: `user:${normalizedEmail}`,
+    email: normalizedEmail,
+    name: input.name?.trim() || normalizedEmail,
+    image: input.image ?? null,
+    role,
+  };
+}
+
+const googleOAuthConfig = loadGoogleOAuthProviderConfig();
+const oauthProviders = googleOAuthConfig
+  ? [
+      Google({
+        clientId: googleOAuthConfig.clientId,
+        clientSecret: googleOAuthConfig.clientSecret,
+        profile(profile) {
+          const email = typeof profile.email === "string" ? profile.email : "";
+          return resolveOAuthUser({
+            email,
+            name: typeof profile.name === "string" ? profile.name : null,
+            image: typeof profile.picture === "string" ? profile.picture : null,
+          });
+        },
+      }),
+    ]
+  : [];
+
 export const authConfig: NextAuthConfig = {
   session: {
     strategy: "jwt",
@@ -65,8 +112,21 @@ export const authConfig: NextAuthConfig = {
         );
       },
     }),
+    ...oauthProviders,
   ],
   callbacks: {
+    async signIn({ account, profile }) {
+      if (account?.provider !== "google") {
+        return true;
+      }
+
+      const email = typeof profile?.email === "string" ? profile.email.trim().toLowerCase() : "";
+      if (!email) {
+        return false;
+      }
+
+      return true;
+    },
     async jwt({ token, user }) {
       return applyRoleToJwt({ token, user: user as User | undefined });
     },
