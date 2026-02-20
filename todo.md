@@ -1047,7 +1047,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-058 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Booking/UX
 - **Context:** API spec defines receipt data for post-payment confirmation UX.
