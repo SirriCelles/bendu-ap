@@ -50,6 +50,7 @@ function buildHarness(options?: {
     providerIntentRef: "np_ref_123",
     metadata: {
       canonicalProvider: "NOTCHPAY",
+      actorId: "gs_test_actor_1",
     },
     booking: {
       id: "bk_1",
@@ -165,6 +166,15 @@ describe("POST /api/payments/[paymentId]/verify", () => {
     expect(body.data.provider).toBe("NOTCHPAY");
     expect(harness.verifyPayment).toHaveBeenCalledTimes(1);
     expect(harness.paymentIntentUpdate).toHaveBeenCalledTimes(1);
+    const paymentUpdateCalls = (
+      harness.paymentIntentUpdate.mock as unknown as {
+        calls: Array<[unknown]>;
+      }
+    ).calls;
+    const updateArgs = paymentUpdateCalls[0][0] as {
+      data?: { metadata?: Record<string, unknown> };
+    };
+    expect(updateArgs.data?.metadata?.actorId).toBe("gs_test_actor_1");
     expect(harness.bookingUpdate).toHaveBeenCalledTimes(1);
     expect(harness.paymentTransactionCreate).toHaveBeenCalledTimes(1);
   });

@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import BookingSuccessError from "../../../app/(public)/booking/[bookingId]/success/error";
-import BookingSuccessLoading from "../../../app/(public)/booking/[bookingId]/success/loading";
+import BookingSuccessError from "../../../app/(receipt)/booking/[bookingId]/success/error";
+import BookingSuccessLoading from "../../../app/(receipt)/booking/[bookingId]/success/loading";
 
 describe("Booking success loading/error states", () => {
   afterEach(() => {

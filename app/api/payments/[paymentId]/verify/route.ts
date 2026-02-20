@@ -408,6 +408,10 @@ export function createPaymentsVerifyPostHandler(deps: PaymentVerifyDeps) {
 
       const canonicalStatus = verifyResult.status;
       const targetPaymentStatus = mapCanonicalStatusToDbPaymentStatus(canonicalStatus);
+      const currentMetadata =
+        payment.metadata && typeof payment.metadata === "object"
+          ? (payment.metadata as Record<string, unknown>)
+          : {};
 
       const persisted = await deps.db.$transaction(async (tx) => {
         let nextPaymentStatus = payment.status;
@@ -420,6 +424,7 @@ export function createPaymentsVerifyPostHandler(deps: PaymentVerifyDeps) {
               status: targetPaymentStatus,
               providerIntentRef: verifyResult.providerReference ?? payment.providerIntentRef,
               metadata: {
+                ...currentMetadata,
                 canonicalStatus,
                 lastVerifiedAt: new Date().toISOString(),
                 providerReference: verifyResult.providerReference,

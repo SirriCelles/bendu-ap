@@ -280,7 +280,9 @@ export async function POST(request: Request): Promise<Response> {
         phone: formInput.guestPhone,
       },
       redirectUrls: {
-        returnUrl: `${baseUrl}/booking/${encodeURIComponent(reserved.booking.id)}/success`,
+        returnUrl: `${baseUrl}/payments/notchpay/callback?bookingId=${encodeURIComponent(
+          reserved.booking.id
+        )}`,
         cancelUrl: `${baseUrl}${roomContextHref}`,
       },
       idempotencyKey,

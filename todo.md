@@ -1599,6 +1599,42 @@ Status: TODO
 - **Dependencies:** 019A, 020
 - **Estimate:** S
 
+## T-069 — Fix post-payment receipt handoff and ship booking receipt success experience
+
+<!-- issue: bookeasy:T-069 -->
+
+Status: TODO
+
+- **Feature Area:** Booking/Payments UX
+- **Context:** After Notch Pay success return, users currently land on `Receipt Unavailable` instead of a confirmed receipt success experience.
+- **Scope Included:** Redirect/callback handoff reliability, payment-to-booking confirmation sync, receipt data readiness, and success-page UX wiring.
+- **Scope Excluded:** Visual redesign details (to be provided), non-MVP refund workflows.
+- **Acceptance Criteria:**
+- [ ] Successful Notch payment return always results in receipt-eligible state (`Booking=CONFIRMED`, `Payment=SUCCEEDED`) before success page render
+- [ ] `/booking/[bookingId]/success` shows confirmed receipt data for successful payments instead of fallback `Receipt Unavailable`
+- [ ] Cancel/failed/expired payment outcomes keep deterministic non-success behavior and do not falsely confirm bookings
+- [ ] End-to-end test covers `pay now -> notch success callback/verify -> success page receipt rendered`
+- **Implementation Notes:** Validate and align `app/api/public/pay-now/route.ts`, `app/api/payments/[paymentId]/verify/route.ts`, webhook transitions, and `lib/domain/booking-receipt.ts` eligibility checks; add explicit observability logs for callback and receipt gating decisions.
+- **Dependencies:** 052, 054, 055, 058
+- **Estimate:** M
+
+- [x] `T-069.1` Map actual Notch return callback parameters and persist deterministic correlation (`bookingId`, `paymentId`, provider reference).
+      Acceptance Criteria: Success return can always resolve the target booking/payment without guessing or brittle query assumptions.
+- [x] `T-069.2` Add/confirm server-side return handler that triggers provider verification before rendering success page.
+      Acceptance Criteria: Return flow never trusts redirect alone; verification updates canonical payment status.
+- [x] `T-069.3` Enforce payment->booking confirmation transition on verified success in a single transactional path.
+      Acceptance Criteria: Verified success moves booking to `CONFIRMED`; non-success statuses do not.
+- [x] `T-069.4` Tighten receipt eligibility timing/read-model behavior for immediate post-payment navigation.
+      Acceptance Criteria: Legitimate successful payments do not transiently fall into `Receipt Unavailable` under normal flow.
+- [x] `T-069.5` Add deterministic fallback/retry UX contract for temporary verification lag.
+      Acceptance Criteria: If verification is still pending, page communicates pending state and retries without dead-end error UX.
+- [x] `T-069.6` Add unit/integration tests for success, pending, failed, cancelled, expired return paths.
+      Acceptance Criteria: Tests assert canonical transitions and response codes/shapes with no external network calls.
+- [ ] `T-069.7` Add e2e skeleton test for checkout return to receipt success page.
+      Acceptance Criteria: Scenario proves final user-visible success path from `/rooms/[id]` pay-now to receipt-rendered success screen.
+- [x] `T-069.8` Plug in provided receipt success UI design on top of stabilized data contract.
+      Acceptance Criteria: New UI renders only receipt contract fields and passes existing success page SSR tests (or updated equivalents).
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.

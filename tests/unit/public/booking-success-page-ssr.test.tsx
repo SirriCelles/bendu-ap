@@ -3,13 +3,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   headersMock: vi.fn(),
+  paymentIntentFindFirstMock: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
   headers: mocks.headersMock,
 }));
 
-import BookingSuccessPage from "../../../app/(public)/booking/[bookingId]/success/page";
+vi.mock("@/lib/db/prisma", () => ({
+  prisma: {
+    paymentIntent: {
+      findFirst: mocks.paymentIntentFindFirstMock,
+    },
+  },
+}));
+
+import BookingSuccessPage from "../../../app/(receipt)/booking/[bookingId]/success/page";
 
 describe("BookingSuccessPage SSR", () => {
   afterEach(() => {
@@ -18,6 +27,7 @@ describe("BookingSuccessPage SSR", () => {
   });
 
   beforeEach(() => {
+    mocks.paymentIntentFindFirstMock.mockResolvedValue(null);
     mocks.headersMock.mockResolvedValue(
       new Headers({
         host: "localhost:3000",
@@ -78,16 +88,16 @@ describe("BookingSuccessPage SSR", () => {
 
     render(page);
 
-    expect(screen.getByRole("heading", { name: "Booking Confirmed" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Thank You For Booking" })).toBeInTheDocument();
     expect(screen.getByText("bk_123")).toBeInTheDocument();
-    expect(screen.getByText("np_ref_123")).toBeInTheDocument();
-    expect(screen.getByText("Deluxe Studio")).toBeInTheDocument();
-    expect(screen.getByText("A-101")).toBeInTheDocument();
-    expect(screen.getByText("XAF 40,000")).toBeInTheDocument();
-    expect(screen.getByText("SUCCEEDED")).toBeInTheDocument();
+    expect(screen.getAllByText("Deluxe Studio").length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "Browse More Rooms" })).toHaveAttribute(
+      "href",
+      "/rooms"
+    );
   });
 
-  it("renders fallback state when receipt endpoint is unavailable", async () => {
+  it("renders pending state when receipt endpoint is not yet eligible", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -105,8 +115,8 @@ describe("BookingSuccessPage SSR", () => {
     });
 
     render(page);
-    expect(screen.getByRole("heading", { name: "Receipt Unavailable" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Try Again" })).toHaveAttribute(
+    expect(screen.getByRole("heading", { name: "Payment Processing" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Refresh Status" })).toHaveAttribute(
       "href",
       "/booking/bk_123/success?retry=1"
     );

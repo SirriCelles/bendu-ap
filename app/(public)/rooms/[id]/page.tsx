@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarCheck2, CreditCard, Sparkles, Star } from "lucide-react";
+import { CalendarCheck2, Sparkles, Star } from "lucide-react";
 
+import { PayNowSubmitButton } from "@/components/public/rooms/pay-now-submit-button";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db/prisma";
 import { queryRoomDetail } from "@/lib/db/room-detail-repo";
@@ -369,14 +370,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                   ) : null}
 
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Button
-                      type="submit"
-                      disabled={!payNowEnabled}
-                      className="w-full border border-transparent bg-accent font-bold text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <CreditCard className="h-4 w-4 stroke-[2.5]" aria-hidden />
-                      Pay Now
-                    </Button>
+                    <PayNowSubmitButton disabled={!payNowEnabled} />
                     <Button asChild className="w-full">
                       <Link
                         href={buildReserveComingSoonHref(room.slug, parsed.input.bookingContext)}
