@@ -58,7 +58,8 @@ describe("notification email template rendering", () => {
 
     expect(html).toContain("Your reservation is confirmed!");
     expect(html).toContain("BookEasy");
-    expect(html).toContain("Buea, Cameroon");
+    expect(html).toContain("Bamenda, Cameroon");
+    expect(html).toContain("Alonta Towers Guest House");
     expect(html).toContain("bk_1");
     expect(html).toContain("np_ref_1");
   });

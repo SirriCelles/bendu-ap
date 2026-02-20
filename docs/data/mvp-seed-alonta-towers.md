@@ -8,7 +8,7 @@
 ## Property
 
 - **propertySlug:** `alonta-towers`
-- **propertyName:** `Alonta Towers`
+- **propertyName:** `Alonta Towers Guest House`
 - **city:** Bamenda
 - **area/quarter:** Upstation (often spelled “Upstation”; keep one spelling consistently)
 - **country:** Cameroon

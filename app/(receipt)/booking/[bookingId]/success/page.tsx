@@ -289,9 +289,9 @@ export default async function BookingSuccessPage({
               />
             </div>
             <div className="flex flex-col justify-center bg-white/40 px-4 py-3 text-secondary-foreground sm:px-5 sm:py-4">
-              <p className="text-base font-semibold sm:text-lg">Alonta Towers</p>
+              <p className="text-base font-semibold sm:text-lg">Alonta Towers Guest House</p>
               <p className="mt-1 text-xs text-secondary-foreground/80 sm:text-sm">
-                Upstation, Bamenda
+                Upstation, Bamenda, NorthWest Region, Cameroon
               </p>
               <p className="mt-1.5 text-xs tracking-[0.26em] text-accent">★★★★</p>
             </div>

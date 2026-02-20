@@ -4,12 +4,13 @@ export const SEED_KEYS = Object.freeze({
 
 export const PROPERTY_BASELINE_SEED = Object.freeze({
   slug: SEED_KEYS.propertySlug,
-  name: "Alonta Towers",
+  name: "Alonta Towers Guest House",
   description:
     "Premium, modern stays in a secure Upstation location with central access and warm hospitality. Facilities include high-speed wifi, cafeteria bar, fitness center, and parking.",
   city: "Bamenda",
   country: "Cameroon",
   addressLine1: "Upstation",
+  addressLine2: "NorthWest Region",
   timezone: "Africa/Douala",
   defaultCurrency: "XAF",
 });

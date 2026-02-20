@@ -2,7 +2,9 @@
 
 ## Version 2.0 — Includes Online Payments
 
-Location: Buea, Cameroon
+Location: Upstation, Bamenda, NorthWest Region, Cameroon
+Property: Alonta Towers Guest House
+Platform Role: BookEasy provides the booking solution for the property
 Primary Currency: XAF (FCFA)
 
 ---

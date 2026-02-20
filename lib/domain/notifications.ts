@@ -160,18 +160,21 @@ export function renderBookingConfirmationEmailHtml(input: {
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
             <tr>
               <td style="padding-bottom:14px;font-size:20px;font-weight:800;letter-spacing:0.4px;">BookEasy</td>
-              <td align="right" style="padding-bottom:14px;font-size:13px;color:#6b7280;">Buea, Cameroon</td>
+              <td align="right" style="padding-bottom:14px;font-size:13px;color:#6b7280;">Bamenda, Cameroon</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding-bottom:10px;font-size:12px;color:#6b7280;">Booking platform for Alonta Towers Guest House</td>
             </tr>
             <tr>
               <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:18px;font-size:16px;color:#374151;">Hey, ${input.guestName}</td>
             </tr>
             <tr>
-              <td colspan="2" style="padding-top:10px;font-size:46px;line-height:1.02;font-weight:900;color:#0f172a;">Your reservation is confirmed!</td>
+              <td colspan="2" style="padding-top:10px;font-size:36px;line-height:1.02;font-weight:500;color:#0f172a;">Your reservation is confirmed!</td>
             </tr>
             <tr>
-              <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:16px;padding-bottom:12px;font-size:34px;">
+              <td colspan="2" style="border-top:1px solid #e5e7eb;padding-top:16px;padding-bottom:12px;font-size:24px;">
                 <span style="font-weight:500;color:#111827;">Confirmation Number:</span>
-                <span style="font-weight:800;color:#f59e0b;"> ${input.bookingId}</span>
+                <span style="font-weight:400;color:#f59e0b;"> ${input.bookingId}</span>
               </td>
             </tr>
             <tr>
@@ -209,11 +212,11 @@ export function renderBookingConfirmationEmailHtml(input: {
             <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>
             <tr>
               <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#374151;vertical-align:top;">Need help?</td>
-              <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#4b5563;line-height:1.55;">For special requests or support, reply to this email or contact our front desk in Buea.</td>
+              <td style="padding-top:16px;padding-bottom:6px;font-size:15px;color:#4b5563;line-height:1.55;">For special requests or support, reply to this email or contact the Alonta Towers Guest House front desk.</td>
             </tr>
             <tr>
               <td style="padding-top:6px;padding-bottom:18px;font-size:15px;color:#374151;vertical-align:top;">Property Address</td>
-              <td style="padding-top:6px;padding-bottom:18px;font-size:15px;color:#4b5563;line-height:1.55;">BookEasy Guest House, Molyko, Buea, Southwest Region, Cameroon.</td>
+              <td style="padding-top:6px;padding-bottom:18px;font-size:15px;color:#4b5563;line-height:1.55;">Alonta Towers Guest House, Upstation, Bamenda, NorthWest Region, Cameroon.</td>
             </tr>
             <tr><td colspan="2" style="border-top:1px solid #e5e7eb;"></td></tr>
             <tr>

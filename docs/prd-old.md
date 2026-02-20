@@ -2,7 +2,7 @@
 
 ## Overview
 
-BookEasy is a booking platform for a **single guest house** located in **Bamenda, Northwest Region, Cameroon**, offering **apartments, studios, and single rooms**.
+BookEasy is a booking platform for **Alonta Towers Guest House** located in **Upstation, Bamenda, NorthWest Region, Cameroon**, offering **apartments, studios, and single rooms**.
 
 The MVP uses a **Reserve Now / Pay on Arrival** model with **XAF (FCFA)** as the primary currency, while remaining fully prepared for future **online payments (EUR/USD)** and **MTN & Orange Mobile Money**.
 

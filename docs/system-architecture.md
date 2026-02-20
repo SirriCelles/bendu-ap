@@ -2,7 +2,9 @@
 
 Version: v1 (MVP + Online Payments)
 Status: Implementation Blueprint (Codex-ready)
-Primary market: Buea, Cameroon
+Primary market: Upstation, Bamenda, NorthWest Region, Cameroon
+Property: Alonta Towers Guest House
+Platform role: BookEasy provides the booking solution for the property
 Currency: XAF (FCFA)
 Payments: Notch Pay (MVP), CinetPay (future via adapter)
 

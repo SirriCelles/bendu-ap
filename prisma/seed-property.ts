@@ -11,6 +11,7 @@ export type PropertySeedDbClient = {
         city: string;
         country: string;
         addressLine1: string;
+        addressLine2: string;
         timezone: string;
         defaultCurrency: "XAF";
       };
@@ -20,6 +21,7 @@ export type PropertySeedDbClient = {
         city: string;
         country: string;
         addressLine1: string;
+        addressLine2: string;
         timezone: string;
         defaultCurrency: "XAF";
       };
@@ -37,6 +39,7 @@ export async function seedPropertyRecord(
     city: PROPERTY_BASELINE_SEED.city,
     country: PROPERTY_BASELINE_SEED.country,
     addressLine1: PROPERTY_BASELINE_SEED.addressLine1,
+    addressLine2: PROPERTY_BASELINE_SEED.addressLine2,
     timezone: PROPERTY_BASELINE_SEED.timezone,
     defaultCurrency: PROPERTY_BASELINE_SEED.defaultCurrency,
   } as const;
@@ -50,6 +53,7 @@ export async function seedPropertyRecord(
       city: createPayload.city,
       country: createPayload.country,
       addressLine1: createPayload.addressLine1,
+      addressLine2: createPayload.addressLine2,
       timezone: createPayload.timezone,
       defaultCurrency: createPayload.defaultCurrency,
     },
