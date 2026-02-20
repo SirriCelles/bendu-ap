@@ -1786,6 +1786,150 @@ Status: TODO
 - **Dependencies:** 041
 - **Estimate:** S
 
+## T-077 — Add “View Bookings” CTA plumbing on public surfaces and canonical route handoff
+
+<!-- issue: bookeasy:T-077 -->
+
+Status: TODO
+
+- **Feature Area:** Booking UX
+- **Context:** Users need a clear entry point to “My Bookings” from public pages before post-booking account features can be used.
+- **Scope Included:** Add/standardize `View Bookings` CTA in header/footer/success contexts and route to canonical `/bookings` entry path.
+- **Scope Excluded:** Booking data retrieval logic and auth enforcement internals.
+- **Acceptance Criteria:**
+- [ ] `View Bookings` CTA is present on approved public surfaces (`app/(public)/layout.tsx`, `app/(receipt)/booking/[bookingId]/success/page.tsx`)
+- [ ] CTA navigation always resolves to canonical `/bookings` route (no duplicate aliases)
+- [ ] Mobile and desktop navigation behavior is verified with SSR page tests
+- **Implementation Notes:** Keep styling compliant with `/docs/design-tokens.md`; update affected public UI tests under `tests/unit/public/**`.
+- **Dependencies:** 017, 069
+- **Estimate:** S
+
+## T-078 — Implement authenticated “My Bookings” dashboard pages (list + detail shells)
+
+<!-- issue: bookeasy:T-078 -->
+
+Status: TODO
+
+- **Feature Area:** Dashboard/Booking UX
+- **Context:** Current route placeholders exist but do not provide production booking dashboard experience.
+- **Scope Included:** Build `/bookings` list page and `/bookings/[bookingId]` detail page shells using SSR data loading and receipt-style detail rendering.
+- **Scope Excluded:** PDF export and email resend actions (covered by 073/074).
+- **Acceptance Criteria:**
+- [ ] `/bookings` renders paginated booking cards with status/date summary from authenticated user data
+- [ ] `/bookings/[bookingId]` renders receipt-style booking detail for owner with empty/error states
+- [ ] Dashboard pages do not leak provider-specific payment payload fields to UI contracts
+- **Implementation Notes:** Implement in `app/(app)/bookings/page.tsx` and `app/(app)/bookings/[bookingId]/page.tsx`; consume API contracts from booking endpoints only.
+- **Dependencies:** 072, 029, 058
+- **Estimate:** M
+
+## T-079 — Extend booking owner APIs for dashboard filters, pagination, and deterministic ordering
+
+<!-- issue: bookeasy:T-079 -->
+
+Status: TODO
+
+- **Feature Area:** Booking/API
+- **Context:** Existing guest booking endpoints are insufficient for account dashboard list UX (status filters + pagination + stable ordering).
+- **Scope Included:** Add/extend owner-facing list/detail contract (`/api/bookings/me`, `/api/bookings/[bookingId]`) for status filters, page params, and deterministic sort.
+- **Scope Excluded:** Admin booking APIs.
+- **Acceptance Criteria:**
+- [ ] `GET /api/bookings/me` supports `status`, `page`, `pageSize` query params with validated bounds
+- [ ] Response includes pagination metadata and stable default ordering
+- [ ] Ownership checks are enforced server-side and return stable forbidden/not-found errors
+- **Implementation Notes:** Add/extend schemas in `lib/validation/**`; implement handler updates in `app/api/bookings/**`; include request correlation/log fields.
+- **Dependencies:** 029, 072
+- **Estimate:** M
+
+## T-080 — Introduce authenticated USER role semantics for dashboard access
+
+<!-- issue: bookeasy:T-080 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication/Security
+- **Context:** Current `ADMIN`/`GUEST` model conflates anonymous guest-session behavior and authenticated account behavior; dashboard access requires explicit authenticated user role semantics.
+- **Scope Included:** Introduce `USER` role for authenticated non-admin accounts and update auth role resolution/callbacks/guards accordingly.
+- **Scope Excluded:** Admin RBAC changes beyond compatibility updates.
+- **Acceptance Criteria:**
+- [ ] Authenticated non-admin sessions resolve to `USER` role (not anonymous guest fallback)
+- [ ] Existing admin protections remain intact for `/admin/**`
+- [ ] Booking/dashboard guards distinguish anonymous guest-session access from authenticated `USER` access
+- **Implementation Notes:** Update `lib/security/auth-role.ts`, `lib/security/rbac.ts`, `lib/security/auth-callbacks.ts`, `auth.ts`, and related type declarations/tests.
+- **Dependencies:** 004, 070
+- **Estimate:** M
+
+## T-081 — Add review domain model and booking linkage for post-stay feedback
+
+<!-- issue: bookeasy:T-081 -->
+
+Status: TODO
+
+- **Feature Area:** Reviews/Data
+- **Context:** User stories require rating/review capability with booking-bound eligibility and one-review-per-booking protection.
+- **Scope Included:** Prisma model(s) for reviews, booking/user linkage fields, unique/index constraints, migration.
+- **Scope Excluded:** Public review moderation UI.
+- **Acceptance Criteria:**
+- [ ] Prisma schema includes `Review` model linked to booking and owner identity with indexed query paths
+- [ ] Constraint prevents duplicate review creation for the same booking by same owner
+- [ ] Migration applies cleanly and seeds remain compatible
+- **Implementation Notes:** Update `prisma/schema.prisma` + migration; include minimal moderation fields (`isHidden`, `moderationStatus`) for safety workflows.
+- **Dependencies:** 010, 080
+- **Estimate:** M
+
+## T-082 — Implement review APIs with eligibility guards, validation, and rate limiting
+
+<!-- issue: bookeasy:T-082 -->
+
+Status: TODO
+
+- **Feature Area:** Reviews/API
+- **Context:** Reviews must be tied to eligible bookings and protected against abuse.
+- **Scope Included:** `POST /api/reviews` and owner/list retrieval contract with Zod validation, booking eligibility policy checks, and rate limiting.
+- **Scope Excluded:** Public review feed ranking/personalization.
+- **Acceptance Criteria:**
+- [ ] Review create endpoint validates payload and enforces rating/text bounds
+- [ ] Eligibility policy is enforced (booking owner + allowed status/time window) with stable conflict/forbidden errors
+- [ ] Review endpoints are rate-limited and emit structured logs without sensitive leakage
+- **Implementation Notes:** Add schemas in `lib/validation/reviews.ts`; handlers in `app/api/reviews/**`; apply `lib/security/rate-limit.ts`.
+- **Dependencies:** 005, 008, 081
+- **Estimate:** M
+
+## T-083 — Harden user-side cancellation policy enforcement and inventory release verification
+
+<!-- issue: bookeasy:T-083 -->
+
+Status: TODO
+
+- **Feature Area:** Booking/Reliability
+- **Context:** Dashboard cancellation actions must consistently apply policy guards and release inventory in all eligible cases.
+- **Scope Included:** Policy check helper reuse in cancel route/service, deterministic transition errors, and availability release verification path.
+- **Scope Excluded:** Refund processing and financial reconciliation.
+- **Acceptance Criteria:**
+- [ ] Cancellation endpoint enforces policy rule (not checked-in/completed; before check-in boundary) with typed errors
+- [ ] Successful cancellation immediately restores availability in subsequent quote/listing checks
+- [ ] Repeat cancellation attempts are idempotent and do not corrupt booking/payment status
+- **Implementation Notes:** Align with transition guards from `T-051`; extend `app/api/bookings/[id]/cancel/route.ts` and booking service helper paths.
+- **Dependencies:** 029, 051, 079
+- **Estimate:** M
+
+## T-084 — Add dashboard security and flow test suite (auth gating, ownership, cancellation, reviews)
+
+<!-- issue: bookeasy:T-084 -->
+
+Status: TODO
+
+- **Feature Area:** QA/Security
+- **Context:** New dashboard access paths introduce sensitive ownership boundaries and policy-critical actions.
+- **Scope Included:** Unit/integration/e2e coverage for auth gating, owner-only booking access, cancellation policy/inventory release, and review eligibility/create flow.
+- **Scope Excluded:** Live third-party OAuth provider contract tests.
+- **Acceptance Criteria:**
+- [ ] Unit tests cover ownership enforcement and review/cancel eligibility guards
+- [ ] Integration tests verify cancellation releases availability and review write constraints
+- [ ] E2E verifies logged-out redirect to login, post-login return to bookings, and successful review submission for eligible booking
+- **Implementation Notes:** Add tests under `tests/unit/api/**`, `tests/unit/domain/**`, and `tests/e2e/**`; mock external providers and block external network in CI.
+- **Dependencies:** 072, 078, 079, 082, 083
+- **Estimate:** M
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.
