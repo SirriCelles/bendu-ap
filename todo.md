@@ -1603,7 +1603,8 @@ Status: TODO
 
 <!-- issue: bookeasy:T-069 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-20 (`pnpm exec playwright test tests/e2e/notchpay-return-receipt.spec.ts --project=chromium` ✅)
 
 - **Feature Area:** Booking/Payments UX
 - **Context:** After Notch Pay success return, users currently land on `Receipt Unavailable` instead of a confirmed receipt success experience.
@@ -1630,7 +1631,7 @@ Status: TODO
       Acceptance Criteria: If verification is still pending, page communicates pending state and retries without dead-end error UX.
 - [x] `T-069.6` Add unit/integration tests for success, pending, failed, cancelled, expired return paths.
       Acceptance Criteria: Tests assert canonical transitions and response codes/shapes with no external network calls.
-- [ ] `T-069.7` Add e2e skeleton test for checkout return to receipt success page.
+- [x] `T-069.7` Add e2e skeleton test for checkout return to receipt success page.
       Acceptance Criteria: Scenario proves final user-visible success path from `/rooms/[id]` pay-now to receipt-rendered success screen.
 - [x] `T-069.8` Plug in provided receipt success UI design on top of stabilized data contract.
       Acceptance Criteria: New UI renders only receipt contract fields and passes existing success page SSR tests (or updated equivalents).
