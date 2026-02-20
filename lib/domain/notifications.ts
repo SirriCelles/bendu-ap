@@ -100,7 +100,17 @@ function formatMinorUnits(amountMinor: number, currency: Currency): string {
 }
 
 function formatDateLabel(value: Date): string {
-  return value.toISOString().slice(0, 10);
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "2-digit",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(value);
+  } catch {
+    return value.toISOString().slice(0, 10);
+  }
 }
 
 function extractMetadataObject(value: unknown): Record<string, unknown> {
