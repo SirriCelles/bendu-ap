@@ -1747,6 +1747,24 @@ Status: TODO
 - **Dependencies:** 070, 071, 072, 073, 074
 - **Estimate:** M
 
+## T-076 — Migrate transactional email sender from Resend sandbox to verified production domain
+
+<!-- issue: bookeasy:T-076 -->
+
+Status: TODO
+
+- **Feature Area:** Notifications/Production Readiness
+- **Context:** Current setup may use Resend sandbox sender (`onboarding@resend.dev`) during development and must be migrated before production go-live.
+- **Scope Included:** Domain verification in Resend, DNS setup (SPF/DKIM), production sender/reply-to env updates, and smoke verification.
+- **Scope Excluded:** Marketing campaign tooling and advanced deliverability analytics.
+- **Acceptance Criteria:**
+- [ ] Resend production domain is verified and healthy (SPF + DKIM passing)
+- [ ] `RESEND_FROM_EMAIL` and `RESEND_REPLY_TO` are switched to production-owned addresses
+- [ ] Production smoke test confirms booking confirmation email delivery from verified sender
+- **Implementation Notes:** Keep sandbox sender for local/dev only; document environment split and rollback plan.
+- **Dependencies:** 041
+- **Estimate:** S
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.

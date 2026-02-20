@@ -1,15 +1,9 @@
-import * as React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-
-import { BookingCancellationEmail } from "@/emails/booking-cancellation-email";
-import { BookingConfirmationEmail } from "@/emails/booking-confirmation-email";
-import { NewMessageAlertEmail } from "@/emails/new-message-alert-email";
 import type { Currency } from "@/generated/prisma";
 
 type NotificationsDb = {
   paymentIntent: {
-    findUnique: (...args: unknown[]) => Promise<unknown>;
-    update: (...args: unknown[]) => Promise<unknown>;
+    findUnique: (args: unknown) => Promise<unknown>;
+    update: (args: unknown) => Promise<unknown>;
   };
 };
 
@@ -43,6 +37,36 @@ type SendBookingConfirmationEmailOptions = {
   fetchImpl?: typeof fetch;
   env?: Partial<NodeJS.ProcessEnv>;
   now?: Date;
+};
+
+type PaymentIntentNotificationRecord = {
+  id: string;
+  status: "NOT_REQUIRED" | "PENDING" | "PAID" | "FAILED" | "REFUNDED" | "EXPIRED";
+  providerIntentRef: string | null;
+  metadata: unknown;
+  booking: {
+    id: string;
+    status:
+      | "DRAFT"
+      | "RESERVED"
+      | "CONFIRMED"
+      | "CHECKED_IN"
+      | "COMPLETED"
+      | "CANCELLED"
+      | "EXPIRED";
+    paymentStatus: "NOT_REQUIRED" | "PENDING" | "PAID" | "FAILED" | "REFUNDED" | "EXPIRED";
+    checkInDate: Date;
+    checkOutDate: Date;
+    guestFullName: string;
+    guestEmail: string;
+    totalAmountMinor: number;
+    currency: Currency;
+    unit: {
+      unitType: {
+        name: string;
+      };
+    };
+  };
 };
 
 function resolveNotificationConfig(env: Partial<NodeJS.ProcessEnv>): NotificationConfig | null {
@@ -119,7 +143,32 @@ export function renderBookingConfirmationEmailHtml(input: {
   paymentReference: string;
   manageUrl: string;
 }): string {
-  return `<!doctype html>${renderToStaticMarkup(React.createElement(BookingConfirmationEmail, input))}`;
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:24px;background:#f6f7fb;font-family:Arial,sans-serif;color:#111827;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;">
+            <tr><td style="font-size:22px;font-weight:700;padding-bottom:12px;">Booking Confirmed</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:8px;">Hi ${input.guestName}, your reservation is confirmed.</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Booking ID:</strong> ${input.bookingId}</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Room:</strong> ${input.roomName}</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Check-in:</strong> ${input.checkInDate}</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Check-out:</strong> ${input.checkOutDate}</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Total:</strong> ${input.totalAmountLabel}</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:16px;"><strong>Payment Reference:</strong> ${input.paymentReference}</td></tr>
+            <tr>
+              <td>
+                <a href="${input.manageUrl}" style="display:inline-block;padding:10px 16px;background:#0f766e;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">View Booking</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
 }
 
 export function renderBookingCancellationEmailHtml(input: {
@@ -127,7 +176,23 @@ export function renderBookingCancellationEmailHtml(input: {
   bookingId: string;
   roomName: string;
 }): string {
-  return `<!doctype html>${renderToStaticMarkup(React.createElement(BookingCancellationEmail, input))}`;
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:24px;background:#f6f7fb;font-family:Arial,sans-serif;color:#111827;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;">
+            <tr><td style="font-size:22px;font-weight:700;padding-bottom:12px;">Booking Cancelled</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:8px;">Hi ${input.guestName}, your booking has been cancelled.</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:4px;"><strong>Booking ID:</strong> ${input.bookingId}</td></tr>
+            <tr><td style="font-size:14px;"><strong>Room:</strong> ${input.roomName}</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
 }
 
 export function renderNewMessageAlertEmailHtml(input: {
@@ -135,7 +200,22 @@ export function renderNewMessageAlertEmailHtml(input: {
   bookingId: string;
   messagePreview: string;
 }): string {
-  return `<!doctype html>${renderToStaticMarkup(React.createElement(NewMessageAlertEmail, input))}`;
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:24px;background:#f6f7fb;font-family:Arial,sans-serif;color:#111827;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;">
+            <tr><td style="font-size:22px;font-weight:700;padding-bottom:12px;">New Message</td></tr>
+            <tr><td style="font-size:14px;padding-bottom:8px;">Hi ${input.recipientName}, you received a new message for booking ${input.bookingId}.</td></tr>
+            <tr><td style="font-size:14px;">${input.messagePreview}</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
 }
 
 async function sendEmailViaResend(params: {
@@ -175,10 +255,11 @@ async function sendEmailViaResend(params: {
 }
 
 export async function sendBookingConfirmationEmailByPaymentIntentId(
-  db: NotificationsDb,
+  db: unknown,
   paymentIntentId: string,
   options: SendBookingConfirmationEmailOptions = {}
 ): Promise<BookingConfirmationDispatchResult> {
+  const notificationsDb = db as NotificationsDb;
   const config = resolveNotificationConfig(options.env ?? process.env);
   if (!config) {
     return {
@@ -190,7 +271,7 @@ export async function sendBookingConfirmationEmailByPaymentIntentId(
   const fetchImpl = options.fetchImpl ?? fetch;
   const now = options.now ?? new Date();
 
-  const paymentIntent = await db.paymentIntent.findUnique({
+  const paymentIntent = (await notificationsDb.paymentIntent.findUnique({
     where: {
       id: paymentIntentId,
     },
@@ -222,7 +303,7 @@ export async function sendBookingConfirmationEmailByPaymentIntentId(
         },
       },
     },
-  });
+  })) as PaymentIntentNotificationRecord | null;
 
   if (!paymentIntent) {
     return {
@@ -279,7 +360,7 @@ export async function sendBookingConfirmationEmailByPaymentIntentId(
       fetchImpl,
     });
 
-    await db.paymentIntent.update({
+    await notificationsDb.paymentIntent.update({
       where: {
         id: paymentIntent.id,
       },

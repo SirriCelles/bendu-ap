@@ -544,6 +544,19 @@ export const POST = createPaymentsVerifyPostHandler({
   getRequestIdentifier,
   createProvider: createNotchPayProviderFromEnv,
   sendBookingConfirmationEmail: async (paymentIntentId) => {
-    await sendBookingConfirmationEmailByPaymentIntentId(prisma, paymentIntentId);
+    const notificationResult = await sendBookingConfirmationEmailByPaymentIntentId(
+      prisma,
+      paymentIntentId
+    );
+    console.info(
+      JSON.stringify({
+        event: "notifications.booking_confirmation.dispatch",
+        source: "payments_verify",
+        paymentIntentId,
+        status: notificationResult.status,
+        reason: notificationResult.reason ?? null,
+        providerMessageId: notificationResult.providerMessageId ?? null,
+      })
+    );
   },
 });

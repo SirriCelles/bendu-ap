@@ -341,7 +341,21 @@ export async function POST(request: Request): Promise<Response> {
         },
       });
 
-      await sendBookingConfirmationEmailByPaymentIntentId(prisma, reserved.paymentIntent.id);
+      const notificationResult = await sendBookingConfirmationEmailByPaymentIntentId(
+        prisma,
+        reserved.paymentIntent.id
+      );
+      console.info(
+        JSON.stringify({
+          event: "notifications.booking_confirmation.dispatch",
+          source: "public_pay_now",
+          paymentIntentId: reserved.paymentIntent.id,
+          bookingId: reserved.booking.id,
+          status: notificationResult.status,
+          reason: notificationResult.reason ?? null,
+          providerMessageId: notificationResult.providerMessageId ?? null,
+        })
+      );
     }
 
     if (!checkoutUrl) {

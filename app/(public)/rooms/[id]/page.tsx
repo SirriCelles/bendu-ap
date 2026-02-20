@@ -243,7 +243,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
             </div>
 
             <aside className="space-y-4 sm:space-y-5">
-              <Card className="rounded-2xl bg-[#cfcfcf]">
+              <Card className="rounded-2xl bg-[#cfcfcf] shadow-xs">
                 <CardHeader className="pb-3 text-center">
                   <CardTitle className="text-base font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                     Sub Total
@@ -384,16 +384,16 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                       </p>
                     ) : null}
 
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-2">
                       <PayNowSubmitButton disabled={!payNowEnabled} />
-                      <Button asChild className="w-full">
+                      {/* <Button asChild className="w-full">
                         <Link
                           href={buildReserveComingSoonHref(room.slug, parsed.input.bookingContext)}
                         >
                           <CalendarCheck2 className="h-4 w-4" aria-hidden />
                           Reserve Now
                         </Link>
-                      </Button>
+                      </Button> */}
                     </div>
                   </form>
                 </CardContent>

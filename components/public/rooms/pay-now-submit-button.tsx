@@ -1,7 +1,7 @@
 "use client";
 
 import { CreditCard, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,26 @@ type PayNowSubmitButtonProps = {
 export function PayNowSubmitButton({ disabled = false }: PayNowSubmitButtonProps) {
   const { pending } = useFormStatus();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const isPending = pending || isSubmitting;
   const isDisabled = disabled || isPending;
+
+  useEffect(() => {
+    const form = buttonRef.current?.form;
+    if (!form) {
+      return;
+    }
+
+    const handleSubmit = () => {
+      setIsSubmitting(true);
+    };
+
+    form.addEventListener("submit", handleSubmit);
+
+    return () => {
+      form.removeEventListener("submit", handleSubmit);
+    };
+  }, []);
 
   useEffect(() => {
     const resetSubmittingState = () => {
@@ -30,21 +48,10 @@ export function PayNowSubmitButton({ disabled = false }: PayNowSubmitButtonProps
   return (
     <div>
       <Button
+        ref={buttonRef}
         type="submit"
         disabled={isDisabled}
         aria-busy={isPending}
-        onClick={(event) => {
-          if (disabled) {
-            return;
-          }
-
-          const form = event.currentTarget.form;
-          if (!form || !form.checkValidity()) {
-            return;
-          }
-
-          setIsSubmitting(true);
-        }}
         className="w-full border border-transparent bg-accent font-bold text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? (
