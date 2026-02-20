@@ -71,13 +71,12 @@ function formatDateForForm(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function buildComingSoonHref(
-  action: "pay-now" | "reserve",
+function buildReserveComingSoonHref(
   roomSlug: string,
   bookingContext: { checkInDate: Date; checkOutDate: Date; guestCount: number } | undefined
 ): string {
   const params = new URLSearchParams({
-    action,
+    action: "reserve",
     room: roomSlug,
   });
 
@@ -92,7 +91,8 @@ function buildComingSoonHref(
 
 export default async function RoomDetailPage({ params, searchParams }: RoomDetailPageProps) {
   const { id } = await params;
-  const parsed = parseRoomDetailQuery(id, await searchParams);
+  const rawSearchParams = await searchParams;
+  const parsed = parseRoomDetailQuery(id, rawSearchParams);
   if (!parsed.input) {
     notFound();
   }
@@ -136,6 +136,16 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
   const gallery = room.images.galleryImageUrls.length
     ? room.images.galleryImageUrls
     : [primaryImage, primaryImage];
+  const payNowAttemptId = crypto.randomUUID();
+  const payNowEnabled =
+    Boolean(parsed.input.bookingContext) && room.availabilitySummary.isAvailable;
+  const paymentErrorCodeRaw = Array.isArray(rawSearchParams.paymentError)
+    ? rawSearchParams.paymentError[0]
+    : rawSearchParams.paymentError;
+  const paymentErrorMessage =
+    paymentErrorCodeRaw && paymentErrorCodeRaw.length > 0
+      ? "Unable to start payment right now. Please review your details and try again."
+      : null;
 
   return (
     <main className="overflow-x-hidden bg-[#fbf7f2]">
@@ -158,6 +168,9 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
       <section className="bg-[#f5f0ea] py-10 sm:py-14 md:py-20 md:pb-24">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 md:px-8">
           {dataError ? <p className="mb-4 text-sm text-destructive">{dataError}</p> : null}
+          {paymentErrorMessage ? (
+            <p className="mb-4 text-sm text-destructive">{paymentErrorMessage}</p>
+          ) : null}
 
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.55fr_1fr] lg:gap-12">
             <div>
@@ -279,27 +292,101 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                   </label>
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <Button
-                    asChild
-                    className="w-full border border-transparent bg-accent font-bold text-accent-foreground hover:opacity-90"
-                  >
-                    <Link
-                      href={buildComingSoonHref("pay-now", room.slug, parsed.input.bookingContext)}
+                <form action="/api/public/pay-now" method="post" className="mt-6 space-y-3">
+                  <input type="hidden" name="roomSlug" value={room.slug} />
+                  <input type="hidden" name="unitTypeId" value={room.unitTypeId} />
+                  <input type="hidden" name="attemptId" value={payNowAttemptId} />
+                  <input
+                    type="hidden"
+                    name="checkInDate"
+                    value={
+                      parsed.input.bookingContext
+                        ? formatDateForForm(parsed.input.bookingContext.checkInDate)
+                        : ""
+                    }
+                  />
+                  <input
+                    type="hidden"
+                    name="checkOutDate"
+                    value={
+                      parsed.input.bookingContext
+                        ? formatDateForForm(parsed.input.bookingContext.checkOutDate)
+                        : ""
+                    }
+                  />
+                  <input
+                    type="hidden"
+                    name="guests"
+                    value={String(
+                      parsed.input.bookingContext?.guestCount ?? room.occupancy.maxGuests
+                    )}
+                  />
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:text-sm">
+                      FULL NAME
+                    </span>
+                    <input
+                      type="text"
+                      name="guestFullName"
+                      required
+                      minLength={2}
+                      maxLength={120}
+                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
+                      placeholder="Your full name"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:text-sm">
+                      EMAIL
+                    </span>
+                    <input
+                      type="email"
+                      name="guestEmail"
+                      required
+                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
+                      placeholder="you@example.com"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.08em] text-[#7a7a7a] sm:text-sm">
+                      PHONE (MOMO)
+                    </span>
+                    <input
+                      type="tel"
+                      name="guestPhone"
+                      required
+                      minLength={7}
+                      maxLength={32}
+                      className="h-11 w-full rounded-lg border-none bg-[#efefef] px-3 text-base text-foreground outline-none"
+                      placeholder="+2376..."
+                    />
+                  </label>
+
+                  {!payNowEnabled ? (
+                    <p className="text-xs text-destructive">
+                      Select valid dates with available inventory before starting payment.
+                    </p>
+                  ) : null}
+
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <Button
+                      type="submit"
+                      disabled={!payNowEnabled}
+                      className="w-full border border-transparent bg-accent font-bold text-accent-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <CreditCard className="h-4 w-4 stroke-[2.5]" aria-hidden />
                       Pay Now
-                    </Link>
-                  </Button>
-                  <Button asChild className="w-full">
-                    <Link
-                      href={buildComingSoonHref("reserve", room.slug, parsed.input.bookingContext)}
-                    >
-                      <CalendarCheck2 className="h-4 w-4" aria-hidden />
-                      Reserve Now
-                    </Link>
-                  </Button>
-                </div>
+                    </Button>
+                    <Button asChild className="w-full">
+                      <Link
+                        href={buildReserveComingSoonHref(room.slug, parsed.input.bookingContext)}
+                      >
+                        <CalendarCheck2 className="h-4 w-4" aria-hidden />
+                        Reserve Now
+                      </Link>
+                    </Button>
+                  </div>
+                </form>
               </div>
 
               <div className="mt-5 rounded-2xl bg-[#bcd0dd] p-5 text-center text-black sm:mt-6 sm:p-8">

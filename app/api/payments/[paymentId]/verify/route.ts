@@ -61,6 +61,25 @@ type VerifyRouteContext = {
 };
 
 const GUEST_SESSION_HEADER = "x-guest-session";
+const GUEST_SESSION_COOKIE = "be_guest_session";
+
+function parseCookieValue(cookieHeader: string | null, key: string): string | null {
+  if (!cookieHeader) {
+    return null;
+  }
+
+  for (const part of cookieHeader.split(";")) {
+    const [name, ...valueParts] = part.trim().split("=");
+    if (name === key) {
+      const value = valueParts.join("=").trim();
+      if (value.length > 0) {
+        return value;
+      }
+    }
+  }
+
+  return null;
+}
 
 type PaymentRow = {
   id: string;
@@ -269,7 +288,9 @@ async function resolveActorContext(request: Request, authFn: typeof auth): Promi
     };
   }
 
-  const guestSession = request.headers.get(GUEST_SESSION_HEADER)?.trim();
+  const guestSession =
+    request.headers.get(GUEST_SESSION_HEADER)?.trim() ??
+    parseCookieValue(request.headers.get("cookie"), GUEST_SESSION_COOKIE);
   if (guestSession) {
     return {
       type: "guest_session",
