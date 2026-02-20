@@ -49,6 +49,9 @@ test("notch callback redirects to booking success and renders receipt (skeleton)
   });
 
   test.skip(!unit, "requires seeded inventory data for e2e skeleton");
+  if (!unit) {
+    return;
+  }
 
   const actorId = `gs_e2e_${crypto.randomUUID().replace(/-/g, "")}`;
   const totalAmountMinor = 50000;

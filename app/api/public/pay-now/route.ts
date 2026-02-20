@@ -5,6 +5,7 @@ import type { PaymentStatus } from "@/generated/prisma";
 import { findAvailableUnits } from "@/lib/db/inventory-repo";
 import { prisma } from "@/lib/db/prisma";
 import { createBookingService } from "@/lib/domain/booking";
+import { sendBookingConfirmationEmailByPaymentIntentId } from "@/lib/domain/notifications";
 import type { PaymentLifecycleStatus } from "@/lib/domain/payments";
 import type { MinorUnitAmount } from "@/lib/domain/pricing";
 import { createNotchPayProviderFromEnv } from "@/lib/payments/notchpay";
@@ -339,6 +340,8 @@ export async function POST(request: Request): Promise<Response> {
           paymentStatus: "PAID",
         },
       });
+
+      await sendBookingConfirmationEmailByPaymentIntentId(prisma, reserved.paymentIntent.id);
     }
 
     if (!checkoutUrl) {

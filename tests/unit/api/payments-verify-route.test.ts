@@ -136,6 +136,7 @@ function buildHarness(options?: {
     })) as never,
     getRequestIdentifier: vi.fn(() => "ip:test") as never,
     createProvider: vi.fn(() => provider),
+    sendBookingConfirmationEmail: vi.fn(async () => undefined),
   });
 
   return {

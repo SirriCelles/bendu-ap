@@ -17,6 +17,7 @@ import {
   resolvePaymentProvider,
 } from "@/lib/domain/payments";
 import { createBookingStatusUpdate, createPaymentStatusUpdate } from "@/lib/domain/booking";
+import { sendBookingConfirmationEmailByPaymentIntentId } from "@/lib/domain/notifications";
 import { prisma } from "@/lib/db/prisma";
 import { HttpError, toErrorResponse } from "@/lib/http/errors";
 import { createNotchPayProviderFromEnv } from "@/lib/payments/notchpay";
@@ -45,6 +46,7 @@ type PaymentVerifyDeps = {
   limitRequest: typeof limitRequest;
   getRequestIdentifier: typeof getRequestIdentifier;
   createProvider: () => PaymentProvider;
+  sendBookingConfirmationEmail: (paymentIntentId: string) => Promise<void>;
 };
 
 type PaymentVerifyRouteResponse = {
@@ -501,6 +503,10 @@ export function createPaymentsVerifyPostHandler(deps: PaymentVerifyDeps) {
         provider: providerKey,
       });
 
+      if (success.data.status === "SUCCEEDED" && success.data.bookingStatus === "CONFIRMED") {
+        await deps.sendBookingConfirmationEmail(payment.id);
+      }
+
       return appendRateLimitHeaders(
         Response.json(success, { status: 200 }),
         rateLimitHeaders(rateLimitResult)
@@ -537,4 +543,7 @@ export const POST = createPaymentsVerifyPostHandler({
   limitRequest,
   getRequestIdentifier,
   createProvider: createNotchPayProviderFromEnv,
+  sendBookingConfirmationEmail: async (paymentIntentId) => {
+    await sendBookingConfirmationEmailByPaymentIntentId(prisma, paymentIntentId);
+  },
 });

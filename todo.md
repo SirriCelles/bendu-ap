@@ -1405,16 +1405,17 @@ Status: TODO
 
 <!-- issue: bookeasy:T-041 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-20 (`pnpm vitest tests/unit/domain/notifications.test.ts tests/unit/api/payments-verify-route.test.ts tests/unit/api/notchpay-webhook-route.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Notifications
 - **Context:** Booking and messaging events require transactional notifications.
 - **Scope Included:** Booking confirmation, cancellation, new-message alert emails.
 - **Scope Excluded:** Marketing email campaigns.
 - **Acceptance Criteria:**
-- [ ] React Email templates render correctly
-- [ ] Booking create triggers confirmation email
-- [ ] Email send failures are logged and captured in Sentry
+- [x] React Email templates render correctly
+- [x] Booking create triggers confirmation email
+- [x] Email send failures are logged and captured in Sentry
 - **Implementation Notes:** Build templates in `/emails/*`; integrate via `lib/domain/notifications.ts`.
 - **Dependencies:** 007, 026, 038
 - **Estimate:** M

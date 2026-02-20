@@ -1,5 +1,6 @@
 import { type BookingStatus, type PaymentStatus, type Prisma } from "@/generated/prisma";
 import { createBookingStatusUpdate, createPaymentStatusUpdate } from "@/lib/domain/booking";
+import { sendBookingConfirmationEmailByPaymentIntentId } from "@/lib/domain/notifications";
 import {
   PaymentDomainError,
   type PaymentLifecycleStatus,
@@ -20,6 +21,7 @@ type WebhookRouteDeps = {
   createProvider: () => PaymentProvider;
   limitRequest: typeof limitRequest;
   getRequestIdentifier: typeof getRequestIdentifier;
+  sendBookingConfirmationEmail: (paymentIntentId: string) => Promise<void>;
 };
 
 function toJsonSafeValue(value: unknown): Prisma.InputJsonValue {
@@ -384,6 +386,10 @@ export function createNotchPayWebhookPostHandler(deps: WebhookRouteDeps) {
         })
       );
 
+      if (result.status === "SUCCEEDED" && result.paymentId) {
+        await deps.sendBookingConfirmationEmail(result.paymentId);
+      }
+
       const response = Response.json(
         {
           data: {
@@ -416,4 +422,7 @@ export const POST = createNotchPayWebhookPostHandler({
   createProvider: createNotchPayProviderFromEnv,
   limitRequest,
   getRequestIdentifier,
+  sendBookingConfirmationEmail: async (paymentIntentId) => {
+    await sendBookingConfirmationEmailByPaymentIntentId(prisma, paymentIntentId);
+  },
 });

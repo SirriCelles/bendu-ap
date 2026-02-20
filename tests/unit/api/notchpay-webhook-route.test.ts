@@ -275,6 +275,7 @@ function buildHarness(options?: {
       source: "local-fallback" as const,
     })) as never,
     getRequestIdentifier: vi.fn(() => "ip:test") as never,
+    sendBookingConfirmationEmail: vi.fn(async () => undefined),
   });
 
   return {
