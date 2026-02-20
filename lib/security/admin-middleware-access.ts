@@ -1,7 +1,7 @@
 import { resolveUserRole } from "@/lib/security/auth-role";
 import { isAdmin } from "@/lib/security/rbac";
 
-const SIGN_IN_PATH = "/auth/login";
+const SIGN_IN_PATH = "/login";
 const FORBIDDEN_REDIRECT_PATH = "/";
 
 export type AdminMiddlewareAccessInput = {

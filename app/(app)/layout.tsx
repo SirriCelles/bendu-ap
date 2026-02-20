@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/auth/login?returnTo=/bookings");
+    redirect("/login?returnTo=/bookings");
   }
 
   return <>{children}</>;

@@ -97,7 +97,7 @@ describe("BookingSuccessPage SSR", () => {
     );
     expect(screen.getByRole("link", { name: "Sign In To Manage Bookings" })).toHaveAttribute(
       "href",
-      "/auth/login?returnTo=/bookings"
+      "/login?returnTo=/bookings"
     );
     expect(screen.getByRole("link", { name: "Go Home" })).toHaveAttribute("href", "/");
   });

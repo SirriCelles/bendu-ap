@@ -135,7 +135,7 @@ export const authConfig: NextAuthConfig = {
     },
   },
   pages: {
-    signIn: "/auth/login",
+    signIn: "/login",
   },
 };
 

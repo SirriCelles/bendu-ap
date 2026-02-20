@@ -72,7 +72,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <p className="mt-4 text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
-            href={`/auth/register?returnTo=${encodeURIComponent(returnTo)}`}
+            href={`/register?returnTo=${encodeURIComponent(returnTo)}`}
             className="font-semibold text-primary underline-offset-2 hover:underline"
           >
             Create one

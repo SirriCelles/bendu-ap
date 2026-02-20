@@ -369,7 +369,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                     <div className="grid grid-cols-1 gap-2">
                       <PayNowSubmitButton disabled={!payNowEnabled} />
                       <Button variant="outline" asChild className="w-full">
-                        <Link href="/auth/login?returnTo=/bookings">View Bookings</Link>
+                        <Link href="/login?returnTo=/bookings">View Bookings</Link>
                       </Button>
                     </div>
                   </form>

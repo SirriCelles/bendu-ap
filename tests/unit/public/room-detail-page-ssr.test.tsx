@@ -79,7 +79,7 @@ describe("RoomDetailPage SSR states", () => {
     expect(payNowForm?.getAttribute("method")).toBe("post");
 
     const viewBookingsLink = screen.getByRole("link", { name: "View Bookings" });
-    expect(viewBookingsLink.getAttribute("href")).toBe("/auth/login?returnTo=/bookings");
+    expect(viewBookingsLink.getAttribute("href")).toBe("/login?returnTo=/bookings");
   });
 
   it("renders notFound for missing room", async () => {
@@ -132,7 +132,7 @@ describe("RoomDetailPage SSR states", () => {
     ).toBeInTheDocument();
 
     const viewBookingsLink = screen.getByRole("link", { name: "View Bookings" });
-    expect(viewBookingsLink.getAttribute("href")).toBe("/auth/login?returnTo=/bookings");
+    expect(viewBookingsLink.getAttribute("href")).toBe("/login?returnTo=/bookings");
   });
 
   it("renders controlled fallback on data access failure", async () => {

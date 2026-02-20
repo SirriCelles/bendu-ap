@@ -72,7 +72,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
         <p className="mt-4 text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
-            href={`/auth/login?returnTo=${encodeURIComponent(returnTo)}`}
+            href={`/login?returnTo=${encodeURIComponent(returnTo)}`}
             className="font-semibold text-primary underline-offset-2 hover:underline"
           >
             Log in

@@ -12,7 +12,7 @@ describe("decideAdminMiddlewareAccess", () => {
 
     expect(decision.kind).toBe("redirect");
     if (decision.kind === "redirect") {
-      expect(decision.location).toContain("/auth/login");
+      expect(decision.location).toContain("/login");
       expect(decision.location).toContain("callbackUrl=%2Fadmin%2Fbookings");
     }
   });

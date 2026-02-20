@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   if (request.nextUrl.pathname.startsWith("/bookings") || request.nextUrl.pathname === "/account") {
     if (!token?.sub) {
-      const loginUrl = new URL("/auth/login", request.url);
+      const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("returnTo", request.nextUrl.pathname + request.nextUrl.search);
       return NextResponse.redirect(loginUrl);
     }
