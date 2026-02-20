@@ -1635,6 +1635,116 @@ Status: TODO
 - [x] `T-069.8` Plug in provided receipt success UI design on top of stabilized data contract.
       Acceptance Criteria: New UI renders only receipt contract fields and passes existing success page SSR tests (or updated equivalents).
 
+## Milestone 8 — Authentication, OAuth, and Receipt Access
+
+## T-070 — Implement OAuth sign-in/sign-up for guest account upgrade
+
+<!-- issue: bookeasy:T-070 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication
+- **Context:** Current auth setup provides role/routing skeleton but does not ship end-user OAuth sign-in for guest-to-account upgrade.
+- **Scope Included:** Auth.js OAuth provider wiring (Google MVP), sign-in/sign-up UI entry points, callback handling, session role assignment for USER flows.
+- **Scope Excluded:** Enterprise SSO and multi-provider management UI.
+- **Acceptance Criteria:**
+- [ ] User can sign in/up with OAuth from public booking/success context
+- [ ] OAuth callback creates or reuses user account deterministically
+- [ ] Session contains role and identity fields required for booking ownership checks
+- **Implementation Notes:** Extend existing Auth.js setup from `T-004`; add user-facing auth screens/entry points and callback guards.
+- **Dependencies:** 004
+- **Estimate:** M
+
+## T-071 — Implement guest-to-user booking ownership linking after authentication
+
+<!-- issue: bookeasy:T-071 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication/Booking
+- **Context:** Guest bookings exist, but authenticated users need a secure way to see their previously created guest bookings.
+- **Scope Included:** Ownership claim/link flow using guest session + verified email/account identity, idempotent linking logic, audit-safe updates.
+- **Scope Excluded:** Manual admin reassignment tooling.
+- **Acceptance Criteria:**
+- [ ] Newly authenticated user can claim eligible guest bookings created with matching identity signals
+- [ ] Linking operation is idempotent and does not duplicate ownership mappings
+- [ ] Non-matching/unauthorized claim attempts fail with stable forbidden/conflict errors
+- **Implementation Notes:** Add service-level ownership migration helper and route/action invoked post-login from success page.
+- **Dependencies:** 029, 070
+- **Estimate:** M
+
+## T-072 — Gate “My Bookings” behind authentication and add login redirect UX
+
+<!-- issue: bookeasy:T-072 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication/Booking UX
+- **Context:** Users should not access booking history without authentication; current guest flows rely mostly on session-scoped access.
+- **Scope Included:** Protected “My Bookings” route(s), redirect-to-login behavior, post-login return-to-target flow.
+- **Scope Excluded:** Admin booking screens.
+- **Acceptance Criteria:**
+- [ ] Accessing “My Bookings” while logged out redirects to login
+- [ ] After successful login, user returns to intended bookings page
+- [ ] Authenticated user can only see bookings they own
+- **Implementation Notes:** Reuse guard utilities from `T-004` and booking ownership constraints from `T-029`/`T-071`.
+- **Dependencies:** 004, 029, 070, 071
+- **Estimate:** S
+
+## T-073 — Send paid booking receipt email and add resend receipt action
+
+<!-- issue: bookeasy:T-073 -->
+
+Status: TODO
+
+- **Feature Area:** Notifications/Booking
+- **Context:** Receipt page exists, but users still need durable confirmation via email after successful payment.
+- **Scope Included:** Automatic receipt email trigger on confirmed+paid booking, resend endpoint/action with auth/ownership checks.
+- **Scope Excluded:** Marketing email sequences.
+- **Acceptance Criteria:**
+- [ ] Successful paid booking triggers receipt email with booking summary and payment reference
+- [ ] Authenticated owner can request receipt resend from booking success/details page
+- [ ] Email send/retry failures are logged with stable error codes and no secret leakage
+- **Implementation Notes:** Build on notification infrastructure from `T-041`; receipt data source must reuse `T-058` contract.
+- **Dependencies:** 041, 058, 069, 070
+- **Estimate:** M
+
+## T-074 — Implement downloadable booking receipt (PDF) for owner and paid guest flow
+
+<!-- issue: bookeasy:T-074 -->
+
+Status: TODO
+
+- **Feature Area:** Booking/Receipts
+- **Context:** Users need offline/shareable proof of booking beyond on-screen receipt.
+- **Scope Included:** Receipt PDF generation endpoint, secure access checks, success-page/download CTA wiring.
+- **Scope Excluded:** Tax invoice compliance formatting beyond MVP receipt fields.
+- **Acceptance Criteria:**
+- [ ] Owner (or valid guest success session) can download receipt PDF for eligible booking
+- [ ] Download output includes booking summary, room snapshot, totals, currency, and payment reference
+- [ ] Unauthorized download attempts return stable 403/404 responses
+- **Implementation Notes:** Reuse `T-058` receipt domain query; keep PDF renderer provider-agnostic and deterministic for tests.
+- **Dependencies:** 058, 069, 070, 071
+- **Estimate:** M
+
+## T-075 — Add authentication and receipt-access automated coverage (OAuth + ownership + delivery)
+
+<!-- issue: bookeasy:T-075 -->
+
+Status: TODO
+
+- **Feature Area:** QA/Security
+- **Context:** OAuth and ownership-linking introduce sensitive security boundaries that require regression coverage.
+- **Scope Included:** Unit/integration/e2e coverage for OAuth callback outcomes, booking claim/link, protected bookings pages, receipt email/download access.
+- **Scope Excluded:** Live OAuth provider contract tests against production provider.
+- **Acceptance Criteria:**
+- [ ] Tests cover logged-out redirect for “My Bookings” and post-login return flow
+- [ ] Tests cover guest-to-user booking linking success and forbidden/conflict cases
+- [ ] Tests cover receipt resend/download authorization and happy paths
+- **Implementation Notes:** Prefer mocked OAuth provider responses and deterministic fixtures; enforce no external network in CI tests.
+- **Dependencies:** 070, 071, 072, 073, 074
+- **Estimate:** M
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.
