@@ -73,6 +73,37 @@ function formatDateLabel(value: string): string {
   }).format(date);
 }
 
+async function createForwardedHeadersForInternalCalls(): Promise<Headers> {
+  const incoming = await headers();
+  const forwardedHeaders = new Headers({ accept: "application/json" });
+  const cookie = incoming.get("cookie");
+  const guestSession = incoming.get("x-guest-session");
+  if (cookie) {
+    forwardedHeaders.set("cookie", cookie);
+  }
+  if (guestSession) {
+    forwardedHeaders.set("x-guest-session", guestSession);
+  }
+
+  return forwardedHeaders;
+}
+
+async function attemptBookingOwnershipClaim(bookingId: string): Promise<void> {
+  const incoming = await headers();
+  const baseUrl = resolveBaseUrl(incoming);
+  const forwardedHeaders = await createForwardedHeadersForInternalCalls();
+
+  try {
+    await fetch(`${baseUrl}/api/bookings/${encodeURIComponent(bookingId)}/claim`, {
+      method: "POST",
+      headers: forwardedHeaders,
+      cache: "no-store",
+    });
+  } catch {
+    // Non-blocking: ownership claim is best effort.
+  }
+}
+
 async function verifyLatestPaymentForBooking(bookingId: string): Promise<void> {
   const latestPayment = await prisma.paymentIntent.findFirst({
     where: {
@@ -102,15 +133,7 @@ async function verifyLatestPaymentForBooking(bookingId: string): Promise<void> {
 
   const incoming = await headers();
   const baseUrl = resolveBaseUrl(incoming);
-  const forwardedHeaders = new Headers({ accept: "application/json" });
-  const cookie = incoming.get("cookie");
-  const guestSession = incoming.get("x-guest-session");
-  if (cookie) {
-    forwardedHeaders.set("cookie", cookie);
-  }
-  if (guestSession) {
-    forwardedHeaders.set("x-guest-session", guestSession);
-  }
+  const forwardedHeaders = await createForwardedHeadersForInternalCalls();
 
   try {
     await fetch(`${baseUrl}/api/payments/${encodeURIComponent(latestPayment.id)}/verify`, {
@@ -126,18 +149,7 @@ async function verifyLatestPaymentForBooking(bookingId: string): Promise<void> {
 async function loadBookingReceipt(bookingId: string): Promise<BookingReceiptLoadResult> {
   const incoming = await headers();
   const baseUrl = resolveBaseUrl(incoming);
-
-  const forwardedHeaders = new Headers({
-    accept: "application/json",
-  });
-  const cookie = incoming.get("cookie");
-  const guestSession = incoming.get("x-guest-session");
-  if (cookie) {
-    forwardedHeaders.set("cookie", cookie);
-  }
-  if (guestSession) {
-    forwardedHeaders.set("x-guest-session", guestSession);
-  }
+  const forwardedHeaders = await createForwardedHeadersForInternalCalls();
 
   const response = await fetch(`${baseUrl}/api/bookings/${encodeURIComponent(bookingId)}/receipt`, {
     method: "GET",
@@ -189,6 +201,7 @@ export default async function BookingSuccessPage({
   if (resolvedSearchParams.from === "notchpay" || resolvedSearchParams.retry != null) {
     await verifyLatestPaymentForBooking(resolvedParams.bookingId);
   }
+  await attemptBookingOwnershipClaim(resolvedParams.bookingId);
 
   const receiptState = await loadBookingReceipt(resolvedParams.bookingId);
   const retryHref = `/booking/${encodeURIComponent(resolvedParams.bookingId)}/success?retry=${

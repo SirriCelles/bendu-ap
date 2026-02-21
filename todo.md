@@ -1682,16 +1682,16 @@ Status: TODO
 
 <!-- issue: bookeasy:T-071 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Authentication/Booking
 - **Context:** Guest bookings exist, but authenticated users need a secure way to see their previously created guest bookings.
 - **Scope Included:** Ownership claim/link flow using guest session + verified email/account identity, idempotent linking logic, audit-safe updates.
 - **Scope Excluded:** Manual admin reassignment tooling.
 - **Acceptance Criteria:**
-- [ ] Newly authenticated user can claim eligible guest bookings created with matching identity signals
-- [ ] Linking operation is idempotent and does not duplicate ownership mappings
-- [ ] Non-matching/unauthorized claim attempts fail with stable forbidden/conflict errors
+- [x] Newly authenticated user can claim eligible guest bookings created with matching identity signals
+- [x] Linking operation is idempotent and does not duplicate ownership mappings
+- [x] Non-matching/unauthorized claim attempts fail with stable forbidden/conflict errors
 - **Implementation Notes:** Add service-level ownership migration helper and route/action invoked post-login from success page.
 - **Dependencies:** 029, 070
 - **Estimate:** M
