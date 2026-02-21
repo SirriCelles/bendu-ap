@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_GUEST_ROLE,
+  DEFAULT_USER_ROLE,
   USER_ROLES,
   isUserRole,
   resolveUserRole,
@@ -9,15 +10,20 @@ import {
 
 describe("auth role domain model", () => {
   it("defines only MVP roles", () => {
-    expect(USER_ROLES).toEqual(["ADMIN", "GUEST"]);
+    expect(USER_ROLES).toEqual(["ADMIN", "USER", "GUEST"]);
   });
 
   it("keeps guest as explicit default role", () => {
     expect(DEFAULT_GUEST_ROLE).toBe("GUEST");
   });
 
+  it("keeps user as default authenticated role", () => {
+    expect(DEFAULT_USER_ROLE).toBe("USER");
+  });
+
   it("detects valid roles", () => {
     expect(isUserRole("ADMIN")).toBe(true);
+    expect(isUserRole("USER")).toBe(true);
     expect(isUserRole("GUEST")).toBe(true);
     expect(isUserRole("owner")).toBe(false);
   });
@@ -31,6 +37,7 @@ describe("auth role domain model", () => {
 
   it("returns valid role values unchanged", () => {
     expect(resolveUserRole("ADMIN")).toBe("ADMIN");
+    expect(resolveUserRole("USER")).toBe("USER");
     expect(resolveUserRole("GUEST")).toBe("GUEST");
   });
 });

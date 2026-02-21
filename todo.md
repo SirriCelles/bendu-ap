@@ -1844,16 +1844,16 @@ Status: TODO
 
 <!-- issue: bookeasy:T-080 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Authentication/Security
 - **Context:** Current `ADMIN`/`GUEST` model conflates anonymous guest-session behavior and authenticated account behavior; dashboard access requires explicit authenticated user role semantics.
 - **Scope Included:** Introduce `USER` role for authenticated non-admin accounts and update auth role resolution/callbacks/guards accordingly.
 - **Scope Excluded:** Admin RBAC changes beyond compatibility updates.
 - **Acceptance Criteria:**
-- [ ] Authenticated non-admin sessions resolve to `USER` role (not anonymous guest fallback)
-- [ ] Existing admin protections remain intact for `/admin/**`
-- [ ] Booking/dashboard guards distinguish anonymous guest-session access from authenticated `USER` access
+- [x] Authenticated non-admin sessions resolve to `USER` role (not anonymous guest fallback)
+- [x] Existing admin protections remain intact for `/admin/**`
+- [x] Booking/dashboard guards distinguish anonymous guest-session access from authenticated `USER` access
 - **Implementation Notes:** Update `lib/security/auth-role.ts`, `lib/security/rbac.ts`, `lib/security/auth-callbacks.ts`, `auth.ts`, and related type declarations/tests.
 - **Dependencies:** 004, 070
 - **Estimate:** M

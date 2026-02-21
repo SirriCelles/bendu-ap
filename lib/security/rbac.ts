@@ -18,6 +18,12 @@ export function isAdmin(role: UserRole | null | undefined): role is "ADMIN" {
   return role === "ADMIN";
 }
 
+export function isAuthenticatedUserRole(
+  role: UserRole | null | undefined
+): role is "ADMIN" | "USER" {
+  return role === "ADMIN" || role === "USER";
+}
+
 export function hasRequiredRole(
   userRole: UserRole | null | undefined,
   requiredRole: UserRole
@@ -26,7 +32,11 @@ export function hasRequiredRole(
     return isAdmin(userRole);
   }
 
-  return userRole === "GUEST" || userRole === "ADMIN";
+  if (requiredRole === "USER") {
+    return isAuthenticatedUserRole(userRole);
+  }
+
+  return userRole === "GUEST" || isAuthenticatedUserRole(userRole);
 }
 
 export function requireRole(userRole: UserRole | null | undefined, requiredRole: UserRole): void {

@@ -4,6 +4,7 @@ import {
   assertAdmin,
   AuthorizationError,
   hasRequiredRole,
+  isAuthenticatedUserRole,
   isAdmin,
   requireRole,
 } from "@/lib/security/rbac";
@@ -11,14 +12,27 @@ import {
 describe("rbac guards", () => {
   it("identifies admin role", () => {
     expect(isAdmin("ADMIN")).toBe(true);
+    expect(isAdmin("USER")).toBe(false);
     expect(isAdmin("GUEST")).toBe(false);
     expect(isAdmin(undefined)).toBe(false);
   });
 
+  it("identifies authenticated account roles", () => {
+    expect(isAuthenticatedUserRole("ADMIN")).toBe(true);
+    expect(isAuthenticatedUserRole("USER")).toBe(true);
+    expect(isAuthenticatedUserRole("GUEST")).toBe(false);
+    expect(isAuthenticatedUserRole(undefined)).toBe(false);
+  });
+
   it("evaluates required role checks", () => {
     expect(hasRequiredRole("ADMIN", "ADMIN")).toBe(true);
+    expect(hasRequiredRole("USER", "ADMIN")).toBe(false);
     expect(hasRequiredRole("GUEST", "ADMIN")).toBe(false);
+    expect(hasRequiredRole("USER", "USER")).toBe(true);
+    expect(hasRequiredRole("ADMIN", "USER")).toBe(true);
+    expect(hasRequiredRole("GUEST", "USER")).toBe(false);
     expect(hasRequiredRole("GUEST", "GUEST")).toBe(true);
+    expect(hasRequiredRole("USER", "GUEST")).toBe(true);
     expect(hasRequiredRole("ADMIN", "GUEST")).toBe(true);
   });
 

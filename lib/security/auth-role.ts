@@ -1,10 +1,9 @@
-import type { Role } from "@/generated/prisma";
+export type UserRole = "ADMIN" | "USER" | "GUEST";
 
-export type UserRole = Role;
-
-export const USER_ROLES = ["ADMIN", "GUEST"] as const satisfies readonly UserRole[];
+export const USER_ROLES = ["ADMIN", "USER", "GUEST"] as const satisfies readonly UserRole[];
 
 export const DEFAULT_GUEST_ROLE = "GUEST" as const satisfies UserRole;
+export const DEFAULT_USER_ROLE = "USER" as const satisfies UserRole;
 
 export function isUserRole(value: string): value is UserRole {
   return USER_ROLES.includes(value as UserRole);

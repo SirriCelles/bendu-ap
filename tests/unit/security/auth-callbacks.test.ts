@@ -4,10 +4,10 @@ import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callback
 
 describe("auth role callbacks", () => {
   it("handles first oauth login payload deterministically", () => {
-    const token = { sub: "existing", role: "GUEST" as const };
+    const token = { sub: "existing", role: "USER" as const };
     const user = {
       id: "user:jane@example.com",
-      role: "GUEST" as const,
+      role: "USER" as const,
       email: "JANE@EXAMPLE.COM ",
       name: "Jane Doe",
     };
@@ -15,7 +15,7 @@ describe("auth role callbacks", () => {
     const nextToken = applyRoleToJwt({ token, user });
 
     expect(nextToken.sub).toBe("user:jane@example.com");
-    expect(nextToken.role).toBe("GUEST");
+    expect(nextToken.role).toBe("USER");
     expect(nextToken.email).toBe("jane@example.com");
     expect(nextToken.name).toBe("Jane Doe");
   });
@@ -23,7 +23,7 @@ describe("auth role callbacks", () => {
   it("keeps deterministic identity on repeat login callbacks", () => {
     const token = {
       sub: "user:jane@example.com",
-      role: "GUEST" as const,
+      role: "USER" as const,
       email: "JANE@EXAMPLE.COM",
       name: "Jane Doe",
     };
@@ -31,7 +31,7 @@ describe("auth role callbacks", () => {
     const nextToken = applyRoleToJwt({ token });
 
     expect(nextToken.sub).toBe("user:jane@example.com");
-    expect(nextToken.role).toBe("GUEST");
+    expect(nextToken.role).toBe("USER");
     expect(nextToken.email).toBe("jane@example.com");
     expect(nextToken.name).toBe("Jane Doe");
   });
@@ -116,7 +116,7 @@ describe("auth role callbacks", () => {
     const session = {
       user: {
         id: "",
-        role: "GUEST" as const,
+        role: "USER" as const,
         name: null,
         email: null,
         image: null,
@@ -125,7 +125,7 @@ describe("auth role callbacks", () => {
     };
     const token = {
       sub: "user:jane@example.com",
-      role: "GUEST" as const,
+      role: "USER" as const,
       email: "jane@example.com",
       name: "Jane Doe",
     };
@@ -133,7 +133,7 @@ describe("auth role callbacks", () => {
     const nextSession = applyRoleToSession({ session, token });
 
     expect(nextSession.user.id).toBe("user:jane@example.com");
-    expect(nextSession.user.role).toBe("GUEST");
+    expect(nextSession.user.role).toBe("USER");
     expect(nextSession.user.email).toBe("jane@example.com");
     expect(nextSession.user.name).toBe("Jane Doe");
   });
@@ -141,7 +141,7 @@ describe("auth role callbacks", () => {
   it("does not clobber token identity on malformed profile payload", () => {
     const token = {
       sub: "user:stable@example.com",
-      role: "GUEST" as const,
+      role: "USER" as const,
       email: "stable@example.com",
       name: "Stable User",
     };

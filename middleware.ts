@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 import { decideAdminMiddlewareAccess } from "@/lib/security/admin-middleware-access";
+import { resolveUserRole } from "@/lib/security/auth-role";
+import { isAuthenticatedUserRole } from "@/lib/security/rbac";
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const token = await getToken({
@@ -10,7 +12,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   });
 
   if (request.nextUrl.pathname.startsWith("/bookings") || request.nextUrl.pathname === "/account") {
-    if (!token?.sub) {
+    const role = resolveUserRole(token?.role);
+    if (!token?.sub || !isAuthenticatedUserRole(role)) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("returnTo", request.nextUrl.pathname + request.nextUrl.search);
       return NextResponse.redirect(loginUrl);

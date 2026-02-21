@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 
 import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callbacks";
-import { DEFAULT_GUEST_ROLE, type UserRole } from "@/lib/security/auth-role";
+import { DEFAULT_USER_ROLE, type UserRole } from "@/lib/security/auth-role";
 import { loadGoogleOAuthProviderConfig } from "@/lib/security/oauth-provider-config";
 
 type AuthUser = {
@@ -32,10 +32,10 @@ function resolveAuthenticatedUser(email: string, password: string, name?: string
   }
 
   return {
-    id: `guest:${normalizedEmail}`,
+    id: `user:${normalizedEmail}`,
     email: normalizedEmail,
-    name: name?.trim() || "Guest",
-    role: DEFAULT_GUEST_ROLE,
+    name: name?.trim() || "User",
+    role: DEFAULT_USER_ROLE,
   };
 }
 
@@ -46,7 +46,7 @@ function resolveRoleForEmail(email: string): UserRole {
     return "ADMIN";
   }
 
-  return DEFAULT_GUEST_ROLE;
+  return DEFAULT_USER_ROLE;
 }
 
 function resolveOAuthUser(input: {
