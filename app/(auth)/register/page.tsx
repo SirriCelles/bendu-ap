@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Eye, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
@@ -88,48 +88,6 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               </p>
             ) : null}
 
-            <form
-              action={async (formData) => {
-                "use server";
-                const name = String(formData.get("name") ?? "");
-                const email = String(formData.get("email") ?? "");
-                const password = String(formData.get("password") ?? "");
-                await signIn("credentials", { name, email, password, redirectTo: returnTo });
-              }}
-              className="space-y-3"
-            >
-              <Input
-                name="name"
-                type="text"
-                required
-                placeholder="Full name"
-                className="h-12 rounded-md border-[#d8d8dc] bg-white"
-              />
-              <Input
-                name="email"
-                type="email"
-                required
-                placeholder="Email"
-                className="h-12 rounded-md border-[#d8d8dc] bg-white"
-              />
-              <div className="relative">
-                <Input
-                  name="password"
-                  type="password"
-                  required
-                  placeholder="Password"
-                  className="h-12 rounded-md border-[#d8d8dc] bg-white pr-10"
-                />
-                <Eye
-                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
-                />
-              </div>
-              <Button type="submit" className="h-12 w-full">
-                Create Account
-              </Button>
-            </form>
-
             <div className="mt-5 flex items-center justify-end text-sm">
               <Link
                 href={`/login?returnTo=${encodeURIComponent(returnTo)}`}
@@ -173,6 +131,14 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 variant="outline"
                 className="h-12 w-full justify-center border-[#d8d8dc] bg-white text-base font-normal text-foreground"
               >
+                <Image
+                  src="/icon/magic-svgrepo-com.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="mr-2 h-4 w-4"
+                  aria-hidden
+                />
                 Email me a sign-in link
               </Button>
             </form>
