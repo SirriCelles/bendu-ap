@@ -15,12 +15,16 @@ type SessionRoleCallbackInput = {
 
 export function applyRoleToJwt({ token, user }: JwtRoleCallbackInput): JWT {
   if (user) {
+    const normalizedEmail =
+      typeof user.email === "string" ? user.email.trim().toLowerCase() : undefined;
     if (typeof user.id === "string" && user.id.trim().length > 0) {
       token.sub = user.id;
+    } else if (normalizedEmail && normalizedEmail.length > 0) {
+      token.sub = `user:${normalizedEmail}`;
     }
     token.role = resolveUserRole(user.role);
-    if (typeof user.email === "string") {
-      token.email = user.email.trim().toLowerCase();
+    if (normalizedEmail) {
+      token.email = normalizedEmail;
     }
     if (typeof user.name === "string") {
       token.name = user.name;

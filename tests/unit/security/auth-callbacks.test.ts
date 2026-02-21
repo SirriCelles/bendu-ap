@@ -163,4 +163,19 @@ describe("auth role callbacks", () => {
     expect(nextToken.email).toBe("stable@example.com");
     expect(nextToken.name).toBe("Stable User");
   });
+
+  it("derives deterministic subject from email when provider user id is missing", () => {
+    const token = { role: "USER" as const };
+    const user = {
+      role: "USER" as const,
+      email: "MOMO.USER@EXAMPLE.COM ",
+      name: "Momo User",
+    };
+
+    const nextToken = applyRoleToJwt({ token, user: user as never });
+
+    expect(nextToken.sub).toBe("user:momo.user@example.com");
+    expect(nextToken.email).toBe("momo.user@example.com");
+    expect(nextToken.role).toBe("USER");
+  });
 });

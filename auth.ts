@@ -1,9 +1,11 @@
 import NextAuth, { type User, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import Resend from "next-auth/providers/resend";
 
 import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callbacks";
 import { DEFAULT_USER_ROLE, type UserRole } from "@/lib/security/auth-role";
+import { loadMagicLinkProviderConfig } from "@/lib/security/magic-link-provider-config";
 import { loadGoogleOAuthProviderConfig } from "@/lib/security/oauth-provider-config";
 
 type AuthUser = {
@@ -67,6 +69,7 @@ function resolveOAuthUser(input: {
 }
 
 const googleOAuthConfig = loadGoogleOAuthProviderConfig();
+const magicLinkConfig = loadMagicLinkProviderConfig();
 const oauthProviders = googleOAuthConfig
   ? [
       Google({
@@ -80,6 +83,15 @@ const oauthProviders = googleOAuthConfig
             image: typeof profile.picture === "string" ? profile.picture : null,
           });
         },
+      }),
+    ]
+  : [];
+const magicLinkProviders = magicLinkConfig
+  ? [
+      Resend({
+        apiKey: magicLinkConfig.apiKey,
+        from: magicLinkConfig.fromEmail,
+        maxAge: magicLinkConfig.maxAgeSeconds,
       }),
     ]
   : [];
@@ -113,14 +125,17 @@ export const authConfig: NextAuthConfig = {
       },
     }),
     ...oauthProviders,
+    ...magicLinkProviders,
   ],
   callbacks: {
-    async signIn({ account, profile }) {
-      if (account?.provider !== "google") {
+    async signIn({ account, profile, user }) {
+      if (account?.provider !== "google" && account?.provider !== "resend") {
         return true;
       }
 
-      const email = typeof profile?.email === "string" ? profile.email.trim().toLowerCase() : "";
+      const emailFromProfile = typeof profile?.email === "string" ? profile.email : "";
+      const emailFromUser = typeof user?.email === "string" ? user.email : "";
+      const email = (emailFromProfile || emailFromUser).trim().toLowerCase();
       if (!email) {
         return false;
       }
@@ -128,6 +143,14 @@ export const authConfig: NextAuthConfig = {
       return true;
     },
     async jwt({ token, user }) {
+      if (user && typeof user.email === "string" && user.email.trim().length > 0) {
+        const normalizedEmail = user.email.trim().toLowerCase();
+        const role = resolveRoleForEmail(normalizedEmail);
+        user.role = role;
+        if (typeof user.id !== "string" || user.id.trim().length === 0) {
+          user.id = `${role === "ADMIN" ? "admin" : "user"}:${normalizedEmail}`;
+        }
+      }
       return applyRoleToJwt({ token, user: user as User | undefined });
     },
     async session({ session, token }) {

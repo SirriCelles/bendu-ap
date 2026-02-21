@@ -1952,16 +1952,17 @@ Status: DONE
 
 <!-- issue: bookeasy:T-086 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/security/magic-link-provider-config.test.ts tests/unit/security/auth-callbacks.test.ts tests/unit/security/oauth-provider-config.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Authentication
 - **Context:** OAuth alone is insufficient for guests who want a low-friction login path to access bookings; passwordless email magic links are required.
 - **Scope Included:** Auth.js Email provider wiring, required env/config validation, token/session callback mapping to `USER` role semantics, and safe fallback when email provider is unavailable.
 - **Scope Excluded:** SMS OTP authentication and enterprise IdP flows.
 - **Acceptance Criteria:**
-- [ ] Auth.js Email provider is configured with validated env vars and startup-safe errors
-- [ ] Magic-link sign-in creates/reuses deterministic account identity by canonical email
-- [ ] Session/JWT role payload remains compatible with `USER` role semantics and admin protections
+- [x] Auth.js Email provider is configured with validated env vars and startup-safe errors
+- [x] Magic-link sign-in creates/reuses deterministic account identity by canonical email
+- [x] Session/JWT role payload remains compatible with `USER` role semantics and admin protections
 - **Implementation Notes:** Update `auth.ts`, add provider config utility under `lib/security/**`, and wire transport adapter through existing email infrastructure from `T-041`.
 - **Dependencies:** 041, 070, 080
 - **Estimate:** M
