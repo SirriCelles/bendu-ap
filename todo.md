@@ -1700,16 +1700,16 @@ Status: DONE
 
 <!-- issue: bookeasy:T-072 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Authentication/Booking UX
 - **Context:** Users should not access booking history without authentication; current guest flows rely mostly on session-scoped access.
 - **Scope Included:** Protected “My Bookings” route(s), redirect-to-login behavior, post-login return-to-target flow.
 - **Scope Excluded:** Admin booking screens.
 - **Acceptance Criteria:**
-- [ ] Accessing “My Bookings” while logged out redirects to login
-- [ ] After successful login, user returns to intended bookings page
-- [ ] Authenticated user can only see bookings they own
+- [x] Accessing “My Bookings” while logged out redirects to login
+- [x] After successful login, user returns to intended bookings page
+- [x] Authenticated user can only see bookings they own
 - **Implementation Notes:** Reuse guard utilities from `T-004` and booking ownership constraints from `T-029`/`T-071`.
 - **Dependencies:** 004, 029, 070, 071
 - **Estimate:** S
