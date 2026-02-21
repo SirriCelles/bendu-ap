@@ -1643,16 +1643,17 @@ Verification: 2026-02-20 (`pnpm exec playwright test tests/e2e/notchpay-return-r
 
 <!-- issue: bookeasy:T-070 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/security/oauth-provider-config.test.ts tests/unit/security/auth-callbacks.test.ts tests/unit/integration/auth-oauth-entry-return.test.tsx` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Authentication
 - **Context:** Current auth setup provides role/routing skeleton but does not ship end-user OAuth sign-in for guest-to-account upgrade.
 - **Scope Included:** Auth.js OAuth provider wiring (Google MVP), sign-in/sign-up UI entry points, callback handling, session role assignment for USER flows.
 - **Scope Excluded:** Enterprise SSO and multi-provider management UI.
 - **Acceptance Criteria:**
-- [ ] User can sign in/up with OAuth from public booking/success context
-- [ ] OAuth callback creates or reuses user account deterministically
-- [ ] Session contains role and identity fields required for booking ownership checks
+- [x] User can sign in/up with OAuth from public booking/success context
+- [x] OAuth callback creates or reuses user account deterministically
+- [x] Session contains role and identity fields required for booking ownership checks
 - **Implementation Notes:** Extend existing Auth.js setup from `T-004`; add user-facing auth screens/entry points and callback guards.
 - **Dependencies:** 004
 - **Estimate:** M
