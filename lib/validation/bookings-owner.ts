@@ -73,7 +73,7 @@ export const bookingOwnerDetailResponseSchema = z.object({
       guest: z.object({
         fullName: z.string().trim().min(2).max(120),
         email: z.email().trim().toLowerCase().max(320),
-        phone: z.string().trim().min(7).max(32),
+        phone: z.string().trim().max(32),
       }),
       room: z.object({
         slug: z.string().trim().min(1).max(191),

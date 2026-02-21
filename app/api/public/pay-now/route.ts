@@ -22,7 +22,7 @@ const payNowFormSchema = z.object({
   guests: z.coerce.number().int().min(1).max(10),
   guestFullName: z.string().trim().min(2).max(120),
   guestEmail: z.email().trim().toLowerCase().max(320),
-  guestPhone: z.string().trim().min(7).max(32),
+  guestPhone: z.string().trim().max(32).optional().default(""),
 });
 
 type ParsedPayNowForm = z.infer<typeof payNowFormSchema>;
@@ -278,7 +278,7 @@ export async function POST(request: Request): Promise<Response> {
       customer: {
         fullName: formInput.guestFullName,
         email: formInput.guestEmail,
-        phone: formInput.guestPhone,
+        ...(formInput.guestPhone ? { phone: formInput.guestPhone } : {}),
       },
       redirectUrls: {
         returnUrl: `${baseUrl}/payments/notchpay/callback?bookingId=${encodeURIComponent(

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Sparkles, Star } from "lucide-react";
 
+import { auth } from "@/auth";
 import { PayNowSubmitButton } from "@/components/public/rooms/pay-now-submit-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,6 +123,35 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
   const gallery = room.images.galleryImageUrls.length
     ? room.images.galleryImageUrls
     : [primaryImage, primaryImage];
+  const session = await auth();
+  const authenticatedEmail =
+    typeof session?.user?.email === "string" ? session.user.email.trim().toLowerCase() : "";
+  const authenticatedName = typeof session?.user?.name === "string" ? session.user.name.trim() : "";
+  let prefillGuestFullName = authenticatedName;
+  const prefillGuestEmail = authenticatedEmail;
+  if (authenticatedEmail) {
+    try {
+      const latestBookingContact = await prisma.booking.findFirst({
+        where: {
+          guestEmail: {
+            equals: authenticatedEmail,
+            mode: "insensitive",
+          },
+        },
+        select: {
+          guestFullName: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      if (!prefillGuestFullName) {
+        prefillGuestFullName = latestBookingContact?.guestFullName?.trim() ?? "";
+      }
+    } catch {
+      // Keep auth-based defaults if booking lookup fails.
+    }
+  }
   const payNowAttemptId = crypto.randomUUID();
   const payNowEnabled =
     Boolean(parsed.input.bookingContext) && room.availabilitySummary.isAvailable;
@@ -322,6 +352,8 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                         minLength={2}
                         maxLength={120}
                         placeholder="Your full name"
+                        defaultValue={prefillGuestFullName}
+                        autoComplete="name"
                         className="h-11"
                       />
                     </div>
@@ -338,39 +370,19 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
                         name="guestEmail"
                         required
                         placeholder="you@example.com"
+                        defaultValue={prefillGuestEmail}
+                        autoComplete="email"
                         className="h-11"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="guestPhone"
-                        className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
-                      >
-                        Phone (Momo)
-                      </Label>
-                      <Input
-                        id="guestPhone"
-                        type="tel"
-                        name="guestPhone"
-                        required
-                        minLength={7}
-                        maxLength={32}
-                        placeholder="+2376..."
-                        className="h-11"
-                      />
-                    </div>
-
                     {!payNowEnabled ? (
                       <p className="text-xs text-destructive">
                         Select valid dates with available inventory before starting payment.
                       </p>
                     ) : null}
 
-                    <div className="grid grid-cols-1 gap-2">
+                    <div className="grid grid-cols-1">
                       <PayNowSubmitButton disabled={!payNowEnabled} />
-                      <Button variant="outline" asChild className="w-full">
-                        <Link href="/login?returnTo=/bookings">View Bookings</Link>
-                      </Button>
                     </div>
                   </form>
                 </CardContent>

@@ -26,7 +26,7 @@ function isAfterDateRange(start: Date, end: Date): boolean {
 const bookingGuestSchema = z.object({
   guestFullName: z.string().trim().min(2).max(120),
   guestEmail: z.email().trim().toLowerCase().max(320),
-  guestPhone: z.string().trim().min(7).max(32),
+  guestPhone: z.string().trim().max(32).default(""),
   adultsCount: z.number().int().min(1).max(MAX_ADULTS_COUNT),
   childrenCount: z.number().int().min(0).max(MAX_CHILDREN_COUNT).default(0),
 });
