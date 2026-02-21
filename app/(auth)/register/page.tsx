@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { Eye, Sparkles } from "lucide-react";
 
 import { signIn } from "@/auth";
@@ -40,6 +41,14 @@ function resolveAuthErrorMessage(errorCode: string | undefined): string | null {
 
   if (errorCode === "OAuthCallbackError" || errorCode === "OAuthAccountNotLinked") {
     return "We could not complete account creation. Please try again.";
+  }
+
+  if (errorCode === "Verification") {
+    return "This sign-in link is invalid or expired. Request a new link to continue.";
+  }
+
+  if (errorCode === "EmailProviderUnavailable") {
+    return "Magic-link signup is temporarily unavailable. Please use Google or credentials.";
   }
 
   return "Sign-up failed. Please retry.";
@@ -129,6 +138,44 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 Already have an account?
               </Link>
             </div>
+
+            <div className="my-7 border-t border-[#e7e7ea]" />
+
+            <form
+              action={async (formData) => {
+                "use server";
+                const email = String(formData.get("email") ?? "").trim();
+                if (!email) {
+                  return;
+                }
+                try {
+                  await signIn("resend", {
+                    email,
+                    redirectTo: returnTo,
+                  });
+                } catch {
+                  redirect(
+                    `/register?returnTo=${encodeURIComponent(returnTo)}&error=EmailProviderUnavailable`
+                  );
+                }
+              }}
+              className="space-y-3"
+            >
+              <Input
+                name="email"
+                type="email"
+                required
+                placeholder="Email for magic link"
+                className="h-12 rounded-md border-[#d8d8dc] bg-white"
+              />
+              <Button
+                type="submit"
+                variant="outline"
+                className="h-12 w-full justify-center border-[#d8d8dc] bg-white text-base font-normal text-foreground"
+              >
+                Email me a sign-in link
+              </Button>
+            </form>
 
             <div className="my-7 border-t border-[#e7e7ea]" />
 

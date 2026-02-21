@@ -1971,16 +1971,17 @@ Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/security/magic-link-p
 
 <!-- issue: bookeasy:T-087 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/integration/auth-oauth-entry-return.test.tsx tests/unit/security/magic-link-provider-config.test.ts tests/unit/security/auth-callbacks.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Authentication/Booking UX
 - **Context:** Users need a clear “email me a sign-in link” flow from login/register surfaces, including post-click guidance and return-to continuity.
 - **Scope Included:** Login/register magic-link request forms, success/pending states, expired/invalid link handling, and return-to routing back to `/bookings` or originating booking path.
 - **Scope Excluded:** Marketing email copy customization.
 - **Acceptance Criteria:**
-- [ ] Login/register pages support magic-link request with user-safe success/error states
-- [ ] Clicking a valid magic link signs user in and returns them to intended `returnTo` page
-- [ ] Post-auth flow preserves booking ownership linking behavior for previously guest-created bookings
+- [x] Login/register pages support magic-link request with user-safe success/error states
+- [x] Clicking a valid magic link signs user in and returns them to intended `returnTo` page
+- [x] Post-auth flow preserves booking ownership linking behavior for previously guest-created bookings
 - **Implementation Notes:** Extend `app/(auth)/login/page.tsx`, `app/(auth)/register/page.tsx`, and callback/error handling routes; reuse ownership claim hook from `T-071`.
 - **Dependencies:** 071, 072, 086
 - **Estimate:** M
