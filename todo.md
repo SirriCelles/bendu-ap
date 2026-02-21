@@ -1990,16 +1990,17 @@ Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/integration/auth-oaut
 
 <!-- issue: bookeasy:T-088 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/security/prisma-auth-adapter.test.ts tests/unit/integration/auth-oauth-entry-return.test.tsx tests/unit/security/bookings-auth-gating.test.ts tests/unit/security/auth-callbacks.test.ts` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** QA/Security
 - **Context:** Magic-link auth introduces token misuse/expiration risks and must be covered to avoid auth regressions.
 - **Scope Included:** Unit/integration tests for request validation, callback token handling, expired/invalid token errors, return-to continuity, and role/ownership invariants.
 - **Scope Excluded:** Live end-to-end email provider delivery tests against production infrastructure.
 - **Acceptance Criteria:**
-- [ ] Tests cover magic-link request success/failure validation paths and stable error mapping
-- [ ] Tests cover callback success, expired token, and invalid token flows with safe UX messages
-- [ ] Tests verify authenticated session role and `/bookings` ownership enforcement remain intact after magic-link login
+- [x] Tests cover magic-link request success/failure validation paths and stable error mapping
+- [x] Tests cover callback success, expired token, and invalid token flows with safe UX messages
+- [x] Tests verify authenticated session role and `/bookings` ownership enforcement remain intact after magic-link login
 - **Implementation Notes:** Add tests under `tests/unit/security/**`, `tests/unit/integration/**`, and route-specific API tests with mocked transport/provider boundaries.
 - **Dependencies:** 086, 087
 - **Estimate:** M

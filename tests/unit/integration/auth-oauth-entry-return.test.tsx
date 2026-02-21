@@ -96,6 +96,48 @@ describe("oauth entry and return flow", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows invalid/expired magic-link message on register error=Verification", async () => {
+    const page = await RegisterPage({
+      searchParams: Promise.resolve({
+        error: "Verification",
+      }),
+    });
+
+    render(page);
+
+    expect(
+      screen.getByText("This sign-in link is invalid or expired. Request a new link to continue.")
+    ).toBeInTheDocument();
+  });
+
+  it("shows provider unavailable message on login fallback", async () => {
+    const page = await LoginPage({
+      searchParams: Promise.resolve({
+        error: "EmailProviderUnavailable",
+      }),
+    });
+
+    render(page);
+
+    expect(
+      screen.getByText("Magic-link login is temporarily unavailable. Please use Google sign-in.")
+    ).toBeInTheDocument();
+  });
+
+  it("shows provider unavailable message on register fallback", async () => {
+    const page = await RegisterPage({
+      searchParams: Promise.resolve({
+        error: "EmailProviderUnavailable",
+      }),
+    });
+
+    render(page);
+
+    expect(
+      screen.getByText("Magic-link signup is temporarily unavailable. Please use Google sign-in.")
+    ).toBeInTheDocument();
+  });
+
   it("renders verify-request pending state with fallback links", async () => {
     const page = await VerifyRequestPage({
       searchParams: Promise.resolve({

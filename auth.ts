@@ -3,10 +3,12 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Resend from "next-auth/providers/resend";
 
+import { prisma } from "@/lib/db/prisma";
 import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callbacks";
 import { DEFAULT_USER_ROLE, type UserRole } from "@/lib/security/auth-role";
 import { loadMagicLinkProviderConfig } from "@/lib/security/magic-link-provider-config";
 import { loadGoogleOAuthProviderConfig } from "@/lib/security/oauth-provider-config";
+import { createPrismaAuthAdapter } from "@/lib/security/prisma-auth-adapter";
 
 type AuthUser = {
   id: string;
@@ -97,6 +99,7 @@ const magicLinkProviders = magicLinkConfig
   : [];
 
 export const authConfig: NextAuthConfig = {
+  adapter: createPrismaAuthAdapter(prisma),
   session: {
     strategy: "jwt",
   },
