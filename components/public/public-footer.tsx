@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Facebook, Instagram, MessageCircle } from "lucide-react";
 
 const pages = [
   { href: "/", label: "Home" },
@@ -32,23 +32,44 @@ export function PublicFooter() {
               <Link
                 href="https://facebook.com"
                 aria-label="Facebook"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#DDE6ED] text-[#1A3D63] sm:h-11 sm:w-11 md:h-16 md:w-16"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#DDE6ED] sm:h-11 sm:w-11 md:h-16 md:w-16"
               >
-                <Facebook className="h-6 w-6 fill-current sm:h-7 sm:w-7 md:h-9 md:w-9" />
+                <Image
+                  src="/icons/socials/facebook-3-logo-svgrepo-com.svg"
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-6 w-6 sm:h-7 sm:w-7 md:h-9 md:w-9"
+                  aria-hidden
+                />
               </Link>
               <Link
                 href="https://instagram.com"
                 aria-label="Instagram"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#DDE6ED] text-[#1A3D63] sm:h-11 sm:w-11 md:h-16 md:w-16"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#DDE6ED] sm:h-11 sm:w-11 md:h-16 md:w-16"
               >
-                <Instagram className="h-6 w-6 sm:h-7 sm:w-7 md:h-9 md:w-9" />
+                <Image
+                  src="/icons/socials/instagram-2-1-logo-svgrepo-com.svg"
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-6 w-6 sm:h-7 sm:w-7 md:h-9 md:w-9"
+                  aria-hidden
+                />
               </Link>
               <Link
                 href="https://wa.me/237675830461"
                 aria-label="WhatsApp"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#DDE6ED] text-[#1A3D63] sm:h-11 sm:w-11 md:h-16 md:w-16"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#DDE6ED] sm:h-11 sm:w-11 md:h-16 md:w-16"
               >
-                <MessageCircle className="h-6 w-6 sm:h-7 sm:w-7 md:h-9 md:w-9" />
+                <Image
+                  src="/icons/socials/whatsapp-svgrepo-com.svg"
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-6 w-6 sm:h-7 sm:w-7 md:h-9 md:w-9"
+                  aria-hidden
+                />
               </Link>
             </div>
           </section>

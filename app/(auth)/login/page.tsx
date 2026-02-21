@@ -70,7 +70,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <div className="w-full">
             <div className="mb-8 text-center">
               <Sparkles className="mx-auto h-10 w-10 text-primary" />
-              <h1 className="mt-4 text-4xl font-bold text-foreground">Log in to BookEasy</h1>
+              <h1 className="mt-4 text-4xl font-bold text-foreground">Log in</h1>
             </div>
 
             {errorMessage ? (
