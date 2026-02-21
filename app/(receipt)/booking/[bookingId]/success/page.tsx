@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import Image from "next/image";
+import { auth } from "@/auth";
 
+import { ResendReceiptButton } from "@/components/public/booking/resend-receipt-button";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db/prisma";
 import {
@@ -204,6 +206,7 @@ export default async function BookingSuccessPage({
   await attemptBookingOwnershipClaim(resolvedParams.bookingId);
 
   const receiptState = await loadBookingReceipt(resolvedParams.bookingId);
+  const session = await auth();
   const retryHref = `/booking/${encodeURIComponent(resolvedParams.bookingId)}/success?retry=${
     resolvedSearchParams.retry === "1" ? "2" : "1"
   }`;
@@ -394,6 +397,7 @@ export default async function BookingSuccessPage({
         </article>
 
         <div className="mt-3 flex flex-col justify-center gap-2 sm:flex-row">
+          {session?.user?.id ? <ResendReceiptButton bookingId={resolvedParams.bookingId} /> : null}
           <Button asChild>
             <Link href="/bookings">See My Bookings</Link>
           </Button>

@@ -1719,19 +1719,41 @@ Status: DONE
 
 <!-- issue: bookeasy:T-073 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/domain/notifications.test.ts tests/unit/api/booking-receipt-resend-route.test.ts tests/unit/public/resend-receipt-button.test.tsx tests/unit/public/booking-success-page-ssr.test.tsx` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Notifications/Booking
 - **Context:** Receipt page exists, but users still need durable confirmation via email after successful payment.
 - **Scope Included:** Automatic receipt email trigger on confirmed+paid booking, resend endpoint/action with auth/ownership checks.
 - **Scope Excluded:** Marketing email sequences.
 - **Acceptance Criteria:**
-- [ ] Successful paid booking triggers receipt email with booking summary and payment reference
-- [ ] Authenticated owner can request receipt resend from booking success/details page
-- [ ] Email send/retry failures are logged with stable error codes and no secret leakage
+- [x] Successful paid booking triggers receipt email with booking summary and payment reference
+- [x] Authenticated owner can request receipt resend from booking success/details page
+- [x] Email send/retry failures are logged with stable error codes and no secret leakage
 - **Implementation Notes:** Build on notification infrastructure from `T-041`; receipt data source must reuse `T-058` contract.
 - **Dependencies:** 041, 058, 069, 070
 - **Estimate:** M
+- **Subtasks:**
+- [x] `T-073.1` Define receipt email payload contract and template data mapper from `T-058` receipt DTO.
+      Acceptance Criteria: Mapper produces deterministic subject/body fields (booking id, guest, dates, totals, payment reference) without provider-specific leakage.
+- [x] `T-073.2` Implement automatic post-payment email trigger in confirmation/verify flow.
+      Acceptance Criteria: When payment becomes successful and booking is confirmed, email dispatch is invoked exactly once for that booking transition.
+- [x] `T-073.3` Add idempotency guard for receipt email dispatch.
+      Acceptance Criteria: Repeat verify/webhook/callback processing does not send duplicate confirmation emails for the same booking.
+- [x] `T-073.4` Persist dispatch metadata on payment/booking record for traceability.
+      Acceptance Criteria: Sent attempts stamp provider message id, sentAt, and attempt counters in metadata/audit-friendly shape.
+- [x] `T-073.5` Create authenticated resend endpoint `POST /api/bookings/[bookingId]/receipt/resend`.
+      Acceptance Criteria: Owner/admin can request resend; non-owner access returns stable 403/404; endpoint returns normalized success/error response.
+- [x] `T-073.6` Add resend action wiring on booking success/details UI.
+      Acceptance Criteria: UI button triggers resend endpoint, shows pending/success/error states, and prevents accidental double-submit while request is in flight.
+- [x] `T-073.7` Add rate limiting + structured logs for resend endpoint.
+      Acceptance Criteria: Excess resend attempts return 429; logs include requestId, bookingId, actorId, and sanitized error code without secrets.
+- [x] `T-073.8` Map email provider failures to stable domain/API errors.
+      Acceptance Criteria: Provider/network/validation failures map to typed error codes and user-safe messages; raw provider secrets are never surfaced.
+- [x] `T-073.9` Add automated tests for auto-send and resend authorization flows.
+      Acceptance Criteria: Tests cover auto-send happy path, idempotent duplicate suppression, owner/admin resend success, and forbidden resend attempts.
+- [x] `T-073.10` Add failure-path tests for resend + provider errors.
+      Acceptance Criteria: Tests cover provider timeout/failure mapping, rate-limit behavior, and logging metadata assertions with no external network calls.
 
 ## T-074 — Implement downloadable booking receipt (PDF) for owner and paid guest flow
 

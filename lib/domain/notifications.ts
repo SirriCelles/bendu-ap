@@ -37,6 +37,8 @@ type SendBookingConfirmationEmailOptions = {
   fetchImpl?: typeof fetch;
   env?: Partial<NodeJS.ProcessEnv>;
   now?: Date;
+  force?: boolean;
+  source?: "auto_dispatch" | "manual_resend";
 };
 
 type PaymentIntentNotificationRecord = {
@@ -385,7 +387,9 @@ export async function sendBookingConfirmationEmailByPaymentIntentId(
   }
 
   const metadata = extractMetadataObject(paymentIntent.metadata);
-  if (hasConfirmationEmailBeenSent(metadata)) {
+  const force = options.force === true;
+  const source = options.source ?? "auto_dispatch";
+  if (!force && hasConfirmationEmailBeenSent(metadata)) {
     return {
       status: "skipped",
       reason: "already_sent",
@@ -439,8 +443,26 @@ export async function sendBookingConfirmationEmailByPaymentIntentId(
       data: {
         metadata: {
           ...metadata,
-          confirmationEmailSentAt: now.toISOString(),
+          confirmationEmailSentAt:
+            typeof metadata.confirmationEmailSentAt === "string"
+              ? metadata.confirmationEmailSentAt
+              : now.toISOString(),
+          confirmationEmailLastSentAt: now.toISOString(),
           confirmationEmailProviderMessageId: result.providerMessageId,
+          confirmationEmailDispatchCount:
+            typeof metadata.confirmationEmailDispatchCount === "number"
+              ? metadata.confirmationEmailDispatchCount + 1
+              : 1,
+          confirmationEmailLastDispatchSource: source,
+          ...(force
+            ? {
+                confirmationEmailResendCount:
+                  typeof metadata.confirmationEmailResendCount === "number"
+                    ? metadata.confirmationEmailResendCount + 1
+                    : 1,
+                confirmationEmailLastResentAt: now.toISOString(),
+              }
+            : {}),
         },
       },
     });

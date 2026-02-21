@@ -124,7 +124,10 @@ describe("sendBookingConfirmationEmailByPaymentIntentId", () => {
       data: { metadata: Record<string, unknown> };
     };
     expect(updateArgs.data.metadata.confirmationEmailSentAt).toBe("2026-03-01T00:00:00.000Z");
+    expect(updateArgs.data.metadata.confirmationEmailLastSentAt).toBe("2026-03-01T00:00:00.000Z");
     expect(updateArgs.data.metadata.confirmationEmailProviderMessageId).toBe("re_email_123");
+    expect(updateArgs.data.metadata.confirmationEmailDispatchCount).toBe(1);
+    expect(updateArgs.data.metadata.confirmationEmailLastDispatchSource).toBe("auto_dispatch");
   });
 
   it("returns failed when provider send fails", async () => {
@@ -167,5 +170,43 @@ describe("sendBookingConfirmationEmailByPaymentIntentId", () => {
     expect(result.status).toBe("skipped");
     expect(result.reason).toBe("already_sent");
     expect(update).not.toHaveBeenCalled();
+  });
+
+  it("supports manual resend with force flag and updates resend metadata", async () => {
+    const { db, update } = buildDb({
+      metadata: {
+        confirmationEmailSentAt: "2026-03-01T00:00:00.000Z",
+        confirmationEmailDispatchCount: 1,
+      },
+    });
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ id: "re_email_456" }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        })
+    );
+
+    const result = await sendBookingConfirmationEmailByPaymentIntentId(db as never, "pay_1", {
+      fetchImpl: fetchImpl as never,
+      env: {
+        RESEND_API_KEY: "re_test",
+        RESEND_FROM_EMAIL: "BookEasy <hello@example.com>",
+      },
+      now: new Date("2026-03-02T00:00:00.000Z"),
+      force: true,
+      source: "manual_resend",
+    });
+
+    expect(result.status).toBe("sent");
+    expect(update).toHaveBeenCalledTimes(1);
+    const updateArgs = (update.mock as unknown as { calls: Array<[unknown]> }).calls[0][0] as {
+      data: { metadata: Record<string, unknown> };
+    };
+    expect(updateArgs.data.metadata.confirmationEmailSentAt).toBe("2026-03-01T00:00:00.000Z");
+    expect(updateArgs.data.metadata.confirmationEmailLastSentAt).toBe("2026-03-02T00:00:00.000Z");
+    expect(updateArgs.data.metadata.confirmationEmailResendCount).toBe(1);
+    expect(updateArgs.data.metadata.confirmationEmailLastDispatchSource).toBe("manual_resend");
+    expect(updateArgs.data.metadata.confirmationEmailDispatchCount).toBe(2);
   });
 });

@@ -6,6 +6,7 @@ import { HttpError } from "@/lib/http/errors";
 // Named limiter profiles for different write surfaces.
 type BucketName =
   | "bookings_write"
+  | "booking_receipt_write"
   | "payments_write"
   | "payments_webhook_write"
   | "messages_write"
@@ -31,6 +32,11 @@ const BUCKETS: Record<BucketName, BucketConfig> = {
     limit: 10,
     window: "1 m",
     prefix: "bookings",
+  },
+  booking_receipt_write: {
+    limit: 5,
+    window: "5 m",
+    prefix: "booking-receipt",
   },
   payments_write: {
     limit: 15,

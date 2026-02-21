@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   headersMock: vi.fn(),
   paymentIntentFindFirstMock: vi.fn(),
+  authMock: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -18,6 +19,10 @@ vi.mock("@/lib/db/prisma", () => ({
   },
 }));
 
+vi.mock("@/auth", () => ({
+  auth: mocks.authMock,
+}));
+
 import BookingSuccessPage from "../../../app/(receipt)/booking/[bookingId]/success/page";
 
 describe("BookingSuccessPage SSR", () => {
@@ -28,6 +33,7 @@ describe("BookingSuccessPage SSR", () => {
 
   beforeEach(() => {
     mocks.paymentIntentFindFirstMock.mockResolvedValue(null);
+    mocks.authMock.mockResolvedValue(null);
     mocks.headersMock.mockResolvedValue(
       new Headers({
         host: "localhost:3000",
