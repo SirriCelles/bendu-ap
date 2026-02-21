@@ -97,6 +97,10 @@ describe("BookingSuccessPage SSR", () => {
     expect(screen.getByRole("heading", { name: "Thank You For Booking" })).toBeInTheDocument();
     expect(screen.getByText("bk_123")).toBeInTheDocument();
     expect(screen.getAllByText("Deluxe Studio").length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "Download Receipt (PDF)" })).toHaveAttribute(
+      "href",
+      "/api/bookings/bk_123/receipt/pdf"
+    );
     expect(screen.getByRole("link", { name: "View Bookings" })).toHaveAttribute(
       "href",
       "/login?returnTo=/dashboard"

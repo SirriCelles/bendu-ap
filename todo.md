@@ -1759,16 +1759,17 @@ Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/domain/notifications.
 
 <!-- issue: bookeasy:T-074 -->
 
-Status: TODO
+Status: DONE
+Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/api/booking-receipt-pdf-route.test.ts tests/unit/public/booking-success-page-ssr.test.tsx` ✅, `pnpm typecheck` ✅)
 
 - **Feature Area:** Booking/Receipts
 - **Context:** Users need offline/shareable proof of booking beyond on-screen receipt.
 - **Scope Included:** Receipt PDF generation endpoint, secure access checks, success-page/download CTA wiring.
 - **Scope Excluded:** Tax invoice compliance formatting beyond MVP receipt fields.
 - **Acceptance Criteria:**
-- [ ] Owner (or valid guest success session) can download receipt PDF for eligible booking
-- [ ] Download output includes booking summary, room snapshot, totals, currency, and payment reference
-- [ ] Unauthorized download attempts return stable 403/404 responses
+- [x] Owner (or valid guest success session) can download receipt PDF for eligible booking
+- [x] Download output includes booking summary, room snapshot, totals, currency, and payment reference
+- [x] Unauthorized download attempts return stable 403/404 responses
 - **Implementation Notes:** Reuse `T-058` receipt domain query; keep PDF renderer provider-agnostic and deterministic for tests.
 - **Dependencies:** 058, 069, 070, 071
 - **Estimate:** M

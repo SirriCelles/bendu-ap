@@ -399,6 +399,13 @@ export default async function BookingSuccessPage({
 
         <div className="mt-3 flex flex-col justify-center gap-2 sm:flex-row">
           {session?.user?.id ? <ResendReceiptButton bookingId={resolvedParams.bookingId} /> : null}
+          <Button variant="outline" asChild>
+            <Link
+              href={`/api/bookings/${encodeURIComponent(resolvedParams.bookingId)}/receipt/pdf`}
+            >
+              Download Receipt (PDF)
+            </Link>
+          </Button>
           <Button asChild>
             <Link href={bookingsHref}>View Bookings</Link>
           </Button>
