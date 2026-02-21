@@ -3,6 +3,39 @@ import { describe, expect, it } from "vitest";
 import { applyRoleToJwt, applyRoleToSession } from "@/lib/security/auth-callbacks";
 
 describe("auth role callbacks", () => {
+  it("handles first oauth login payload deterministically", () => {
+    const token = { sub: "existing", role: "GUEST" as const };
+    const user = {
+      id: "user:jane@example.com",
+      role: "GUEST" as const,
+      email: "JANE@EXAMPLE.COM ",
+      name: "Jane Doe",
+    };
+
+    const nextToken = applyRoleToJwt({ token, user });
+
+    expect(nextToken.sub).toBe("user:jane@example.com");
+    expect(nextToken.role).toBe("GUEST");
+    expect(nextToken.email).toBe("jane@example.com");
+    expect(nextToken.name).toBe("Jane Doe");
+  });
+
+  it("keeps deterministic identity on repeat login callbacks", () => {
+    const token = {
+      sub: "user:jane@example.com",
+      role: "GUEST" as const,
+      email: "JANE@EXAMPLE.COM",
+      name: "Jane Doe",
+    };
+
+    const nextToken = applyRoleToJwt({ token });
+
+    expect(nextToken.sub).toBe("user:jane@example.com");
+    expect(nextToken.role).toBe("GUEST");
+    expect(nextToken.email).toBe("jane@example.com");
+    expect(nextToken.name).toBe("Jane Doe");
+  });
+
   it("stores admin role and subject on sign-in", () => {
     const token = { sub: "existing" };
     const user = {
@@ -103,5 +136,31 @@ describe("auth role callbacks", () => {
     expect(nextSession.user.role).toBe("GUEST");
     expect(nextSession.user.email).toBe("jane@example.com");
     expect(nextSession.user.name).toBe("Jane Doe");
+  });
+
+  it("does not clobber token identity on malformed profile payload", () => {
+    const token = {
+      sub: "user:stable@example.com",
+      role: "GUEST" as const,
+      email: "stable@example.com",
+      name: "Stable User",
+    };
+
+    const malformedUser = {
+      id: "" as unknown as string,
+      role: "OWNER" as never,
+      email: undefined,
+      name: undefined,
+    };
+
+    const nextToken = applyRoleToJwt({
+      token,
+      user: malformedUser as never,
+    });
+
+    expect(nextToken.sub).toBe("user:stable@example.com");
+    expect(nextToken.role).toBe("GUEST");
+    expect(nextToken.email).toBe("stable@example.com");
+    expect(nextToken.name).toBe("Stable User");
   });
 });

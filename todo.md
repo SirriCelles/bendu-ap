@@ -1077,7 +1077,7 @@ Status: DONE
 
 <!-- issue: bookeasy:T-059 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Payments
 - **Context:** System design requires easy provider swap from Notch Pay to CinetPay with minimal domain impact.
@@ -1673,9 +1673,9 @@ Status: TODO
       Acceptance Criteria: Denied/failed OAuth attempts render user-safe error messages with retry path.
 - [x] `T-070.8` Add route guard updates for authenticated user pages.
       Acceptance Criteria: Protected user routes require session and redirect unauthenticated users to login with preserved target.
-- [ ] `T-070.9` Add unit tests for callback/session normalization and deterministic user creation.
+- [x] `T-070.9` Add unit tests for callback/session normalization and deterministic user creation.
       Acceptance Criteria: Tests cover first login, repeat login, and malformed profile payload handling.
-- [ ] `T-070.10` Add integration tests for OAuth entry + return flow.
+- [x] `T-070.10` Add integration tests for OAuth entry + return flow.
       Acceptance Criteria: Tests validate login initiation, callback success, and return-to-target behavior (mocked provider boundary).
 
 ## T-071 — Implement guest-to-user booking ownership linking after authentication
