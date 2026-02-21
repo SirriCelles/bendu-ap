@@ -1948,6 +1948,60 @@ Status: DONE
 - **Dependencies:** 070, 072
 - **Estimate:** S
 
+## T-086 — Implement Auth.js magic-link provider for passwordless sign-in (USER + guest upgrade)
+
+<!-- issue: bookeasy:T-086 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication
+- **Context:** OAuth alone is insufficient for guests who want a low-friction login path to access bookings; passwordless email magic links are required.
+- **Scope Included:** Auth.js Email provider wiring, required env/config validation, token/session callback mapping to `USER` role semantics, and safe fallback when email provider is unavailable.
+- **Scope Excluded:** SMS OTP authentication and enterprise IdP flows.
+- **Acceptance Criteria:**
+- [ ] Auth.js Email provider is configured with validated env vars and startup-safe errors
+- [ ] Magic-link sign-in creates/reuses deterministic account identity by canonical email
+- [ ] Session/JWT role payload remains compatible with `USER` role semantics and admin protections
+- **Implementation Notes:** Update `auth.ts`, add provider config utility under `lib/security/**`, and wire transport adapter through existing email infrastructure from `T-041`.
+- **Dependencies:** 041, 070, 080
+- **Estimate:** M
+
+## T-087 — Add magic-link UX for login/register and guest-to-user booking handoff
+
+<!-- issue: bookeasy:T-087 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication/Booking UX
+- **Context:** Users need a clear “email me a sign-in link” flow from login/register surfaces, including post-click guidance and return-to continuity.
+- **Scope Included:** Login/register magic-link request forms, success/pending states, expired/invalid link handling, and return-to routing back to `/bookings` or originating booking path.
+- **Scope Excluded:** Marketing email copy customization.
+- **Acceptance Criteria:**
+- [ ] Login/register pages support magic-link request with user-safe success/error states
+- [ ] Clicking a valid magic link signs user in and returns them to intended `returnTo` page
+- [ ] Post-auth flow preserves booking ownership linking behavior for previously guest-created bookings
+- **Implementation Notes:** Extend `app/(auth)/login/page.tsx`, `app/(auth)/register/page.tsx`, and callback/error handling routes; reuse ownership claim hook from `T-071`.
+- **Dependencies:** 071, 072, 086
+- **Estimate:** M
+
+## T-088 — Add security and regression test coverage for magic-link auth flow
+
+<!-- issue: bookeasy:T-088 -->
+
+Status: TODO
+
+- **Feature Area:** QA/Security
+- **Context:** Magic-link auth introduces token misuse/expiration risks and must be covered to avoid auth regressions.
+- **Scope Included:** Unit/integration tests for request validation, callback token handling, expired/invalid token errors, return-to continuity, and role/ownership invariants.
+- **Scope Excluded:** Live end-to-end email provider delivery tests against production infrastructure.
+- **Acceptance Criteria:**
+- [ ] Tests cover magic-link request success/failure validation paths and stable error mapping
+- [ ] Tests cover callback success, expired token, and invalid token flows with safe UX messages
+- [ ] Tests verify authenticated session role and `/bookings` ownership enforcement remain intact after magic-link login
+- **Implementation Notes:** Add tests under `tests/unit/security/**`, `tests/unit/integration/**`, and route-specific API tests with mocked transport/provider boundaries.
+- **Dependencies:** 086, 087
+- **Estimate:** M
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.
