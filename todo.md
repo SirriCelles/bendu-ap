@@ -1826,16 +1826,16 @@ Status: TODO
 
 <!-- issue: bookeasy:T-079 -->
 
-Status: TODO
+Status: DONE
 
 - **Feature Area:** Booking/API
 - **Context:** Existing guest booking endpoints are insufficient for account dashboard list UX (status filters + pagination + stable ordering).
 - **Scope Included:** Add/extend owner-facing list/detail contract (`/api/bookings/me`, `/api/bookings/[bookingId]`) for status filters, page params, and deterministic sort.
 - **Scope Excluded:** Admin booking APIs.
 - **Acceptance Criteria:**
-- [ ] `GET /api/bookings/me` supports `status`, `page`, `pageSize` query params with validated bounds
-- [ ] Response includes pagination metadata and stable default ordering
-- [ ] Ownership checks are enforced server-side and return stable forbidden/not-found errors
+- [x] `GET /api/bookings/me` supports `status`, `page`, `pageSize` query params with validated bounds
+- [x] Response includes pagination metadata and stable default ordering
+- [x] Ownership checks are enforced server-side and return stable forbidden/not-found errors
 - **Implementation Notes:** Add/extend schemas in `lib/validation/**`; implement handler updates in `app/api/bookings/**`; include request correlation/log fields.
 - **Dependencies:** 029, 072
 - **Estimate:** M
