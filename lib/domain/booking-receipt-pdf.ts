@@ -7,15 +7,7 @@ function escapePdfText(input: string): string {
 }
 
 function formatMoney(amountMinor: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat("en-CM", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(amountMinor);
-  } catch {
-    return `${currency} ${amountMinor}`;
-  }
+  return `${currency} ${amountMinor.toLocaleString("en-US")}`;
 }
 
 function formatDateLabel(value: string): string {
@@ -35,6 +27,8 @@ function formatDateLabel(value: string): string {
 
 function toReceiptLines(receipt: BookingReceiptResponse["data"]): string[] {
   return [
+    "",
+    "",
     "BookEasy Booking Receipt",
     "",
     `Confirmation Number: ${receipt.booking.bookingId}`,
@@ -45,7 +39,6 @@ function toReceiptLines(receipt: BookingReceiptResponse["data"]): string[] {
     `Property: Alonta Towers Guest House`,
     `Location: Upstation, Bamenda, NorthWest Region, Cameroon`,
     `Room: ${receipt.room.title}`,
-    `Room Slug: ${receipt.room.slug}`,
     `Room Snapshot: ${receipt.room.thumbnailUrl ?? "N/A"}`,
     "",
     `Guest Name: ${receipt.booking.guest.fullName}`,
@@ -65,11 +58,21 @@ function toReceiptLines(receipt: BookingReceiptResponse["data"]): string[] {
 }
 
 export function renderBookingReceiptPdf(receipt: BookingReceiptResponse["data"]): Buffer {
-  const lines = toReceiptLines(receipt).map((line) => `(${escapePdfText(line)}) Tj`);
+  const lines = toReceiptLines(receipt);
+  const textCommands = lines
+    .map((line, index) => {
+      const escaped = `(${escapePdfText(line)}) Tj`;
+      if (index === 0) {
+        return escaped;
+      }
+      return `0 -16 Td\n${escaped}`;
+    })
+    .join("\n");
+
   const streamBody = `BT
 /F1 12 Tf
 50 790 Td
-${lines.join("\nT*\n")}
+${textCommands}
 ET`;
 
   const objects: string[] = [
