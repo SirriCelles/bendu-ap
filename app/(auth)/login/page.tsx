@@ -48,7 +48,11 @@ function resolveAuthErrorMessage(errorCode: string | undefined): string | null {
   }
 
   if (errorCode === "EmailProviderUnavailable") {
-    return "Magic-link login is temporarily unavailable. Please use Google or password sign-in.";
+    return "Magic-link login is temporarily unavailable. Please use Google sign-in.";
+  }
+
+  if (errorCode === "AdapterError") {
+    return "Magic-link login is not ready yet. Please try again shortly.";
   }
 
   return "Sign-in failed. Please retry.";
@@ -91,7 +95,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <div className="mt-5 flex items-center justify-end text-sm">
               <Link
                 href={`/register?returnTo=${encodeURIComponent(returnTo)}`}
-                className="text-muted-foreground underline underline-offset-2"
+                className="text-muted-foreground underline underline-offset-2 transition-colors hover:text-primary"
               >
                 Create an account
               </Link>
@@ -111,10 +115,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     email,
                     redirectTo: returnTo,
                   });
-                } catch {
-                  redirect(
-                    `/login?returnTo=${encodeURIComponent(returnTo)}&error=EmailProviderUnavailable`
-                  );
+                } catch (error) {
+                  if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+                    throw error;
+                  }
+                  redirect(`/login?returnTo=${encodeURIComponent(returnTo)}&error=AdapterError`);
                 }
               }}
               className="space-y-3"
@@ -132,7 +137,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 className="h-12 w-full justify-center border-[#d8d8dc] bg-white text-base font-normal text-foreground"
               >
                 <Image
-                  src="/icon/magic-svgrepo-com.svg"
+                  src="/icon/magic-wand-wizard-svgrepo-com.svg"
                   alt=""
                   width={16}
                   height={16}
@@ -171,11 +176,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
             <p className="mt-10 text-center text-xs text-muted-foreground">
               By continuing, you agree to our{" "}
-              <Link href="/terms" className="underline underline-offset-2">
+              <Link
+                href="/terms"
+                className="underline underline-offset-2 transition-colors hover:text-primary"
+              >
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="underline underline-offset-2">
+              <Link
+                href="/privacy"
+                className="underline underline-offset-2 transition-colors hover:text-primary"
+              >
                 Privacy Policy
               </Link>
               .

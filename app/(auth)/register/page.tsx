@@ -30,6 +30,10 @@ function resolveSafeReturnTo(value: string | undefined): string {
   return trimmed;
 }
 
+function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+
 function resolveAuthErrorMessage(errorCode: string | undefined): string | null {
   if (!errorCode) {
     return null;
@@ -48,7 +52,11 @@ function resolveAuthErrorMessage(errorCode: string | undefined): string | null {
   }
 
   if (errorCode === "EmailProviderUnavailable") {
-    return "Magic-link signup is temporarily unavailable. Please use Google or credentials.";
+    return "Magic-link signup is temporarily unavailable. Please use Google sign-in.";
+  }
+
+  if (errorCode === "AdapterError") {
+    return "Magic-link signup is not ready yet. Please try again shortly.";
   }
 
   return "Sign-up failed. Please retry.";
@@ -91,7 +99,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             <div className="mt-5 flex items-center justify-end text-sm">
               <Link
                 href={`/login?returnTo=${encodeURIComponent(returnTo)}`}
-                className="text-muted-foreground underline underline-offset-2"
+                className="text-muted-foreground underline underline-offset-2 transition-colors hover:text-primary"
               >
                 Already have an account?
               </Link>
@@ -102,23 +110,53 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             <form
               action={async (formData) => {
                 "use server";
+                const fullName = String(formData.get("fullName") ?? "").trim();
                 const email = String(formData.get("email") ?? "").trim();
-                if (!email) {
+                if (!fullName || !email) {
                   return;
                 }
                 try {
+                  const { prisma } = await import("@/lib/db/prisma");
+                  const normalizedEmail = normalizeEmail(email);
+                  const existingUser = await prisma.user.findUnique({
+                    where: { email: normalizedEmail },
+                    select: { id: true, name: true },
+                  });
+
+                  if (!existingUser) {
+                    await prisma.user.create({
+                      data: {
+                        email: normalizedEmail,
+                        name: fullName,
+                      },
+                    });
+                  } else if (!existingUser.name || existingUser.name.trim().length === 0) {
+                    await prisma.user.update({
+                      where: { id: existingUser.id },
+                      data: { name: fullName },
+                    });
+                  }
+
                   await signIn("resend", {
-                    email,
+                    email: normalizedEmail,
                     redirectTo: returnTo,
                   });
-                } catch {
-                  redirect(
-                    `/register?returnTo=${encodeURIComponent(returnTo)}&error=EmailProviderUnavailable`
-                  );
+                } catch (error) {
+                  if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+                    throw error;
+                  }
+                  redirect(`/register?returnTo=${encodeURIComponent(returnTo)}&error=AdapterError`);
                 }
               }}
               className="space-y-3"
             >
+              <Input
+                name="fullName"
+                type="text"
+                required
+                placeholder="Full name"
+                className="h-12 rounded-md border-[#d8d8dc] bg-white"
+              />
               <Input
                 name="email"
                 type="email"
@@ -132,7 +170,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 className="h-12 w-full justify-center border-[#d8d8dc] bg-white text-base font-normal text-foreground"
               >
                 <Image
-                  src="/icon/magic-svgrepo-com.svg"
+                  src="/icon/magic-wand-wizard-svgrepo-com.svg"
                   alt=""
                   width={16}
                   height={16}
@@ -171,11 +209,17 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
 
             <p className="mt-10 text-center text-xs text-muted-foreground">
               By continuing, you agree to our{" "}
-              <Link href="/terms" className="underline underline-offset-2">
+              <Link
+                href="/terms"
+                className="underline underline-offset-2 transition-colors hover:text-primary"
+              >
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="underline underline-offset-2">
+              <Link
+                href="/privacy"
+                className="underline underline-offset-2 transition-colors hover:text-primary"
+              >
                 Privacy Policy
               </Link>
               .
