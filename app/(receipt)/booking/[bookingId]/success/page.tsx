@@ -207,6 +207,7 @@ export default async function BookingSuccessPage({
 
   const receiptState = await loadBookingReceipt(resolvedParams.bookingId);
   const session = await auth();
+  const bookingsHref = session?.user?.id ? "/bookings" : "/login?returnTo=/bookings";
   const retryHref = `/booking/${encodeURIComponent(resolvedParams.bookingId)}/success?retry=${
     resolvedSearchParams.retry === "1" ? "2" : "1"
   }`;
@@ -399,10 +400,7 @@ export default async function BookingSuccessPage({
         <div className="mt-3 flex flex-col justify-center gap-2 sm:flex-row">
           {session?.user?.id ? <ResendReceiptButton bookingId={resolvedParams.bookingId} /> : null}
           <Button asChild>
-            <Link href="/bookings">See My Bookings</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/login?returnTo=/bookings">Sign In To Manage Bookings</Link>
+            <Link href={bookingsHref}>View Bookings</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href="/">Go Home</Link>

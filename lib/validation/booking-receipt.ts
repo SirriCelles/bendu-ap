@@ -8,6 +8,7 @@ import { z } from "zod";
 const trimmedNonEmptyString = z.string().trim().min(1).max(191);
 const emailSchema = z.email().trim().toLowerCase().max(320);
 const phoneSchema = z.string().trim().max(32);
+const thumbnailUrlSchema = z.union([z.url(), z.string().trim().regex(/^\/.*/)]).nullable();
 const currencySchema = z.enum(["XAF", "EUR", "USD"]);
 const moneyMinorSchema = z.number().int().min(0).max(1_000_000_000);
 const bookingStatusSchema = z.enum(["RESERVED", "CONFIRMED", "CANCELLED", "EXPIRED"]);
@@ -43,7 +44,7 @@ export const bookingReceiptResponseSchema = z.object({
       slug: z.string().trim().min(1).max(191),
       title: z.string().trim().min(1).max(191),
       unitCode: z.string().trim().min(1).max(64),
-      thumbnailUrl: z.url().nullable(),
+      thumbnailUrl: thumbnailUrlSchema,
     }),
     totals: z.object({
       subtotalMinor: moneyMinorSchema,

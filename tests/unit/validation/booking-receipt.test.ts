@@ -76,6 +76,20 @@ describe("parseBookingReceiptResponse", () => {
     expect(parsed.data.totals.currency).toBe("XAF");
   });
 
+  it("accepts relative room thumbnail paths", () => {
+    const parsed = parseBookingReceiptResponse({
+      data: {
+        ...validReceipt().data,
+        room: {
+          ...validReceipt().data.room,
+          thumbnailUrl: "/images/landing/room-image.jpg",
+        },
+      },
+    });
+
+    expect(parsed.data.room.thumbnailUrl).toBe("/images/landing/room-image.jpg");
+  });
+
   it("fails when required booking/payment/room/totals fields are missing", () => {
     try {
       parseBookingReceiptResponse({
