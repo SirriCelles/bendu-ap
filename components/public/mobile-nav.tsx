@@ -72,7 +72,7 @@ export function MobileNav({ user }: MobileNavProps) {
           </Button>
           {user ? (
             <Link
-              href="/bookings"
+              href="/dashboard"
               className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
               onClick={() => setOpen(false)}
             >
@@ -85,12 +85,12 @@ export function MobileNav({ user }: MobileNavProps) {
           ) : (
             <>
               <Button asChild variant="outline">
-                <Link href="/login?returnTo=/bookings" onClick={() => setOpen(false)}>
+                <Link href="/login?returnTo=/dashboard" onClick={() => setOpen(false)}>
                   Login
                 </Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/register?returnTo=/bookings" onClick={() => setOpen(false)}>
+                <Link href="/register?returnTo=/dashboard" onClick={() => setOpen(false)}>
                   Sign Up
                 </Link>
               </Button>

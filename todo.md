@@ -2028,6 +2028,24 @@ Verification: 2026-02-21 (`pnpm exec vitest run tests/unit/security/prisma-auth-
 - **Dependencies:** 086, 087
 - **Estimate:** M
 
+## T-089 — Create user dashboard blueprint page and wire public CTAs
+
+<!-- issue: bookeasy:T-089 -->
+
+Status: TODO
+
+- **Feature Area:** Authentication/Navigation UX
+- **Context:** Users now need a clear landing page for post-auth account actions before full dashboard modules are built.
+- **Scope Included:** Add a minimal authenticated `/dashboard` blueprint and route `My Dashboard` / `View Bookings` public CTAs to it.
+- **Scope Excluded:** Full dashboard business features (filters, metrics, cancellation/review widgets, account settings workflows).
+- **Acceptance Criteria:**
+- [ ] Authenticated users can open `/dashboard` and see a simple dashboard shell with links to bookings/account areas
+- [ ] Public header/mobile `My Dashboard` controls route to `/dashboard`
+- [ ] Public `View Bookings` CTA routes authenticated users to `/dashboard` and unauthenticated users to `/login?returnTo=/dashboard`
+- **Implementation Notes:** Implement shell in `app/(app)/dashboard/page.tsx`; update link wiring in `components/public/public-header.tsx`, `components/public/mobile-nav.tsx`, and receipt/success CTA surfaces.
+- **Dependencies:** 072, 085
+- **Estimate:** S
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.

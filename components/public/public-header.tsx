@@ -48,7 +48,7 @@ export async function PublicHeader() {
           </Button>
           {user ? (
             <Link
-              href="/bookings"
+              href="/dashboard"
               aria-label="Open user dashboard"
               className="hidden items-center gap-2 rounded-full border border-white/70 bg-transparent px-2 py-1 text-white hover:bg-background/20 md:inline-flex"
             >
@@ -66,7 +66,7 @@ export async function PublicHeader() {
                 variant="secondary"
                 className="hidden border-white/70 bg-transparent text-white hover:bg-background/20 hover:text-white md:inline-flex"
               >
-                <Link href="/login?returnTo=/bookings">Login</Link>
+                <Link href="/login?returnTo=/dashboard">Login</Link>
               </Button>
               <Button
                 asChild
@@ -74,7 +74,7 @@ export async function PublicHeader() {
                 size="sm"
                 className="hidden border-white/70 bg-transparent text-white hover:bg-background/20 hover:text-white md:inline-flex"
               >
-                <Link href="/register?returnTo=/bookings">Sign Up</Link>
+                <Link href="/register?returnTo=/dashboard">Sign Up</Link>
               </Button>
             </>
           )}

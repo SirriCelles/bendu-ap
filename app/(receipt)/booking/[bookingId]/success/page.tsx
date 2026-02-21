@@ -207,7 +207,7 @@ export default async function BookingSuccessPage({
 
   const receiptState = await loadBookingReceipt(resolvedParams.bookingId);
   const session = await auth();
-  const bookingsHref = session?.user?.id ? "/bookings" : "/login?returnTo=/bookings";
+  const bookingsHref = session?.user?.id ? "/dashboard" : "/login?returnTo=/dashboard";
   const retryHref = `/booking/${encodeURIComponent(resolvedParams.bookingId)}/success?retry=${
     resolvedSearchParams.retry === "1" ? "2" : "1"
   }`;

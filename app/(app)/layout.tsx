@@ -9,7 +9,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await auth();
   const role = resolveUserRole(session?.user?.role);
   if (!session?.user?.id || !isAuthenticatedUserRole(role)) {
-    redirect("/login?returnTo=/bookings");
+    redirect("/login?returnTo=/dashboard");
   }
 
   return <>{children}</>;

@@ -97,13 +97,9 @@ describe("BookingSuccessPage SSR", () => {
     expect(screen.getByRole("heading", { name: "Thank You For Booking" })).toBeInTheDocument();
     expect(screen.getByText("bk_123")).toBeInTheDocument();
     expect(screen.getAllByText("Deluxe Studio").length).toBeGreaterThan(0);
-    expect(screen.getByRole("link", { name: "See My Bookings" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "View Bookings" })).toHaveAttribute(
       "href",
-      "/bookings"
-    );
-    expect(screen.getByRole("link", { name: "Sign In To Manage Bookings" })).toHaveAttribute(
-      "href",
-      "/login?returnTo=/bookings"
+      "/login?returnTo=/dashboard"
     );
     expect(screen.getByRole("link", { name: "Go Home" })).toHaveAttribute("href", "/");
   });
