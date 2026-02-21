@@ -39,7 +39,7 @@ function resolveAuthErrorMessage(errorCode: string | undefined): string | null {
   }
 
   if (errorCode === "OAuthCallbackError" || errorCode === "OAuthAccountNotLinked") {
-    return "We could not complete OAuth sign-in. Please try again.";
+    return "We could not complete Log in. Please try again";
   }
 
   return "Sign-in failed. Please retry.";

@@ -1930,6 +1930,24 @@ Status: TODO
 - **Dependencies:** 072, 078, 079, 082, 083
 - **Estimate:** M
 
+## T-085 — Add authenticated profile entry in public header/mobile nav for dashboard access
+
+<!-- issue: bookeasy:T-085 -->
+
+Status: DONE
+
+- **Feature Area:** Authentication/Navigation UX
+- **Context:** After successful sign-in/sign-up, users need an immediate visual account indicator and quick path to their booking dashboard from public pages.
+- **Scope Included:** Session-aware public header/mobile nav rendering with profile avatar/icon and dashboard link handoff.
+- **Scope Excluded:** Full account settings menu and sign-out dropdown workflows.
+- **Acceptance Criteria:**
+- [x] Authenticated users see a profile icon/image control in public header and mobile nav
+- [x] Clicking profile control routes user to canonical dashboard entry (`/bookings`)
+- [x] Logged-out users continue to see `Login` / `Sign Up` CTAs unchanged
+- **Implementation Notes:** Implement in `components/public/public-header.tsx` and `components/public/mobile-nav.tsx` using `auth()` session data; keep desktop/mobile behavior aligned.
+- **Dependencies:** 070, 072
+- **Estimate:** S
+
 ## Immediate Next Actions (Start Milestone 0)
 
 1. Execute Task 001 and Task 002 to lock the strict TypeScript baseline and verify Prisma/Neon migration health.

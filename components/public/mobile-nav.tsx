@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu, UserCircle2 } from "lucide-react";
 
 import { primaryCta, primaryNavItems } from "@/components/public/nav-config";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function MobileNav() {
+type MobileNavProps = {
+  user?: {
+    name?: string | null;
+    image?: string | null;
+  } | null;
+};
+
+function getInitials(name: string | null | undefined): string {
+  if (!name) {
+    return "U";
+  }
+
+  const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
+  if (parts.length === 0) {
+    return "U";
+  }
+
+  return parts.map((part) => part.charAt(0).toUpperCase()).join("");
+}
+
+export function MobileNav({ user }: MobileNavProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -50,6 +70,32 @@ export function MobileNav() {
               {primaryCta.label}
             </Link>
           </Button>
+          {user ? (
+            <Link
+              href="/bookings"
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+              onClick={() => setOpen(false)}
+            >
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-muted text-[11px] font-semibold">
+                {getInitials(user.name)}
+              </span>
+              <UserCircle2 className="h-4 w-4" aria-hidden />
+              My Dashboard
+            </Link>
+          ) : (
+            <>
+              <Button asChild variant="outline">
+                <Link href="/login?returnTo=/bookings" onClick={() => setOpen(false)}>
+                  Login
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/register?returnTo=/bookings" onClick={() => setOpen(false)}>
+                  Sign Up
+                </Link>
+              </Button>
+            </>
+          )}
         </nav>
       </DialogContent>
     </Dialog>
